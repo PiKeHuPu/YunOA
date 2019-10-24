@@ -19,11 +19,11 @@
               <h4>基本信息</h4>
             </legend>
             <div class="form-group has-feedback">
-                <label class="col-sm-2 control-label">姓名</label>
+                <label class="col-sm-2 control-label">姓名<span style="color: red; font-size: 20px">*</span></label>
                 <div class="col-sm-3">
                     <input class="form-control" name="name" type="text" value=""/>
                 </div>
-                <label class="col-sm-2 control-label">性别</label>
+                <label class="col-sm-2 control-label">性别<span style="color: red; font-size: 20px">*</span></label>
                 <div class="col-sm-3">
                   <select class="form-control" name="gender">
                     <option value="male">男</option>
@@ -34,17 +34,17 @@
             </div>
 
             <div class="form-group has-feedback">
-                <label class="col-sm-2 control-label">生日</label>
+                <label class="col-sm-2 control-label">生日&nbsp;&nbsp;</label>
                 <div class="col-sm-3">
                     <input type="text" class="form-control pull-right form_datetime" name="birthday"/>
                 </div>
-                <label class="col-sm-2 control-label">用户名</label>
+                <label class="col-sm-2 control-label">用户名<span style="color: red; font-size: 20px">*</span></label>
                 <div class="col-sm-3">
                     <input type="text" class="form-control" name="username"/>
                 </div>
             </div>
             <div class="form-group has-feedback">
-                <label class="col-sm-2 control-label">状态</label>
+                <label class="col-sm-2 control-label">状态<span style="color: red; font-size: 20px">*</span></label>
                 <div class="col-sm-6">
                     <label class="control-label">
                       <input type="radio" class="minimal" name="is_active"  value="True" checked>启用
@@ -58,11 +58,12 @@
               <h4>密码信息</h4>
             </legend>
             <div class="form-group has-feedback">
-                <label class="col-sm-2 control-label">密码</label>
+                <label class="col-sm-2 control-label">密码<span style="color: red; font-size: 20px">*</span></label>
                 <div class="col-sm-3">
                     <input class="form-control" name="password" type="password" value=""/>
+                    <span>6-20位数字或字母</span>
                 </div>
-                <label class="col-sm-2 control-label">确认密码</label>
+                <label class="col-sm-2 control-label">确认密码<span style="color: red; font-size: 20px">*</span></label>
                 <div class="col-sm-3">
                     <input class="form-control" name="confirm_password" type="password" value=""/>
                 </div>
@@ -71,11 +72,11 @@
               <h4>联系信息</h4>
             </legend>
             <div class="form-group has-feedback">
-                <label class="col-sm-2 control-label">手机</label>
+                <label class="col-sm-2 control-label">手机<span style="color: red; font-size: 20px">*</span></label>
                 <div class="col-sm-3">
                     <input class="form-control" name="mobile" type="text"/>
                 </div>
-                <label class="col-sm-2 control-label">邮箱</label>
+                <label class="col-sm-2 control-label">邮箱<span style="color: red; font-size: 20px">*</span></label>
                 <div class="col-sm-3">
                     <input class="form-control" name="email" type="text"/>
                 </div>
@@ -121,7 +122,7 @@
                 <div class="col-sm-6">
                     {% for role in roles %}
                     <label class="control-label">
-                      <input type="checkbox" class="minimal" name="roles" value="{{ role.id }}" {% if role in user_roles %}checked{% endif %}>
+                      <input type="checkbox" class="minimal" name="roles" value="{{ role.id }}" {% if role in user_roles or role.id == 14 %}checked{% endif %}>
                         {{ role.title }}
                     </label>
                     {% endfor %}
