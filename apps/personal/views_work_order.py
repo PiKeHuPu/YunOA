@@ -162,7 +162,7 @@ class WorkOrderListView(LoginRequiredMixin, View):
 
     def get(self, request):
         fields = ['id', 'number', 'title', 'type', 'status', 'start_time', 'end_time', 'structure__title',
-                  'create_time', 'advance', 'adv_payment', 'cretor__name']
+                  'create_time', 'advance', 'adv_payment', 'cretor__name', 'cost']
         filters = dict()
         if request.GET.get('number'):
             filters['number__contains'] = request.GET.get('number')
