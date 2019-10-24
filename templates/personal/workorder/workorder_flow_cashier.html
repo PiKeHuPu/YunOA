@@ -1,0 +1,112 @@
+{% extends 'base-layer.html' %}
+{% load staticfiles %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+{% endblock %}
+
+{% block main %}
+    <div class="box box-danger">
+        <form class="form-horizontal" id="addForm" method="post">
+            {% csrf_token %}
+            <input type="hidden" name='id' value="{{ flow.id }}"/>
+            <div class="box-body">
+                <fieldset>
+                    <legend>
+                        <h4>设置出纳</h4>
+                    </legend>
+                    <div class="form-group has-feedback">
+                        <div class="col-sm-3">
+                            <select class="form-control" name="user" id="user">
+                                {{ flow.structure.title|default:"--职员--" }} </option>
+                                {% for s in users %}
+                                    <option value={{ s.id }}
+                                                    {% if cashier == s.id %} selected="selected"{% endif %}
+                                    > {{ s.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="box-footer ">
+                <div class="row span7 text-center ">
+                    <button type="button" id="btnSave" class="btn btn-info margin-right ">保存</button>
+                </div>
+            </div>
+
+            <div class="box-body">
+                <fieldset>
+                    <legend>
+                        <h4>设置财务总监</h4>
+                    </legend>
+                    <div class="form-group has-feedback">
+                        <div class="col-sm-3">
+                            <select class="form-control" name="CFO" id="CFO">
+                                {{ flow.structure.title|default:"--职员--" }} </option>
+                                {% for s in users %}
+                                    <option value={{ s.id }}
+                                                    {% if CFO == s.id %} selected="selected"{% endif %}
+                                    > {{ s.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="box-footer ">
+                <div class="row span7 text-center ">
+                    <button type="button" onclick="saveCFO()" class="btn btn-info margin-right ">保存</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'plugins/combo-select/jquery.combo.select.js' %}"></script>
+    <script src="{% static 'plugins/select3/jquery.multi-select.js' %}"></script>
+    <script>
+        $("#btnSave").click(function () {
+            var data = {'user_id': $("#user").val(), 'job_type': '0'};
+            $.ajax({
+                type: "POST",
+                url: "{% url 'system-personal:workorder_flow_cashier' %}",
+                data: JSON.stringify(data),
+                cache: false,
+                success: function (msg) {
+                    if (msg.status == 'success') {
+                        layer.alert('数据保存成功！', {icon: 1}, function (index) {
+                            parent.layer.close();
+                        });
+                    } else {
+                        layer.alert('数据保存失败', {icon: 5});
+                        //$('errorMessage').html(msg.message)
+                    }
+                    return;
+                }
+            });
+        });
+        function saveCFO() {
+            var data = {'user_id': $("#CFO").val(), 'job_type': '1'};
+            $.ajax({
+                type: "POST",
+                url: "{% url 'system-personal:workorder_flow_cashier' %}",
+                data: JSON.stringify(data),
+                cache: false,
+                success: function (msg) {
+                    if (msg.status == 'success') {
+                        layer.alert('数据保存成功！', {icon: 1}, function (index) {
+                        });
+                    } else {
+                        layer.alert('数据保存失败', {icon: 5});
+                        //$('errorMessage').html(msg.message)
+                    }
+                    return;
+                }
+            });
+        }
+    </script>
+{% endblock %}

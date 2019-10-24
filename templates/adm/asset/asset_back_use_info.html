@@ -1,0 +1,142 @@
+{% extends 'base-layer.html' %}
+{% load staticfiles %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-datetimepicker.min.css' %}">
+{% endblock %}
+
+{% block main %}
+    <div class="box box-danger">
+        <form class="form-horizontal" id="addForm" method="post">
+
+            {% csrf_token %}
+            <div class="box-body">
+                <fieldset>
+                    <legend>
+                    </legend>
+                    <div class="form-group has-feedback">
+                        <input class="form-control" name="operator" type="hidden" value="{{ asset.operator }}"/>
+                        <input class="form-control" name="id" type="hidden" value="{{ asset.id }}"/>
+                        <label class="col-sm-2 control-label">资产编号</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" name="assetNum" type="text" value="{{ asset.assetNum }}"
+                                   disabled="1"/>
+                        </div>
+                        <label class="col-sm-2 control-label">仓库</label>
+                        <div class="col-sm-3">
+                            <select class="form-control select2" style="width:100%;" name="assetType" disabled="1">
+                                <option value="{{ asset.assetType_id }}">{{ asset.assetType.name }}</option>
+                                {% for type in asset_type %}
+                                    <option value="{{ type.id }}">{{ type.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">名称</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" name="brand" type="text" value="{{ asset.brand }}"
+                                   disabled="1"/>
+                        </div>
+                        <label class="col-sm-2 control-label">型号</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" name="model" type="text" value="{{ asset.model }}"
+                                   disabled="1"/>
+                        </div>
+
+
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">领用数量</label>
+                        <div class="col-sm-3">
+                            <div class="input-group">
+                                <input class="form-control" name="assetCount" type="Number" min="1" disabled="1"
+                                       max="{{ asset_use.useCount }}" value="{{ asset_use.useCount }}"/>
+                                <span class="input-group-addon">{{ asset.assetUnit }}</span>
+                            </div>
+                        </div>
+
+                        <label class="col-sm-2 control-label">归还数量</label>
+                        <div class="col-sm-3">
+                            <div class="input-group">
+                                <input class="form-control" name="assetCount" type="Number" min="1" id="backCount"
+                                       max="{{ asset_use.useCount }}" value="{{ asset_use.useCount }}"/>
+                                <span class="input-group-addon">{{ asset.assetUnit }}</span>
+                            </div>
+
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="box-footer ">
+                <div class="row span7 text-center ">
+                    <button type="button" id="btnCancel" class="btn btn-default margin-right ">重置</button>
+                    <button type="button" id="btnSave" class="btn btn-info margin-right ">保存</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
+    <script type="text/javascript">
+
+
+        $("#btnSave").click(function () {
+            if ($("#backCount").val() == "") {
+                layer.alert("归还数量不能为空", {icon: 5});
+                return
+            }
+            var useCount = Number({{ asset_use.useCount }});
+            var backCount = Number($("#backCount").val());
+            if (backCount <= 0) {
+                layer.alert("归还数量为正整数", {icon: 5});
+                return
+            }
+            if (backCount > useCount) {
+                layer.alert("归还数量超出领用数量({{ asset_use.useCount }})", {icon: 5});
+                return
+            }
+            var data = {
+                id: {{ asset_use.id }},
+                backCount: backCount
+            };
+            $.ajax({
+                type: "POST",
+                url: "{% url 'personal-asset-use-back' %}",
+                data: JSON.stringify(data),
+                cache: false,
+                success: function (msg) {
+                    if (msg.status == 'success') {
+                        layer.alert('归还成功！', {icon: 1}, function (index) {
+                            parent.layer.closeAll(); //关闭所有弹窗
+                        });
+                    } else if (msg.status == 'fail') {
+                        layer.alert(msg.asset_form_errors, {icon: 5});
+                    }
+                    return;
+                }
+            });
+        });
+
+        /*点取消刷新新页面*/
+        $("#btnCancel").click(function () {
+            window.location.reload();
+
+        })
+
+
+        // select2
+        $(function () {
+            //Initialize Select2 Elements
+            $(".select2").select2();
+        });
+    </script>
+
+{% endblock %}

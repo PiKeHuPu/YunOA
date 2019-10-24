@@ -1,0 +1,9 @@
+{% extends 'base-layer.html' %}
+{% load staticfiles %}
+{% block main %}
+    <a href="{{ MEDIA_URL }}{{ bulletin.file_content }}">Open</a>
+{% endblock %}
+
+{% block javascripts %}
+
+{% endblock %}

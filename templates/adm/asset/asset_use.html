@@ -1,0 +1,229 @@
+{% extends "base-left.html" %}
+{% load staticfiles %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugins/datatables/jquery.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+    <!-- iCheck for checkboxes and radio inputs -->
+{% endblock %}
+
+{% block content %}
+
+    <!-- Content Header (Page header) -->
+
+    <section class="content-header margin-bottom">
+        <ol class="breadcrumb">
+            <li><a href=""><i class="fa fa-dashboard"></i>办公平台</a></li>
+            {% if menu.parent.parent %}
+                <li class="active"><a href="{{ menu.parent.parent.url }}">{{ menu.parent.parent.title }}</a></li>
+            {% endif %}
+            <li class="active"><a href="{{ menu.url }}">{{ menu.title }}</a></li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div id="devlist">
+            <div class="box box-primary" id="liebiao">
+
+                <div class="box-header">
+                    <form class="form-inline" id="queryForm">
+                        <div class="form-group searchArea margin-r-5 margin-top-5">
+                            <label>设备编号：</label>
+                            <input type="text" name="assetNum" class="form-control inputText" id="assetNum">
+                        </div>
+                        <div class="form-group searchArea margin-r-5 margin-top-5">
+                            <label>所在仓库：</label>
+                            <select class="form-control inputText select2" name="assetType" , id="assetType">
+                                <option></option>
+                                {% for type in asset_types %}
+                                    <option value={{ type.id }}>{{ type.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group searchArea margin-r-5 margin-top-5">
+                            <label>资产型号：</label>
+                            <input type="text" name="model" class="form-control inputText" id="model">
+                        </div>
+                        <div class="form-group searchArea margin-r-5 margin-top-5">
+                            <label>资产状态：</label>
+                            <select class="form-control inputText select2" name="status" , id="status">
+                                <option></option>
+                                {% for status in status_list %}
+                                    <option value={{ status.item }}>{{ status.value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="button" id="btnAssetSearch" class="btn btn-default">
+                            <i class="glyphicon glyphicon-search"></i>查询
+                        </button>
+                    </form>
+                </div>
+                <div class="box-body">
+                    <table id="dtbList" class="display" cellspacing="0" width="100%">
+                        <thead>
+                        <tr valign="middle">
+                            <th><input type="checkbox" id="checkAll"></th>
+                            <th>资产编号</th>
+                            <th>仓库</th>
+                            <th>名称</th>
+                            <th>型号</th>
+                            <th>状态</th>
+                            <th>数量</th>
+                            <th>单位</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <br> <br>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- /.content -->
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables/dataTables.const.js' %}"></script>
+    <script src="{% static 'plugins/datatables/moment.min.js' %}"></script>
+    <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+    <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+    <!-- iCheck 1.0.1 -->
+    <script type="text/javascript">
+        $(function () {
+            $('#ADM-ASSET').addClass('active');
+
+        });
+    </script>
+
+    <script type="text/javascript">
+        var oDataTable = null;
+        $(function () {
+            oDataTable = initTable();
+
+            function initTable() {
+                var oTable = $('#dtbList').DataTable($.extend(true, {"scrollx":true},
+                    DATATABLES_CONSTANT.DATA_TABLES.DEFAULT_OPTION,
+                    {
+                        ajax: {
+                            "url": "{% url 'adm-asset:use-list' %}",
+                            "data": function (d) {
+                                d.assetNum = $("#assetNum").val();
+                                d.assetType = $("#assetType").val();
+                                d.model = $("#model").val();
+                                d.status = $("#status").val();
+                            }
+                        },
+
+                        columns: [
+                            DATATABLES_CONSTANT.DATA_TABLES.COLUMN.CHECKBOX,
+                            {
+                                data: "assetNum",
+                            },
+                            {
+                                data: "assetType__name",
+                            },
+                            {
+                                data: "brand",
+                            },
+                            {
+                                data: "model",
+                            },
+                            {
+                                data: "status",
+                                render: function (data, type, row, meta) {
+                                    if (data == 0) {
+                                        var ret = "<button class='btn btn-primary btn-xs'>闲置</button>";
+                                        return ret;
+                                    }
+                                    if (data == 1) {
+                                        var ret = "<button class='btn  btn-success btn-xs'>在用</button>";
+                                        return ret;
+
+                                    }
+                                    if (data == 2) {
+                                        var ret = "<button class='btn btn-warning btn-xs'>维修</button>";
+                                        return ret;
+
+                                    }
+                                    if (data == 3) {
+                                        var ret = "<button class='btn btn-danger btn-xs'>报废</button>";
+                                        return ret;
+                                    }
+                                    if (data == 4) {
+                                        var ret = "<button class='btn btn-info btn-xs'>售出</button>";
+                                        return ret;
+                                    }
+                                }
+                            },
+                            {
+                                data: "assetCount",
+                            },
+                            {
+                                data: "assetUnit",
+                            },
+                            {
+                                data: "id",
+                                {#width : "10%",#}
+                                bSortable: "false",
+                                render: function (data, type, row, meta) {
+                                    var ret = "<button title='领用' onclick='doUse("
+                                        + data + ")'><i class='glyphicon glyphicon-paperclip'></i></button>";
+                                    return ret;
+                                }
+                            }],
+                    }));
+                return oTable;
+            }
+
+            //刷新页面GET查询请求
+            $("#btnAssetSearch").click(function () {
+                oDataTable.ajax.reload();
+            });
+
+
+            //select选择后刷新页面GET请求
+            $("#select").change(function () {
+                //alert($("#select").val())
+                oDataTable.ajax.reload();
+            });
+            //checkbox全选
+            $("#checkAll").on("click", function () {
+                if ($(this).prop("checked") === true) {
+                    $("input[name='checkList']").prop("checked", $(this).prop("checked"));
+                    $('#example tbody tr').addClass('selected');
+                } else {
+                    $("input[name='checkList']").prop("checked", false);
+                    $('#example tbody tr').removeClass('selected');
+                }
+            });
+
+        });
+
+        function doUse(id) {
+            layer.open({
+                type: 2,
+                title: '领用登记',
+                shadeClose: false,
+                maxmin: true,
+                area: ['800px', '460px'],
+                content: "{% url 'personal-asset-use' %}" + '?id=' + id,
+                end: function () {
+                    window.location.reload();
+                }
+            });
+
+        }
+    </script>
+    <script>
+        $(function () {
+            //Initialize Select2 Elements
+            $(".select2").select2();
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,289 @@
+{% extends 'base-layer.html' %}
+{% load staticfiles %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-datetimepicker.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap-multiselect/bootstrap-multiselect.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/fileinput/fileinput.css' %}">
+
+{% endblock %}
+{% block main %}
+    <div class="box box-danger">
+        <form class="form-horizontal" id="addForm" method="post">
+            {% csrf_token %}
+            <input type="hidden" name='proposer' value="{{ request.user.id }}"/>
+            <div class="box-body">
+                <fieldset>
+                    <legend>
+                        <div class="form-group has-feedback">
+                            <div class="col-sm-8">基础信息</div>
+                        </div>
+                    </legend>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">工作内容</label>
+                        <div class="col-sm-8">
+                            <textarea class="form-control" name="title" id="title" style="height:150px;resize:vertical"
+                            >{{ ap.title }}</textarea>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">申请类型</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" name="title" type="text" id="order-type" disabled="disabled"
+                                   value="{% if ap.type == '0' %}立项报销{% elif ap.type == '1' %}出差报销{% endif %}"/>
+                        </div>
+                        <label class="col-sm-2 control-label">总费用(元)</label>
+
+                        <div class="col-sm-3">
+                            <input class="form-control" name="cost" id="all_fee" {% if ap.type == '1' %}disabled="disabled"{% endif %}
+                                   type="number" name="points" min="0" value="{{ ap.all_fee }}"/>
+                        </div>
+                    </div>
+
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">银行账号</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" name="bank_account" type="text" id="bank-account"
+                               value=
+                                   "{% if ap.bank_account %}{{ ap.bank_account }}{% else %}{{ request.user.bank_card }}{% endif %}"/>
+                        </div>
+                        <label class="col-sm-2 control-label">收款方</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" name="payee" type="text"
+                               value=
+                                   "{% if ap.payee %}{{ ap.payee }}{% else %}{{ request.user.bank_user_name }}{% endif %}"
+                               placeholder="1万元以上必须对公支付" id="payee"/>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">开户银行</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" name="bank_info" type="text" id="bank-info"
+                               value=
+                                   "{% if ap.bank_info %}{{ ap.bank_info}}{% else %}{{ request.user.bank_name }}{% endif %}"/>
+                        </div>
+                        <label class="col-sm-2 control-label">发票类型</label>
+                        <div class="col-sm-3">
+                            <select class="form-control select2" style="width:100%;" name="type" id="invoice"
+                                    multiple="multiple">
+                                {% for i in invoice_list %}
+                                    <option value="{{ i.item }}">{{ i.value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">图片上传(请小于5M)</label>
+                        <div class="col-sm-3">
+                            <div v-show="seen" id="file_be">
+                                <button type="button" class="btn-sm btn-success" onclick="fileRe()">替换</button>
+                                <button type="button" class="btn-sm" onclick="openFile()">预览</button>
+                            </div>
+                            <div class="file-loading" v-show="seen" id="file_no">
+                                <input id="file_content" name="file_content" class="form-control" type="file"/>
+                            </div>
+                        </div>
+                    </div>
+                {% if ap.type == '0' %}
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">费用明细</label>
+                        <div class="col-sm-8">
+                                <textarea class="form-control" name="destination" id="detail" required
+                                          value="{{ ap.detail }}" style="height: 160px;">{{ ap.detail }}</textarea>
+                        </div>
+                    </div>
+                {% endif %}
+                </fieldset>
+
+                {% if ap.type == '1' %}
+                    <fieldset>
+                        <legend>
+                            <div class="form-group has-feedback">
+                                <div class="col-sm-8">出差日期 </div>
+                            </div>
+                        </legend>
+                        <div class="form-group has-feedback">
+                            <label class="col-sm-2 control-label">开始时间</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control pull-right form_datetime" name="start_time"
+                                       id="start-time"
+                                       value="{{ ap.start_time |date:'Y-m-d H:m' }}"/>
+                            </div>
+                            <label class="col-sm-2 control-label">结束时间</label>
+                            <div class="col-sm-3">
+                                <input type="text" class="form-control pull-right form_datetime" name="end_time"
+                                       id="end-time"
+                                       value="{{ ap.end_time |date:'Y-m-d H:m' }}"/>
+                            </div>
+                        </div>
+                    </fieldset>
+
+
+                    <fieldset>
+
+                        <legend>
+                            <div class="form-group has-feedback">
+                                <div class="col-sm-8">费用详情</div>
+                            </div>
+                        </legend>
+                        <div class="form-group has-feedback">
+                            <label class="col-sm-2 control-label">交通费用</label>
+                            <div class="col-sm-3">
+                                <input class="form-control" id="tran_fee" type="number" name="" min="0"
+                                       value="{{ ap.tran_fee }}"/>
+                            </div>
+
+                            <label class="col-sm-2 control-label">住宿费用</label>
+                            <div class="col-sm-3">
+                                <input class="form-control" id="acco_fee" type="number" name="acco_fee"
+                                       min="0" value="{{ ap.acco_fee }}"/>
+                            </div>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <label class="col-sm-2 control-label">餐饮费用</label>
+                            <div class="col-sm-3">
+                                <input class="form-control" id="food_fee" type="number" name="food_fee"
+                                       min="0" value="{{ ap.food_fee }}"/>
+                            </div>
+                            <label class="col-sm-2 control-label">招待费用</label>
+                            <div class="col-sm-3">
+                                <input class="form-control" id="rece_fee" type="number" name="rece_fee"
+                                       min="0" value="{{ ap.rece_fee }}"/>
+                            </div>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <label class="col-sm-2 control-label">其他费用</label>
+                            <div class="col-sm-3">
+                                <input class="form-control" id="other_fee" type="number" name="other_fee"
+                                       min="0" value="{{ ap.other_fee }}"/>
+                            </div>
+
+                        </div>
+                        <div class="form-group has-feedback">
+                            <label class="col-sm-2 control-label">费用明细</label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control" name="destination" id="detail" required
+                                          value="{{ ap.detail }}" style="height: 160px;">{{ ap.detail }}</textarea>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>
+                            <div class="form-group has-feedback">
+                                <div class="col-sm-8">出差详情</div>
+                            </div>
+                        </legend>
+                        <div class="form-group has-feedback">
+                            <label class="col-sm-2 control-label">出发地点</label>
+                            <div class="col-sm-3">
+                                <input class="form-control" name="becity" id="becity" type="text"
+                                       value="{{ ap.becity }}"/>
+                            </div>
+                            <label class="col-sm-2 control-label">目标地点</label>
+                            <div class="col-sm-3">
+                                <input class="form-control" name="destination" id="destination" type="text"
+                                       value="{{ ap.destination }}"/>
+                            </div>
+                        </div>
+
+                        <div class="form-group has-feedback">
+                            <label class="col-sm-2 control-label">随行人员</label>
+                            <div class="col-sm-3">
+                                <select class="form-control select2" style="width:100%;" name="type" id="people"
+                                        multiple="multiple">
+                                    {% for user in users %}
+                                        <option value="{{ user.id }}">{{ user.name }}
+                                            | {{ user.department__title }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <label class="col-sm-2 control-label">交通工具</label>
+                            <div class="col-sm-3">
+                                <select class="form-control select2" style="width:100%;" name="type" id="transport"
+                                        value="{{ ap.transport }}" multiple="multiple">
+                                    {% for tra in transport_list %}
+                                        <option value="{{ tra.item }}">{{ tra.value }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <label class="col-sm-2 control-label">完成情况</label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control" name="completion_info" id="completion_info" required
+                                          value="{{ ap.completion_info }}" style="height: 160px;">{{ ap.completion_info }}</textarea>
+                            </div>
+                        </div>
+                    </fieldset>
+                {% endif %}
+            </div>
+            <div class="box-footer ">
+                <div class="row span7 text-center">
+                    <button type="button" id="btnCancel" class="btn btn-default margin-right ">重置</button>
+                    <button type="button" id="btnSave" class="btn btn-info margin-right ">保存</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-multiselect/bootstrap-multiselect.js' %}"></script>
+    <script src="{% static 'plugins/fileinput/fileinput.js' %}"></script>
+    <script src="{% static 'plugins/fileinput/zh.js' %}"></script>
+
+    <script src="{% static 'js/vue-2.6.10.js' %}"></script>
+    <script type="text/javascript">
+        var ap_type, ap_people, ap_transport, ap_invoice, id, ap_id;
+        ap_type = '{{ ap.type }}';
+        id = '{{ ap.workorder_id }}';
+        ap_id = '{{ ap.id }}'
+        {% if invoice %}
+            ap_invoice = {{ invoice|safe }};
+        {% endif %}
+        {% if ap.type == '0' %}
+
+        {% elif ap.type == '1' %}
+            {% if people %}
+                ap_people = {{ people|safe }};
+            {% endif %}
+            {% if transport %}
+                ap_transport = {{ transport|safe }};
+            {% endif %}
+
+        {% endif %}
+    // 替换上传文件
+        {% if ap.file_content %}
+            var file_content = true;
+            var file_path = "{{ ap.file_content }}";
+            var file_tem = file_path.split('/');
+            var file_name = file_tem[file_tem.length - 1];
+            $("#file_be").prepend("<span>" + file_name + "</span>");
+
+        {% else %}
+            var file_content = false;
+
+        {% endif %}
+        // 预览旧图片
+        function openFile() {
+            layer.open({
+                type: 2,
+                title: "{{ ap.number }}",
+                shadeClose: false,
+                maxmin: true,
+                area: ['560px', '480px'],
+                content: ["{{ MEDIA_URL }}{{ ap.file_content }}"],
+                end: function () {
+                }
+            });
+        }
+    </script>
+    <script src="{% static 'appjs/personal/apply_update.js' %}"></script>
+
+{% endblock %}

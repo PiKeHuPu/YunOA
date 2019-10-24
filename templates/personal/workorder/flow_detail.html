@@ -1,0 +1,158 @@
+{% extends 'base-layer.html' %}
+{% load staticfiles %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/select3/multi-select.css' %}"></link>
+{% endblock %}
+
+{% block main %}
+    <div class="box box-danger">
+        <form class="form-horizontal" id="addForm" method="post">
+            {% csrf_token %}
+            <input type="hidden" name='id' value="{{ flow.id }}"/>
+            <div class="box-body">
+                <fieldset>
+                    <legend>
+                        <h4>审批流程</h4>
+                    </legend>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">部门</label>
+                        <div class="col-sm-3">
+                            <select class="form-control" name="structure" id="structure">
+                                <option value="{{ flow.structure_id|default_if_none:'' }}">
+                                    {{ flow.structure.title|default:"--部门--" }} </option>
+                                {% for s in structures %}
+                                    <option value={{ s.id }}> {{ s.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <label class="col-sm-2 control-label">事件类别</label>
+                        <div class="col-sm-3">
+                            <select class="form-control" name="order_type" id="order_type">
+                                <option value={{ flow.order_type }}> {{ flow.get_order_type_display|default:"--类型--" }}
+                                </option>
+                                {% for s in flow_type %}
+                                    <option value={{ s.0 }}>{{ s.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group has-feedback">
+
+                        <label class="col-sm-2 control-label">申请类别</label>
+                        <div class="col-sm-3">
+                            <select class="form-control" name="order_type" id="pro_type">
+                                <option value={{ flow.pro_type }}> {{ flow.get_pro_type_display|default:"--类型--" }}
+                                </option>
+                                {% for s in pro_type %}
+                                    <option value={{ s.0 }}>{{ s.1 }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <legend>
+                        <h4>基本审批流程</h4>
+                    </legend>
+                    <div class="row">
+                        <div class="col-xs-2"></div>
+                        <div class="col-xs-4">
+                            <label class="col-sm-2" style="padding-left: 0px;">审批流程</label>
+                            <br><br>
+                            <p class="text-maroon">*注意：请按审批流程先后顺序选择用户(由底层向高层选择)</p>
+                            <select id="process" size="8" multiple="multiple" name="process">
+                            {% if flow_users %}
+                                {% for item in process %}
+                                    <option value="{{ item.id }}" selected>{{ item.name }}</option>
+                                {% endfor %}
+                                {% for item in flow_users %}
+                                    <option value="{{ item.id }}">{{ item.name }}</option>
+                                {% endfor %}
+                            {% else %}
+                                {% for item in users %}
+                                    <option value="{{ item.id }}">{{ item.name }}</option>
+                                {% endfor %}
+                            {% endif %}
+                            </select>
+                        </div>
+                        <div class="col-xs-4">
+                            <label class="col-sm-2" style="padding-left: 0px;">抄送</label>
+                            <br><br>
+                            <p class="text-maroon">*注意：不需要留意顺序</p>
+                            <select id="carbonSe" size="8" multiple="multiple" name="carbon">
+                                {% for item in users %}
+                                   <option value="{{ item.id }}" {% if item.id in carbon_user %} selected {% endif %}>
+                                       {{ item.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <legend>
+                        <h4>带条件审批流程</h4>
+                    </legend>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">审批条件</label>
+                        <div class="col-sm-3">
+                            <select class="form-control" name="factor_type" id="factor_type">
+                                <option value=''>--条件--</option>
+                                <option value='0' {% if flow.factor_type == '0' %} selected="selected" {% endif %}>时间(单位:天)</option>
+                                <option value='1' {% if flow.factor_type == '1' %} selected="selected" {% endif %}>金额(单位:元)</option>
+                            </select>
+                        </div>
+
+                        <label class="col-sm-2 control-label">值</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" name="factor" type="text" value="{{ flow.factor }}"
+                                   id="factor"/>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">审批人</label>
+                        <div class="col-sm-3">
+                            <select class="form-control" name="factor_process" id="factor_process">
+                                <option value={{ flow.factor_type }}> {{ order_user|default:"--无--" }}
+                                </option>
+
+                                {% for item in users %}
+                                    {% if item.id == order_user_id %}
+                                        <option value="{{ item.id }}" selected="selected">{{ item.name }}</option>
+                                    {% else %}
+                                        <option value="{{ item.id }}">{{ item.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                </fieldset>
+
+            </div>
+            <div class="box-footer ">
+                <div class="row span7 text-center ">
+                    <button type="button" id="btnCancel" class="btn btn-default margin-right ">重置</button>
+                    <button type="button" id="btnSave" class="btn btn-info margin-right ">保存</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'plugins/combo-select/jquery.combo.select.js' %}"></script>
+    <script src="{% static 'plugins/select3/jquery.multi-select.js' %}"></script>
+    <script>
+        var userInfo = {};
+        var flow_id;
+        {% if flow %} flow_id = {{ flow.id }} {% endif %}
+        {% for item in users %}
+            userInfo["{{ item.name }}"] = "{{ item.id }}";
+            userInfo["{{ item.id }}"] = "{{ item.name }}";
+        {% endfor %}
+    </script>
+    <script src="{% static 'appjs/personal/workorderflow_detail.js' %}"></script>
+{% endblock %}

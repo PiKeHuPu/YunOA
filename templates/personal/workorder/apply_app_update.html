@@ -1,0 +1,353 @@
+{% extends "base-layer.html" %}
+{% load staticfiles %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugins/datatables/jquery.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+{% endblock %}
+<div class="content-wrapper">
+
+
+    {% block main %}
+
+        <!-- Content Header (Page header) -->
+
+        <!-- Main content -->
+
+        <section class="content">
+            <div class="row" {% if ban %}hidden{% endif %}>
+                <div class="col-md-2">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">{% if cashier == '0' %}审批意见{% else %}完成付款{% endif %}</h3>
+
+                            <div class="box-tools">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                        class="fa fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="box-body no-padding">
+
+                            <textarea class="form-control" name="cost" id="desc" type="textarea"
+                                      style="margin: 0px 3px 0px 0px; height: 486px;resize:vertical">{% if cashier == '1' %}付款成功{% endif %}</textarea>
+                            <br>
+                            <div class="text-center">
+                                {% if cashier == '0' %}
+                                    <button type="button" class="btn btn-primary" data-toggle="modal"
+                                            onclick="updateOpin('disagree')">不同意
+                                    </button>
+                                {% endif %}
+                                <button type="button" class="btn btn-danger" onclick="updateOpin('agree')">
+                                    {% if cashier == '1' %}完成付款{% else %}同意{% endif %}
+                                </button>
+                            </div>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                    <!-- /. box -->
+                </div>
+                <!-- /.col -->
+                <div class="col-md-6">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">报销详情</h3>
+
+                            <div class="box-tools">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                        class="fa fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="box-body no-padding">
+
+                            <textarea class="form-control" name="cost" id="desc" type="textarea" disabled="disabled"
+                                      style="margin: 0px 3px 0px 0px; height: 250px; resize:vertical">{{ ap.title }}</textarea>
+                            <br>
+                            {% if ap.file_content %}
+                        <td>
+                            <button type="button" class="btn-sm btn-success" onclick="openFile()">查看附件</button>
+                        </td>
+                    {% endif %}
+                        </div>
+                        <div class="box-body no-padding">
+                            <div class="table-responsive mailbox-messages">
+                                <table class="table" id="tbWorkList" style="table-layout: fixed;">
+                                    <tbody>
+                                    <tr>
+                                        <td style="width:15%;"><strong> 审批单号</strong></td>
+                                        <td>
+                                            <a href="/personal/workorder_Icrt/detail?id={{ ap.workorder.id }}"> {{ ap.workorder.number }}</a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong> 申请类型</strong></td>
+                                        <td>报销：{{ ap.get_type_display }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong> 总费用</strong></td>
+                                        <td>{{ ap.all_fee }}元</td>
+                                    </tr>
+                                    {% if ap.workorder.advance == "1" %}
+                                        <tr>
+                                        <td><strong> 已预支</strong></td>
+                                        <td>{{ ap.workorder.cost }}元</td>
+                                    </tr>
+                                    {% endif %}
+                                    <tr>
+                                        <td><strong> 审批状态</strong></td>
+                                        <td>{{ ap.get_status_display }}</td>
+                                    </tr>
+                                    {% if ap.status == '1' %}
+                                        <tr>
+                                            <td><strong> 当前审批人</strong></td>
+                                            <td>{{ ap.next_user.name }}</td>
+                                        </tr>
+                                    {% endif %}
+                                    <tr>
+                                        <td><strong> 申请时间</strong></td>
+                                        <td>{{ ap.create_time }}</td>
+
+                                    </tr>
+                                    <tr>
+                                        <td><strong> 所在部门</strong></td>
+                                        <td>{{ ap.structure.title }}</td>
+
+                                    </tr>
+                                    <tr>
+                                        <td><strong> 发票类型</strong></td>
+                                        <td>{% for i in invoice_type %} {{ i }};   {% endfor %}</td>
+
+                                    </tr>
+                                    <tr>
+                                        <td><strong> 收款方</strong></td>
+                                        <td>{{ ap.payee }}</td>
+
+                                    </tr>
+
+                                    <tr>
+                                        <td><strong> 银行账户:</strong></td>
+                                        <td>{{ ap.bank_account }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong> 开户行:</strong></td>
+                                        <td>{{ ap.bank_info }}</td>
+                                    </tr>
+
+                                    {% if ap.type == '1' %}
+                                        <tr>
+                                            <td><strong> 时间</strong></td>
+                                            <td>
+                                                <span style="color:green">{{ ap.start_time }}</span>
+                                                -->
+                                                <span style="color:firebrick">{{ ap.end_time }}</span></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong> 行程:</strong></td>
+                                            <td>
+                                                <span style="color:green">{{ ap.becity }} </span>
+                                                -->
+                                                <span style="color:firebrick">{{ ap.destination }}</span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong> 随行人员</strong></td>
+                                            <td>{% if people %}{% for i in people %} {{ i.name }};{% endfor %}{% else %}
+                                                无{% endif %}</td>
+
+                                        </tr>
+                                        <tr>
+                                            <td><strong> 分类费用</strong></td>
+                                            <td>
+                                                <p>交通：{{ ap.tran_fee }}元</p>
+                                                <p>住宿: {{ ap.acco_fee }}元</p>
+                                                <p>餐饮: {{ ap.food_fee }}元</p>
+                                                <p>招待: {{ ap.rece_fee }}元</p>
+                                                <p>其他: {{ ap.other_fee }}元</p>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong> 交通工具</strong></td>
+                                            <td>{% for i in transport %} {{ i }};   {% endfor %}</td>
+                                        </tr>
+
+                                        <!--这里可以加是否预支  advance-->
+                                    {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="box-footer ">
+
+                            </div>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                    <!-- /. end worklist_details box -->
+                    <div class="box">
+                        <div class="box-header with-border">
+                            <i class="fa fa-commenting"></i>
+                            <h3 class="box-title">审批记录</h3>
+
+                            <div class="box-tools pull-right">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                        class="fa fa-minus"></i>
+                                </button>
+                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i
+                                        class="fa fa-times"></i></button>
+                            </div>
+                        </div>
+                        <!-- /.box-header -->
+                        <div class="box-body">
+                            <ul class="products-list product-list-in-box">
+                                <!-- /.item -->
+                                <li class="item">
+                                    <div>
+                                        <small>{{ ap.create_time }}</small>
+                                        <span class="text-green">{{ ap.structure.title }}</span>
+                                        <a href="javascript:void(0)" class="product-title">
+                                            {{ ap.cretor.name }}
+                                        </a>
+                                        <span class="text-orange"><small>创建</small></span>
+
+
+                                    </div>
+                                </li>
+                                {% for wlog in work_order_log %}
+                                    <li class="item">
+                                        {# <div class="product-img">#}
+                                        {# <img src="/media/{{ wlog.creator.image }}" alt="Product Image">#}
+                                        {# </div>#}
+                                        <div>
+
+                                            <small>{{ wlog.create_time }}</small>
+                                            <span class="text-green">{{ wlog.structure.title }}</span>
+                                            <a href="javascript:void(0)" class="product-title">
+                                                {{ wlog.creator.name }}
+                                            </a>
+                                            <span class="text-orange">审批</span>
+                                            <span>{{ wlog.get_record_type_display }}</span>
+
+                                            <span class="text-muted margin-top-5">
+                                            详情：{{ wlog.desc }}
+                                        </span>
+
+
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                    <!-- /. message box -->
+                    <!-- /.col -->
+                </div>
+                <!-- /.col -->
+                <div class="col-md-4">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">报销明细</h3>
+
+                            <div class="box-tools">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                        class="fa fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="box-body no-padding">
+
+                            <textarea class="form-control" name="cost" id="desc" type="textarea" disabled="disabled"
+                                      style="margin: 0px 3px 0px 0px; height: 250px;resize:vertical;">{{ ap.detail }}</textarea>
+                            <br>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                    {% if ap.type == '1' %}
+
+                        <div class="box box-primary">
+                            <div class="box-header with-border">
+                                <h3 class="box-title">完成情况</h3>
+
+                                <div class="box-tools">
+                                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                            class="fa fa-minus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="box-body no-padding">
+
+                            <textarea class="form-control" name="cost" id="desc" type="textarea" disabled="disabled"
+                                      style="margin: 0px 3px 0px 0px; height: 250px;resize:vertical;"> {{ ap.completion_info }}</textarea>
+                                <br>
+                            </div>
+                            <!-- /.box-body -->
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <!-- /.row -->
+        </section>
+
+        <!-- /.content -->
+
+    {% endblock %}
+</div>
+{% block javascripts %}
+    <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables/dataTables.const.js' %}"></script>
+    <script src="{% static 'plugins/datatables/moment.min.js' %}"></script>
+    <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+    <script type="text/javascript">
+
+        function updateOpin(opinion) {
+            var desc = $('#desc').val();
+            var data = {
+                'opinion': opinion,
+                'id': '{{ ap.id }}',
+                'desc': desc,
+                'type': '{{ ap.type }}',
+                'structure': '{{ ap.structure.id }}'
+            };
+            if (opinion == 'disagree' && desc == '') {
+                layer.alert('不同意，请写下审批意见', {icon: 5});
+                return
+            }
+            $.ajax({
+                type: 'POST',
+                url: ["{% url 'personal-workorder_ap_cost_app-update' %}"],
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=UTF-8",
+                cache: false,
+                beforeSend: function () {
+                    this.layerIndex = layer.load(1, {
+                        shade: [0.1, '#fff'] //0.1透明度的白色背景
+                    });
+                },
+                success: function (msg) {
+                    layer.closeAll('loading');
+                    if (msg.status == 'success') {
+                        layer.alert('审批提交成功！', {icon: 1}, function (index) {
+                            parent.layer.closeAll(); //关闭所有弹窗
+                        });
+                    } else {
+                        layer.alert(msg.error, {icon: 5});
+                    }
+                    return;
+                }
+            });
+        }
+        function openFile() {
+            layer.open({
+                    type: 2,
+                    title: "{{ ap.workorder.number }}",
+                    shadeClose: false,
+                    maxmin: true,
+                    area: ['640px', '480px'],
+                    content: ["{{ MEDIA_URL }}{{ ap.file_content }}"],
+                    end: function () {
+                    }
+                });
+        }
+    </script>
+
+{% endblock %}
