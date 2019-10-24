@@ -19,7 +19,7 @@ class Bulletin(models.Model):
     """
     type_choices = CHOICES['bulletin_type']
     status_choices = CHOICES['bulletin_status']
-    title = models.CharField(max_length=20, verbose_name='标题')
+    title = models.CharField(max_length=100, verbose_name='标题')
     type = models.ForeignKey(BulletinType, related_name='bulletin', verbose_name='类型')   # '0'规章， ‘1’公告
     status = models.CharField(max_length=10, choices=status_choices, default='1', verbose_name='状态')  # ‘0’停用， ‘1’启用
     file_content = models.FileField(upload_to='file/%y/%m', blank=True, null=True, verbose_name='附件')

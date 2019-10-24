@@ -27,7 +27,7 @@
                                     v-model="selected">
                                 {% for type in bu_type %}
                                     <option value="{{ type.id }}"
-                                    {% if bulletin.status == type %} selected="selected" {% endif %}
+                                    {% if bulletin.type == type %} selected="selected" {% endif %}
                                     >{{ type.title }}</option>
                                 {% endfor %}
                             </select>

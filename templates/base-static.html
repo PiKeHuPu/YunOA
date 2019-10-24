@@ -16,6 +16,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link rel="stylesheet" href="{% static 'dist/css/myself.css' %}">
     <link rel="stylesheet" href="{% static 'dist/css/skins/skin-green-light.min.css' %}">
     <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap-treeview/bootstrap-treeview.css' %}">
 
     {% block css %} {% endblock %}
 
@@ -34,7 +35,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     {% endblock %}
 
     <!-- Control Sidebar -->
-    <aside class="control-sidebar control-sidebar-dark" id="control_bulletin">
+    <aside class="control-sidebar control-sidebar-dark" id="control_bulletin" >
         <!-- Create the tabs -->
         <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
             <li class="active"><a href="#control-sidebar-home-tab" data-toggle="tab"><i class="fa fa-table"></i></a>
@@ -51,9 +52,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <!--............分类.................-->
 
                 <!--.............................-->
-                <!-- /.control-sidebar-menu -->
-
-                <!-- /.control-sidebar-menu -->
 
             </div>
             <!-- /.tab-pane -->
@@ -93,6 +91,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <script src="{% static 'dist/js/app.min.js' %}"></script>
 <script src="{% static 'dist/js/glo-mess.js' %}"></script>
 <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+<script src="{% static 'plugins/bootstrap-treeview/bootstrap-treeview.js' %}"></script>
 <script>
     var bulletin_info_bool = true;  // 初始没有获取公告信息
     function getBulletin() {
@@ -118,36 +117,44 @@ scratch. This page gets rid of all links and provides the needed markup only.
     }
 
     function AppendBulletin(data) {
-        var _type = '<h3 class="control-sidebar-heading">',
-            _ul = '<ul class="control-sidebar-menu">', // 缺</ul>
-            _li = '<li style="list-style:none;">' +
-                '<div style="margin:0px; padding:0px; font-size:0px; height:1px; overflow:hidden; background:#FAEBD7;"></div>',
-            _a = '<a href="#" onclick="showBulletin(',
-
-            _ae = ')"</a>',
-            _lih = '<div style="margin-left: 15px;margin-right: 15px;"><h5>',
-            _li2 = '</h5><p>',
-            _lie = '</p></div></li>';
-
+        var tree = [];
         for (var i in data) {
-            $("#control-sidebar-home-tab").append(
-                _type+i+"</h3>"+_ul
-            )
-            $.each(data[i], function (i, item) {
-                var create_time = item.create_time;
-                create_time = create_time.split("T")[0]
-                $("#control-sidebar-home-tab").append(
-                _li +
-                    _a + "'" +item.title +"'," + "'" + item.type__title +"'," +"'"+ item.file_content+"'"+
-                        _ae+_lih+ create_time +_li2+ item.title +_lie
-            )
-            })
-            $("#control-sidebar-home-tab").append(
-                "</ul>"
-            )
-
+            var tem = {
+                text:i,
+                state:{
+                    expanded: false
+                },
+                showBorder: false,
+                nodes:TemNodes(data[i])
+            };
+            tree.push(tem)
         }
+        $("#control-sidebar-home-tab").treeview({
+            data: tree,
+            enableLinks: true,
+            highlightSelected: false,
+            backColor:"#222D32",
+            borderColor:"#222D32",
+            showIcon:false,
+            onhoverColor: "#808080"
+        })
     }
+
+    function TemNodes(data) {
+        var tem_nodes = [];
+        $.each(data, function (i, item) {
+            var create_time = item.create_time;
+            create_time = create_time.split("T")[0]
+            var tem = {
+                text: '<p style="color: white">'+create_time+'</p>' + item.title.slice(0,10),
+                href: "javascript: showBulletin('"+item.title+"','"+item.type__title+"','"+item.file_content+"')"
+
+            }
+            tem_nodes.push(tem)
+        })
+        return tem_nodes
+    }
+
     function showBulletin(title, type_title, file_content) {
             var lay = layer.open({
                             type: 2,
