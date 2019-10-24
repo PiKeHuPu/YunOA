@@ -21,66 +21,64 @@
             <div class="col-lg-3 col-xs-6">
                 <!-- small box -->
                 <div class="small-box bg-teal">
+                    <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px">需要我审批</p>
                     <div class="inner">
-                        <p style="font-size:28px">申请：<a href="{% url 'personal-workorder-app' %}"
-                                                        class="small-box-footer">{{ work_order_x }}</a></p>
-                        <p style="font-size:28px">报销：<a href="{% url 'personal-workorder_ap_cost_app' %}"
-                                                        class="small-box-footer">{{ apply_x }}</a></p>
+                        <a href="{% url 'personal-workorder-app' %}"
+                                                        class="small-box-footer"><p style="font-size:28px; color: white" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">申请：{{ work_order_x }}</p></a>
+                        <a href="{% url 'personal-workorder_ap_cost_app' %}"
+                                                        class="small-box-footer"><p style="font-size:28px; color: white" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">报销：{{ apply_x }}</p></a>
                     </div>
-                    <div class="icon">
+                    <div class="icon" style="margin-top: 40px">
                         <i class="fa fa-pencil"></i>
                     </div>
-                    <p class="small-box-footer">需要我审批</p>
                 </div>
             </div>
             <!-- ./col -->
             <div class="col-lg-3 col-xs-6">
                 <!-- small box -->
                 <div class="small-box bg-yellow ">
+                    <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px">等待中...</p>
                     <div class="inner">
-                        <p style="font-size:28px">申请：<a href="{% url 'personal-workorder_Icrt' %}"
-                                                        class="small-box-footer">{{ work_order_0 }}</a></p>
-                        <p style="font-size:28px">报销：<a href="{% url 'personal-workorder_ap_cost' %}"
-                                                        class="small-box-footer">{{ apply_0 }}</a></p>
+                        <a href="{% url 'personal-workorder_Icrt' %}"
+                                                        class="small-box-footer"><p style="font-size:28px; color: white" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">申请：{{ work_order_0 }}</p></a>
+                        <a href="{% url 'personal-workorder_ap_cost' %}"
+                                                        class="small-box-footer"><p style="font-size:28px; color: white" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">报销：{{ apply_0 }}</p></a>
                     </div>
-                    <div class="icon">
+                    <div class="icon" style="margin-top: 40px">
                         <i class="fa fa-send-o"></i>
                     </div>
-                    <a class="small-box-footer">等待中...</a>
                 </div>
             </div>
             <!-- ./col -->
             <div class="col-lg-3 col-xs-6">
                 <!-- small box -->
                 <div class="small-box bg-green">
+                    <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px">审批中...</p>
                     <div class="inner">
-                        <p style="font-size:28px">申请：<a href="{% url 'personal-workorder_Icrt' %}"
-                                                        class="small-box-footer">{{ work_order_1 }}</a></p>
-                        <p style="font-size:28px">报销：<a href="{% url 'personal-workorder_ap_cost' %}"
-                                                        class="small-box-footer">{{ apply_1 }}</a></p>
-
-
+                        <a href="{% url 'personal-workorder_Icrt' %}"
+                                                        class="small-box-footer"><p style="font-size:28px; color: white" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">申请：{{ work_order_1 }}</p></a>
+                        <a href="{% url 'personal-workorder_ap_cost' %}"
+                                                        class="small-box-footer"><p style="font-size:28px; color: white" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">报销：{{ apply_1 }}</p></a>
                     </div>
-                    <div class="icon">
+                    <div class="icon" style="margin-top: 50px">
                         <i class="glyphicon glyphicon-play"></i>
                     </div>
-                    <p class="small-box-footer">审批中...</p>
                 </div>
             </div>
             <!-- ./col -->
             <div class="col-lg-3 col-xs-6">
                 <!-- small box -->
                 <div class="small-box bg-red">
+                    <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px">完成</p>
                     <div class="inner">
-                        <p style="font-size:28px">申请：<a href="{% url 'personal-workorder_Icrt' %}"
-                                                        class="small-box-footer">{{ work_order_2 }}</a></p>
-                        <p style="font-size:28px">报销：<a href="{% url 'personal-workorder_ap_cost' %}"
-                                                        class="small-box-footer">{{ apply_2 }}</a></p>
+                        <a href="{% url 'personal-workorder_Icrt' %}"
+                                                        class="small-box-footer"><p style="font-size:28px; color: white" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">申请：{{ work_order_2 }}</p></a>
+                        <a href="{% url 'personal-workorder_ap_cost' %}"
+                                                        class="small-box-footer"><p style="font-size:28px; color: white" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">报销：{{ apply_2 }}</p></a>
                     </div>
-                    <div class="icon">
+                    <div class="icon" style="margin-top: 40px">
                         <i class="fa fa-check"></i>
                     </div>
-                    <p class="small-box-footer"><span>完成</p>
                 </div>
             </div>
             <!-- ./col -->
