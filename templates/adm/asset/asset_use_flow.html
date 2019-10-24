@@ -44,6 +44,11 @@
                             </select>
                         </div>
 
+                        <div class="form-group searchArea margin-r-5 margin-top-5">
+                            <label>资产名称：</label>
+                            <input type="text" name="asset__brand" class="form-control inputText" id="asset__brand">
+                        </div>
+
 {#                        <div class="form-group searchArea margin-r-5 margin-top-5">#}
 {#                            <label>领取方：</label>#}
 {#                            <select class="form-control inputText select2" name="status" id="party">#}
@@ -126,6 +131,7 @@
                             "data": function (d) {
                                 d.assetNum = $("#assetNum").val();
                                 d.assetType = $("#assetType").val();
+                                d.asset__brand = $("#asset__brand").val();
                                 d.party = $("#party").val();
                                 d.status = $("#status").val();
                             }
