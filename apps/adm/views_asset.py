@@ -44,7 +44,7 @@ class AssetListView(LoginRequiredMixin, View):
 
     def get(self, request):
         fields = ['assetNum', 'assetType__name', 'brand', 'model', 'status', 'assetCount', 'assetUnit', 'operator',
-                  'add_time', 'id']
+                  'add_time', 'id', 'brand']
         filters = dict()
 
         if 'assetNum' in request.GET and request.GET['assetNum']:
@@ -55,6 +55,8 @@ class AssetListView(LoginRequiredMixin, View):
             filters['model__icontains'] = request.GET['model']
         if 'status' in request.GET and request.GET['status']:
             filters['status'] = request.GET['status']
+        if 'brand' in request.GET and request.GET['brand']:
+            filters['brand'] = request.GET['brand']
         ret = dict(data=list(Asset.objects.filter(**filters).values(*fields)))
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
 
@@ -212,6 +214,8 @@ class AssetUseFlowListView(LoginRequiredMixin, View):
             filters['party__icontains'] = request.GET['party']
         if request.GET.get('status'):
             filters['asset__status'] = request.GET['status']
+        if request.GET.get('asset__brand'):
+            filters['asset__brand'] = request.GET['asset__brand']
         ret = dict(data=list(AssetUseLog.objects.filter(**filters).values(*fields)))
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
 
