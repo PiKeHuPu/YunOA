@@ -41,6 +41,12 @@
                                 {% endfor %}
                             </select>
                         </div>
+
+                        <div class="form-group searchArea margin-r-5 margin-top-5">
+                            <label>资产名称：</label>
+                            <input type="text" name="brand" class="form-control inputText" id="brand">
+                        </div>
+
                         <div class="form-group searchArea margin-r-5 margin-top-5">
                             <label>资产型号：</label>
                             <input type="text" name="model" class="form-control inputText" id="model">
@@ -115,6 +121,7 @@
                             "data": function (d) {
                                 d.assetNum = $("#assetNum").val();
                                 d.assetType = $("#assetType").val();
+                                d.brand = $("#brand").val();
                                 d.model = $("#model").val();
                                 d.status = $("#status").val();
                             }
