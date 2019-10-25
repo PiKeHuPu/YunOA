@@ -9,6 +9,4 @@ Desktop.ini
 *.so
 *.egg
 *.egg-info
-dist
-build
 media/
