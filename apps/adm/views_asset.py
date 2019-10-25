@@ -44,7 +44,7 @@ class AssetListView(LoginRequiredMixin, View):
 
     def get(self, request):
         fields = ['assetNum', 'assetType__name', 'brand', 'model', 'status', 'assetCount', 'assetUnit', 'operator',
-                  'add_time', 'id', 'brand']
+                  'add_time', 'id', 'dueDate', 'dueremind']
         filters = dict()
 
         if 'assetNum' in request.GET and request.GET['assetNum']:

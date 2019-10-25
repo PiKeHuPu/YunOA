@@ -90,8 +90,9 @@
                         <th>状态</th>
                         <th>数量</th>
                         <th>单位</th>
-                        <th>入库人</th>
+{#                        <th>入库人</th>#}
                         <th>入库时间</th>
+                        <th>到期时间</th>
                         <th>操作</th>
                     </tr>
                     </thead>
@@ -183,14 +184,21 @@ $(function() {
                                 {
 									data : "assetUnit",
 								},
-								{
-									data : "operator",
-								},
                                 {
 									data : "add_time",
                                      render : function(data, type, full, meta) {
                                          return  moment(data).format("YYYY-MM-DD HH:mm");}
 								},
+                                {
+                                    data: "dueremind",
+                                    render : function(data, type, row, meta) {
+                                        if (data == 1) {
+                                            return row.dueDate
+                                        } else {
+                                            return "未设置";
+                                        }
+                                    }
+                                },
 								{
 									data : "id",
 									{#width : "10%",#}
