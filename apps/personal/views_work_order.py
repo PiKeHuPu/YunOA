@@ -303,6 +303,10 @@ class WorkOrderDetailView(LoginRequiredMixin, View):
     # 审批详情
     def get(self, request):
         ret = dict()
+
+        user_id = request.user.id  # 获取当前访问用户id
+        ret['user_id'] = user_id
+
         admin_user_list = []
         if 'id' in request.GET and request.GET['id']:
             work_order = get_object_or_404(WorkOrder, pk=request.GET['id'])
@@ -823,11 +827,13 @@ class APListView(LoginRequiredMixin, View):
                   'create_time', 'workorder__advance', 'cretor__name', 'all_fee']
         filters = dict()
         if request.GET.get('number'):
-            filters['number__contains'] = request.GET.get('number')
+            filters['workorder__number'] = request.GET.get('number')
         if request.GET.get('workorder_status'):
             filters['status'] = request.GET.get('workorder_status')
         if request.GET.get('customer'):
             filters['type'] = request.GET.get('customer')
+        if request.GET.get('cretor'):
+            filters['cretor__name'] = request.GET.get('cretor')
         if 'main_url' in request.GET and request.GET['main_url'] == '/personal/workorder_ap_cost/':  # 我的
             filters['cretor_id'] = request.user.id
             ret = dict(data=list(BusinessApply.objects.filter(**filters).values(*fields).order_by('-create_time')))
@@ -1163,14 +1169,16 @@ class APPLogListView(LoginRequiredMixin, View):
 
     def get(self, request):
         fields = ['id', 'order_id__id', 'order_id__number', 'order_id__title', 'type', 'order_id__structure__title',
-                  'create_time',  'order_id__cretor__name', 'record_type']
+                  'create_time',  'order_id__cretor__name', 'record_type', 'order_id__cost']
         filters = dict(creator = request.user)
         if request.GET.get('number'):
-            filters['number__contains'] = request.GET.get('number')
+            filters['order_id__number'] = request.GET.get('number')
         if request.GET.get('record_type'):
             filters['record_type'] = request.GET.get('record_type')
         if request.GET.get('app_type'):
             filters['type'] = request.GET.get('app_type')
+        if request.GET.get('cretor'):
+            filters['order_id__cretor__name'] = request.GET.get('cretor')
         # l = WorkOrderLog.objects.filter(**filters).values(*fields).order_by('-create_time')
         # ret = ""
         ret = dict(data=list(WorkOrderLog.objects.filter(**filters).values(*fields).order_by('-create_time')))
