@@ -820,7 +820,7 @@ class APListView(LoginRequiredMixin, View):
 
     def get(self, request):
         fields = ['id', 'workorder__number', 'workorder__id', 'title', 'type', 'status', 'structure__title',
-                  'create_time', 'workorder__advance', 'cretor__name']
+                  'create_time', 'workorder__advance', 'cretor__name', 'all_fee']
         filters = dict()
         if request.GET.get('number'):
             filters['number__contains'] = request.GET.get('number')
