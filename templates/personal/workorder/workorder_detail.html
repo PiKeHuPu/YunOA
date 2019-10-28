@@ -75,10 +75,10 @@
                                     <td>
                                         {% if work_order.status == '2' or work_order.status == '4' or work_order.status == '6' %}
 {#                                            如果当前用户是申请人，跳转到报销详情页，如果是审批人，跳转到审批报销#}
-                                            {% if work_order.cretor_id == user_id %}
-                                                <a href="/personal/workorder_ap_cost/detail?id={{ work_order.id }}"> {{ work_order.number }}</a>
-                                            {% elif work_order.next_user_id == user_id %}
+                                            {% if work_order.next_user_id == user_id %}
                                                 <a href="/personal/workorder_ap_cost_app/update?id={{ work_order.id }}"> {{ work_order.number }}</a>
+                                            {% else %}
+                                                <a href="/personal/workorder_ap_cost/detail?id={{ work_order.id }}"> {{ work_order.number }}</a>
                                             {% endif %}
                                         {% else %}
                                             {{ work_order.number }}
