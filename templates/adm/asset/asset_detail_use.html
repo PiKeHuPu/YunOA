@@ -5,6 +5,11 @@
     <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
     <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-datetimepicker.min.css' %}">
+    <style>
+        input[type=date]::-webkit-inner-spin-button {
+            visibility: hidden;
+        }
+    </style>
 {% endblock %}
 
 {% block main %}
@@ -23,6 +28,11 @@
                             <label class="col-sm-2 control-label">领用用途</label>
                             <div class="col-sm-3">
                                  <input class="form-control" name="title" type="text" id="asset_title"/>
+                            </div>
+
+                            <label class="col-sm-2 control-label">预计归还日期</label>
+                            <div class="col-sm-3">
+                                 <input class="form-control" name="use_time" type="date" id="use_time"/>
                             </div>
                         </div>
                         <label class="col-sm-2 control-label">资产编号</label>
@@ -86,11 +96,27 @@
     <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
     <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
     <script type="text/javascript">
-
+        //限制预计归还时间
+        $(function(){
+            //得到当前时间
+            var date_now = new Date();
+            //得到当前年份
+            var year = date_now.getFullYear();
+            //得到当前月份
+            //注：
+            //  1：js中获取Date中的month时，会比当前月份少一个月，所以这里需要先加一
+            //  2: 判断当前月份是否小于10，如果小于，那么就在月份的前面加一个 '0' ， 如果大于，就显示当前月份
+            var month = date_now.getMonth()+1 < 10 ? "0"+(date_now.getMonth()+1) : (date_now.getMonth()+1);
+            //得到当前日子（多少号）
+            var date = date_now.getDate() < 10 ? "0"+date_now.getDate() : date_now.getDate();
+            //设置input标签的min属性
+            $("#use_time").attr("min",year+"-"+month+"-"+date);
+        });
 
         $("#btnSave").click(function () {
             var useCount = $("#use_count").val();
             var title = $("#asset_title").val();
+            var use_time = $("#use_time").val();
             if (useCount == "") {
                 layer.alert("领用数量不能为空", {icon: 5});
                 return
@@ -106,7 +132,8 @@
             var data = {
                 id: {{ asset.id }},
                 useCount: useCount,
-                title: title
+                title: title,
+                use_time: use_time,
             };
             $.ajax({
                 type: "POST",
