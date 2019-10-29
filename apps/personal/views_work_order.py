@@ -1148,6 +1148,55 @@ class CostAppUpdateView(LoginRequiredMixin, View):
         return HttpResponse(json.dumps(res), content_type='application/json')
 
 
+class CostAppUpdateDetailView(LoginRequiredMixin, View):
+    """
+    审批报销页面点击审批单号时的跳转页面
+    """
+    def get(self, request):
+        ret = dict()
+
+        user_id = request.user.id  # 获取当前访问用户id
+        ret['user_id'] = user_id
+
+        admin_user_list = []
+        if 'id' in request.GET and request.GET['id']:
+            work_order = get_object_or_404(WorkOrder, pk=request.GET['id'])
+            work_order_log = work_order.workorderlog_set.filter(type='0').order_by('create_time')  # 关联表查询方法
+            people = work_order.people
+            if people:
+                ret['people'] = [people]
+                if '|' in people:
+                    tem_people = people.split('|')
+                    people_obj = User.objects.filter(id__in=tem_people).values('id', 'name')
+                    ret['people'] = people_obj
+
+            try:
+                role = Role.objects.get(title="管理")
+                admin_user_ids = role.userprofile_set.values('id')
+                for admin_user_id in admin_user_ids:
+                    admin_user_list.append(admin_user_id['id'])
+            except Exception:
+                pass
+            user_list = [x.creator.id for x in work_order_log]  # 审批过的人
+            user_list += [work_order.cretor_id, work_order.next_user_id]  # 自己和当前审批人
+            cashier = SpecialRole.objects.filter(title__in = ['0','1']) # 出纳0, CFO1
+            if cashier:
+                for i in cashier:
+                    user_list.append(i.user.id)
+            user_list.extend(admin_user_list)
+
+            # 和工单无关联的用户禁止通过手动指定ID的形式非法获取数据
+            if user_id == work_order.cretor_id:
+                ret['ban'] = 'ban'
+            elif request.user.id in user_list:
+                ret['work_order'] = work_order
+                # ret['work_order_record'] = work_order_record
+                ret['work_order_log'] = work_order_log
+            else:
+                ret['ban'] = 'ban'
+        return render(request, 'personal/workorder/apply_app_update_detail.html', ret)
+
+
 class WorkOrderAppLogView(LoginRequiredMixin, View):
     """
     审批历史页面

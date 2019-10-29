@@ -76,6 +76,8 @@ urlpatterns = [
     url(r'^personal/workorder_ap_cost_app/$', order.ApplyCostAppView.as_view(), name="personal-workorder_ap_cost_app"),
     url(r'^personal/workorder_ap_cost_app/update', order.CostAppUpdateView.as_view(),
         name="personal-workorder_ap_cost_app-update"),  # 更新报销审批
+    url(r'^update_detail', order.CostAppUpdateDetailView.as_view(),
+        name="personal-workorder_ap_cost_app-update_detail"),  # 审批报销页面点击审批单号时的跳转页面
     # url(r'^personal/workorder_app/list', order.WorkOrderAppListView.as_view(), name="personal-workorder_app_list"),
     # url(r'^personal/workorder_app/send', order.WrokOrderSendView.as_view(), name="personal-workorder-send"),
     # url(r'^personal/workorder_rec/$', order.WorkOrderView.as_view(), name="personal-workorder_rec"),

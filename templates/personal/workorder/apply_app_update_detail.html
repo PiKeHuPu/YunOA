@@ -1,21 +1,26 @@
-{% extends "base-left.html" %}
-{% load staticfiles %}
+{% load static %}
 
-{% block css %}
-    <link rel="stylesheet" href="{% static 'plugins/datatables/jquery.dataTables.min.css' %}">
-    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
-{% endblock %}
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/plugins/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/dist/css/AdminLTE.min.css">
+    <link rel="stylesheet" href="/static/dist/css/myself.css">
+    <link rel="stylesheet" href="/static/dist/css/skins/skin-green-light.min.css">
+    <link rel="stylesheet" href="/static/js/plugins/layer/skin/layer.css">
+    <link rel="stylesheet" href="/static/plugins/bootstrap-treeview/bootstrap-treeview.css">
 
-{% block content %}
+    <link rel="stylesheet" href="/static/plugins/datatables/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="/static/js/plugins/layer/skin/layer.css">
 
-    <!-- Content Header (Page header) -->
-    <section class="content-header margin-bottom">
-        <ol class="breadcrumb">
-            <li><a href=""><i class="fa fa-dashboard"></i>办公平台</a></li>
-            <li class="active"><a href="">工单管理</a></li>
-            <li class="active"><a href="#">申请详情</a></li>
-        </ol>
-    </section>
+</head>
+<body>
     <!-- Main content -->
 
     <section class="content">
@@ -74,7 +79,7 @@
 
                                     <td>
                                         {% if work_order.status == '2' or work_order.status == '4' or work_order.status == '6' %}
-                                            <a href="/personal/workorder_ap_cost/detail?id={{ work_order.id }}"> {{ work_order.number }}</a>
+                                            <a href="personal/workorder_ap_cost_app/update?id={{ work_order.id }}"> {{ work_order.number }}</a>
                                         {% else %}
                                             {{ work_order.number }}
                                         {% endif %}
@@ -253,89 +258,85 @@
     </section>
 
     <!-- /.content -->
+</body>
+<script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/dataTables.const.js' %}"></script>
+<script src="{% static 'plugins/datatables/moment.min.js' %}"></script>
+<script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#PERSONAL-WORKORDER').addClass('active');
+        $('#{{ menu.code }}').addClass('active');
 
-{% endblock %}
+    });
 
-{% block javascripts %}
-    <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
-    <script src="{% static 'plugins/datatables/dataTables.const.js' %}"></script>
-    <script src="{% static 'plugins/datatables/moment.min.js' %}"></script>
-    <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
-    <script type="text/javascript">
-        $(function () {
-            $('#PERSONAL-WORKORDER').addClass('active');
-            $('#{{ menu.code }}').addClass('active');
+    var oDataTable = null;
+    $(function () {
+        oDataTable = initTable();
 
-        });
-
-        var oDataTable = null;
-        $(function () {
-            oDataTable = initTable();
-
-            function initTable() {
-                var oTable = $('#dtbList').DataTable($.extend(true, {"scrollx": true},
-                    DATATABLES_CONSTANT.DATA_TABLES.DEFAULT_OPTION,
-                    {
-                        ajax: {
-                            "url": "{% url 'adm-equipment:list' %}",
-                            "data": function (d) {
-                                d.customer = "{{ work_order.customer_id }}";
-                            }
+        function initTable() {
+            var oTable = $('#dtbList').DataTable($.extend(true, {"scrollx": true},
+                DATATABLES_CONSTANT.DATA_TABLES.DEFAULT_OPTION,
+                {
+                    ajax: {
+                        "url": "{% url 'adm-equipment:list' %}",
+                        "data": function (d) {
+                            d.customer = "{{ work_order.customer_id }}";
+                        }
+                    },
+                    columns: [
+                        {
+                            data: "id",
+                            width: "5%",
                         },
-                        columns: [
-                            {
-                                data: "id",
-                                width: "5%",
-                            },
-                            {
-                                data: "number",
-                                width: "10%",
-                            },
+                        {
+                            data: "number",
+                            width: "10%",
+                        },
 
 
-                            {
-                                data: "equipment_type__name",
-                            },
-                            {
-                                data: "equipment_model",
-                            },
-                            {
-                                data: "buy_date",
-                            },
-                            {
-                                data: "warranty_date",
-                            },
+                        {
+                            data: "equipment_type__name",
+                        },
+                        {
+                            data: "equipment_model",
+                        },
+                        {
+                            data: "buy_date",
+                        },
+                        {
+                            data: "warranty_date",
+                        },
 
-                            {
-                                data: "id",
-                                {#width : "10%",#}
-                                bSortable: "false",
-                                render: function (data, type, row, meta) {
-                                    var ret = "<button title='编辑' onclick='doEquipmentUpdate("
-                                        + data + ")'><i class='glyphicon glyphicon-pencil'></i></button>";
-                                    return ret;
-                                }
-                            }],
-                    }));
-                return oTable;
-            }
-
-
-        });
-
-        function openFile() {
-            layer.open({
-                    type: 2,
-                    title: "{{ work_order.number }}",
-                    shadeClose: false,
-                    maxmin: true,
-                    area: ['640px', '480px'],
-                    content: ["{{ MEDIA_URL }}{{ work_order.file_content }}"],
-                    end: function () {
-                    }
-                });
+                        {
+                            data: "id",
+                            {#width : "10%",#}
+                            bSortable: "false",
+                            render: function (data, type, row, meta) {
+                                var ret = "<button title='编辑' onclick='doEquipmentUpdate("
+                                    + data + ")'><i class='glyphicon glyphicon-pencil'></i></button>";
+                                return ret;
+                            }
+                        }],
+                }));
+            return oTable;
         }
 
-    </script>
 
-{% endblock %}
+    });
+
+    function openFile() {
+        layer.open({
+                type: 2,
+                title: "{{ work_order.number }}",
+                shadeClose: false,
+                maxmin: true,
+                area: ['640px', '480px'],
+                content: ["{{ MEDIA_URL }}{{ work_order.file_content }}"],
+                end: function () {
+                }
+            });
+    }
+
+</script>
+</html>
