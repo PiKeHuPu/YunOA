@@ -87,6 +87,11 @@
 
                                     </tr>
                                     <tr>
+                                        <td><strong> 申请人</strong></td>
+                                        <td>{{ work_order.cretor.name }}</td>
+
+                                    </tr>
+                                    <tr>
                                         <td><strong> 申请时间</strong></td>
                                         <td>{{ work_order.create_time }}</td>
 
@@ -236,6 +241,32 @@
                         </div>
                         <!-- /.box-body -->
                     </div>
+
+                    <div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th colspan="4" style="width:500px; font-size: 18px">申请人最近10条其他申请记录</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="text-align: center; font-weight: bolder">申请名称</td>
+                                    <td style="text-align: center; font-weight: bolder">金额</td>
+                                    <td style="text-align: center; font-weight: bolder">申请时间</td>
+                                </tr>
+                                {% for user_order in user_orders %}
+                                <tr>
+                                    <td>{{ user_order.title }}</td>
+                                    <td>{{ user_order.cost }}</td>
+                                    <td style="text-align: center">{{ user_order.create_time }}</td>
+                                </tr>
+                                {% endfor %}
+
+                            </tbody>
+                        </table>
+                    </div>
+
                     <!-- /. message box -->
                 </div>
                 <!-- /.col -->

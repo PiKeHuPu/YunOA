@@ -400,6 +400,11 @@ class WorkOrderAppUpdateView(LoginRequiredMixin, View):
             if request_user_id == cashier.user.id:
                 ret['cashier'] = '1'
 
+            # 获取申请人近十条申请记录
+            user_id = work_order.cretor_id
+            user_orders = WorkOrder.objects.filter(Q(cretor_id=user_id) & ~Q(id=request.GET.get('id'))).order_by("-create_time")[:10]
+            ret['user_orders'] = user_orders
+
         return render(request, 'personal/workorder/workorder_app_update.html', ret)
 
     def post(self, request):
