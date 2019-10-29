@@ -956,6 +956,7 @@ class ApplyCostAppView(LoginRequiredMixin, View):
         type_list = to_list(BusinessApply.type_choices)
         ret['type_list'] = type_list
         ret['status_list'] = status_list
+
         return render(request, 'personal/workorder/apply_app.html', ret)
 
 
@@ -1068,6 +1069,12 @@ class CostAppUpdateView(LoginRequiredMixin, View):
                         ret['transport'].append(tr_dict.get(i))
                 else:
                     ret['transport'] = [tr_dict.get(transport)]
+
+            # 获取申请人近十条报销申请记录
+            user_id = ap.cretor_id
+            businessApplys = BusinessApply.objects.filter(Q(cretor_id=user_id) & ~Q(workorder_id=request.GET.get('id')) & ~Q(status=-1)).order_by("-create_time")[:10]
+            ret['businessApplys'] = businessApplys
+
         ret.update({
             'users_dict': users,
             'work_order_log': work_order_log,

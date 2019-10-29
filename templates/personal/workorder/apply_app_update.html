@@ -98,6 +98,10 @@
                                         <td><strong> 审批状态</strong></td>
                                         <td>{{ ap.get_status_display }}</td>
                                     </tr>
+                                    <tr>
+                                        <td><strong> 申请人</strong></td>
+                                        <td>{{ ap.cretor.name }}</td>
+                                    </tr>
                                     {% if ap.status == '1' %}
                                         <tr>
                                             <td><strong> 当前审批人</strong></td>
@@ -262,6 +266,34 @@
                         </div>
                         <!-- /.box-body -->
                     </div>
+
+
+                    <div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th colspan="4" style="width:500px; font-size: 18px">申请人最近10条其他报销申请记录</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="text-align: center; font-weight: bolder">申请名称</td>
+                                    <td style="text-align: center; font-weight: bolder">金额</td>
+                                    <td style="text-align: center; font-weight: bolder">创建时间</td>
+                                </tr>
+                                {% for businessApply in businessApplys %}
+                                <tr>
+                                    <td>{{ businessApply.title }}</td>
+                                    <td>{{ businessApply.all_fee }}</td>
+                                    <td style="text-align: center">{{ businessApply.create_time }}</td>
+                                </tr>
+                                {% endfor %}
+
+                            </tbody>
+                        </table>
+                    </div>
+
+
                     {% if ap.type == '1' %}
 
                         <div class="box box-primary">
