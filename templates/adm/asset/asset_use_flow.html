@@ -86,6 +86,7 @@
                             <th>领取人</th>
 {#                            <th>领取方</th>#}
                             <th>领取时间</th>
+                            <th>预计归还日期</th>
                             <th>用途</th>
                             <th>归还操作</th>
                         </tr>
@@ -207,6 +208,9 @@
                                 render: function (data, type, full, meta) {
                                     return moment(data).format("YYYY-MM-DD HH:mm");
                                 }
+                            },
+                            {
+                                data: "use_time",
                             },
                             {
                                 data: "title"

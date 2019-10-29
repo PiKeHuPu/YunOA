@@ -201,9 +201,7 @@ class AssetUseFlowListView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        fields = ['asset__assetNum', 'asset__assetType__name', 'asset__brand', 'asset__model', 'asset__status',
-                  'useCount', 'asset__assetUnit', 'operator', 'add_time', 'area','title', 'id', 'party', 'give_back',
-                  'back_date']
+        fields = ['asset__assetNum', 'asset__assetType__name', 'asset__brand', 'asset__model', 'asset__status','useCount', 'asset__assetUnit', 'operator', 'add_time', 'area','title', 'id', 'party', 'give_back','back_date', 'use_time']
         filters = dict()
 
         if request.GET.get('assetNum'):
@@ -396,6 +394,7 @@ class AssetUseInfoView(LoginRequiredMixin, View):
         if ret_info.get('id'):
             asset = Asset.objects.filter(id=ret_info.get('id')).first()
             use_count = ret_info.get('useCount')
+            use_time = ret_info.get('use_time')
             if use_count:
                 if int(use_count) <= int(asset.assetCount):
                     # status = asset.get_status_display()  # TODO 状态是否修改
@@ -403,6 +402,7 @@ class AssetUseInfoView(LoginRequiredMixin, View):
                     asset_use.asset_id = asset.id
                     asset_use.operator = request.user.name
                     asset_use.useCount = use_count
+                    asset_use.use_time = use_time
                     asset_use.title = ret_info.get('title', '')
                     asset.assetCount = int(asset.assetCount) - int(use_count)
                     asset_use.save()
