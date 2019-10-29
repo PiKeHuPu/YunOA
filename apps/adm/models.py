@@ -149,6 +149,7 @@ class AssetUseLog(models.Model):
     area = models.TextField(default="", verbose_name="使用地区")
     title = models.TextField(default="", verbose_name="用途")
     add_time = models.DateTimeField(auto_now_add=True, verbose_name="添加时间")
+    use_time = models.DateField(null=True, blank=True, verbose_name="预计归还日期")
     party = models.CharField(max_length=1, default="0", choices=party_choices, verbose_name="领取方")
     give_back = models.CharField(max_length=1, default="0", choices=party_choices, verbose_name="是否归回")
     back_date = models.DateField(verbose_name="归还日期", null=True, blank=True, default=django.utils.timezone.now)
