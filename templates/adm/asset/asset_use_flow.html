@@ -144,10 +144,12 @@
                                 data: "asset__assetNum"
                             },
                             {
-                                data: "asset__assetType__name"
+                                data: "asset__assetType__name",
+                                width: "10%"
                             },
                             {
-                                data: "asset__brand"
+                                data: "asset__brand",
+                                width: "8%"
                             },
                             {
                                 data: "asset__model"
@@ -186,7 +188,8 @@
                                 }
                             },
                             {
-                                data: "operator"
+                                data: "operator",
+                                width: "6%"
                             },
                             {#{#}
                             {#    data: "party",#}
@@ -205,12 +208,21 @@
 
                             {
                                 data: "add_time",
+                                width: "9%",
                                 render: function (data, type, full, meta) {
                                     return moment(data).format("YYYY-MM-DD HH:mm");
                                 }
                             },
                             {
                                 data: "use_time",
+                                width: "10%",
+                                render: function (data, type, row, meta) {
+                                    if (data){
+                                        return data;
+                                    } else {
+                                        return "未设置";
+                                    }
+                                }
                             },
                             {
                                 data: "title"
