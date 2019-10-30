@@ -17,6 +17,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <link rel="stylesheet" href="{% static 'dist/css/skins/skin-green-light.min.css' %}">
     <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/bootstrap-treeview/bootstrap-treeview.css' %}">
+    <style>
+        #sco::-webkit-scrollbar {
+            display: none;
+    }
+    </style>
 
     {% block css %} {% endblock %}
 
@@ -36,6 +41,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
     <!-- Control Sidebar -->
     <aside class="control-sidebar control-sidebar-dark" id="control_bulletin" >
+
+    <div class="control-sidebar-bg" style="overflow: scroll; margin-top: 50px" id="sco">
         <!-- Create the tabs -->
         <ul class="nav nav-tabs nav-justified control-sidebar-tabs">
             <li class="active"><a href="#control-sidebar-home-tab" data-toggle="tab"><i class="fa fa-table"></i></a>
@@ -73,11 +80,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </div>
             <!-- /.tab-pane -->
         </div>
+    </div>
+
     </aside>
     <!-- /.control-sidebar -->
     <!-- Add the sidebar's background. This div must be placed
          immediately after the control sidebar -->
     <div class="control-sidebar-bg"></div>
+
+
 </div>
 <!-- ./wrapper -->
 
