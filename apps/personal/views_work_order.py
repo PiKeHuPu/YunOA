@@ -170,6 +170,8 @@ class WorkOrderListView(LoginRequiredMixin, View):
             filters['status'] = request.GET.get('workorder_status')
         if request.GET.get('customer'):
             filters['type'] = request.GET.get('customer')
+        if request.GET.get('cretor__name'):
+            filters['cretor__name'] = request.GET.get('cretor__name')
         if 'main_url' in request.GET and request.GET['main_url'] == '/personal/workorder_Icrt/':
             filters['cretor_id'] = request.user.id
             ret = dict(data=list(WorkOrder.objects.filter(**filters).values(*fields).order_by('-create_time')))

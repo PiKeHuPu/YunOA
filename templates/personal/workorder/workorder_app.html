@@ -45,7 +45,16 @@
                                    placeholder="请输入工单号">
                         </div>
                         <div class="form-group searchArea margin-r-5 margin-top-5">
-                            <label>申请状态：</label>
+                            <label>审批类型：</label>
+                            <select class="form-control inputText select2" name="customer" id="customer">
+                                <option></option>
+                                {% for type in type_list %}
+                                    <option value= {{ type.item }}>{{ type.value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group searchArea margin-r-5 margin-top-5">
+                            <label>审批状态：</label>
                             <select class="form-control inputText select2" name="workorder_status"
                                     id="workorder_status">
                                 <option></option>
@@ -55,16 +64,15 @@
                             </select>
                         </div>
                         <div class="form-group searchArea margin-r-5 margin-top-5">
-                            <label>申请类型：</label>
-                            <select class="form-control inputText select2" name="customer" id="customer">
-                                <option></option>
-                                {% for type in type_list %}
-                                    <option value= {{ type.item }}>{{ type.value }}</option>
-                                {% endfor %}
-                            </select>
+                            <label>申请人：</label>
+                            <input type="text" name="cretor__name" class="form-control inputText" id="cretor__name">
                         </div>
                         <button type="button" id="btnWorkorderSearch" class="btn btn-default">
                             <i class="glyphicon glyphicon-search"></i>查询
+                        </button>
+                        &nbsp;
+                        <button type="button" id="btnWorkorderSearch" class="btn btn-default">
+                            <a href="/personal/workorder_app/log" style="font-weight: bolder">审批历史</a>
                         </button>
                     </form>
                 </div>
@@ -129,6 +137,7 @@
                                 d.number = $("#number").val();
                                 d.workorder_status = $("#workorder_status").val();
                                 d.customer = $("#customer").val();
+                                d.cretor__name = $("#cretor__name").val();
                             }
                         },
                         columns: [
