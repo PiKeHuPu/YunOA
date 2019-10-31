@@ -21,6 +21,7 @@ from utils.mixin_utils import LoginRequiredMixin
 from rbac.models import Role
 from users.models import Structure
 from system.models import SystemSetup
+from bulletin.models import UserBulletin
 
 
 class UserBackend(ModelBackend):
@@ -71,6 +72,22 @@ class LoginView(View):
             if user is not None:
                 if user.is_active:
                     login(request, user)
+
+                    # 公告提醒
+                    # 获取当前用户id
+                    user_id = request.session.get('_auth_user_id')
+                    # 获取当前用户已读公告
+                    read_bulletin = UserBulletin.objects.filter(user_id=user_id)
+                    # 获取当前用户已读公告的id列表
+                    read_list = []
+                    for i in read_bulletin:
+                        read_list.append(i.bulletin_id)
+                    # 获取当前用户已读公告数量
+                    bulletin_num = read_bulletin.count()
+                    # 利用session传递公告id列表
+                    request.session['read_list'] = read_list
+                    # print(read_list, '+++++++++++++++++++++++++++++++++++++++')
+
                     return HttpResponseRedirect(redirect_to)
                 else:
                     msg = "用户未激活！"

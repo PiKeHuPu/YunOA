@@ -50,7 +50,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
             <li><a href="#control-sidebar-settings-tab" data-toggle="tab"><i class="fa fa-gears"></i></a></li>
         </ul>
         <!-- Tab panes -->
-        <div class="tab-content" style="margin-left: 15px; margin-top: 10px">
+        <div class="tab-content" style="margin-left: 15px; margin-top: 10px" id="b_con">
             <!-- Home tab content -->
             <div class="tab-pane active" id="control-sidebar-home-tab">
                 <div style="margin:10% 30%" id="waitIco">
@@ -105,18 +105,21 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <script src="{% static 'plugins/bootstrap-treeview/bootstrap-treeview.js' %}"></script>
 <script>
     var bulletin_info_bool = true;  // 初始没有获取公告信息
+    var read_list = []; // 用户已读公告id列表
     function getBulletin() {
         if ($("#control_bulletin").attr("class").search("open") == -1) {
             if (bulletin_info_bool) {
                 $.ajax({
+                    async: false,
                     type: 'get',
                     url: "{% url 'bulletin_show' %}",
                     cache: false,
                     success: function (msg) {
                         $("#waitIco").remove();
                         bulletin_info_bool = false;
+                        read_list = msg.read_list;
                         if (msg.status == 'success') {
-                            AppendBulletin(msg.data)
+                            AppendBulletin(msg.data);
                         } else {
 
                         }
@@ -124,6 +127,21 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     }
                 });
             }
+        } else {
+            $.ajax({
+                async: false,
+                type: 'get',
+                url: "{% url 'bulletin_show' %}",
+                cache: false,
+                success: function (msg) {
+                    $("#waitIco").remove();
+                    bulletin_info_bool = false;
+                    read_list = msg.read_list;
+                    if (msg.status == 'success') {
+                        AppendBulletin(msg.data);
+                    }
+                }
+            });
         }
     }
 
@@ -155,31 +173,51 @@ scratch. This page gets rid of all links and provides the needed markup only.
         var tem_nodes = [];
         $.each(data, function (i, item) {
             var create_time = item.create_time;
-            create_time = create_time.split("T")[0]
-            var tem = {
-                text: '<p style="color: white">'+create_time+'</p>' + item.title.slice(0,10),
-                href: "javascript: showBulletin('"+item.title+"','"+item.type__title+"','"+item.file_content+"')"
+            create_time = create_time.split("T")[0];
 
+            // 判断公告是否在用户已读列表中
+            if (read_list.includes(item.id)) {
+                {#console.log(item.id, "in");#}
+                var tem = {
+                text: '<p style="color: white">'+create_time+'</p>' + item.title.slice(0,10),
+                href: "javascript: showBulletin('"+item.title+"','"+item.type__title+"','"+item.file_content+"','"+item.id+"')"
+                };
+            } else {
+                {#console.log(item.id, "out");#}
+                var tem = {
+                text: '<p style="color: red">'+create_time+' <b>(未读)</b></p>' + item.title.slice(0,10),
+                href: "javascript: showBulletin('"+item.title+"','"+item.type__title+"','"+item.file_content+"','"+item.id+"')"
+                };
             }
+
             tem_nodes.push(tem)
-        })
+        });
         return tem_nodes
     }
 
-    function showBulletin(title, type_title, file_content) {
-            var lay = layer.open({
-                            type: 2,
-                            title: '【'+type_title+'】·   '+title,
-                            shadeClose: false,
-                            maxmin: true,
-                            area: ['800px', '400px'],
-                            content: ["{{ MEDIA_URL }}"+file_content],
-                            end: function () {
-                                oDataTable.ajax.reload();
-                            }
-                        });
-            layer.full(lay)
-        }
+    function showBulletin(title, type_title, file_content, id) {
+        var bulletin_id = {'bulletin_id': id};
+        var lay = layer.open({
+                        type: 2,
+                        title: '【'+type_title+'】·   '+title,
+                        shadeClose: false,
+                        maxmin: true,
+                        area: ['800px', '400px'],
+                        content: ["{{ MEDIA_URL }}"+file_content],
+                        end: function () {
+                            $.ajax({
+                                type: 'get',
+                                url: "{% url 'database_update' %}",
+                                data : bulletin_id,
+                                success : function(result) {
+                                    getBulletin();
+                                },
+                            });
+                            oDataTable.ajax.reload();
+                        }
+                    });
+        layer.full(lay);
+    }
 
 </script>
 

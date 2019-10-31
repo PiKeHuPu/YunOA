@@ -103,4 +103,5 @@ urlpatterns = [
     url(r'system/bulletin/type$', bulletin_views.CreateTypeView.as_view(), name="bulletin_type"),
     url(r'system/bulletin/list$', bulletin_views.ListView.as_view(), name="bulletin_list"),
     url(r'system/bulletin/other/update$', bulletin_views.UpdateOtherView.as_view(), name="bulletin_other_update"),
+    url(r'system/bulletin/database/update$', bulletin_views.DatabaseUpdateView.as_view(), name="database_update"),
 ]

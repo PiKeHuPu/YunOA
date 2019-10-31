@@ -11,9 +11,9 @@ User = get_user_model()
 from django.views.generic.base import View
 from django.http import HttpResponse
 from django.core.serializers.json import DjangoJSONEncoder
+from django.utils import timezone
 
-from .models import Bulletin
-from .models import BulletinType
+from .models import Bulletin, BulletinType, UserBulletin
 from .form import BulletinUpdateForm
 from .form import BulletinCreateForm
 from rbac.models import Menu
@@ -36,6 +36,12 @@ class ShowView(LoginRequiredMixin, View):
             if not tem_dict.get(type_title):
                 tem_dict[type_title] = []
             tem_dict[type_title].append(i)
+
+        # 已读公告id列表
+        read_list = request.session.get('read_list')
+        ret['read_list'] = read_list
+        # print(read_list)
+
         ret['data'] = tem_dict
         ret['status'] = 'success'
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
@@ -159,3 +165,31 @@ class CreateTypeView(LoginRequiredMixin, View):
         bu_type.save()
         res['status'] = 'success'
         return HttpResponse(json.dumps(res, cls=DjangoJSONEncoder), content_type='application/json')
+
+
+class DatabaseUpdateView(LoginRequiredMixin, View):
+    """
+    用户点击公告后修改数据库
+    """
+    def get(self, request):
+        ret = dict()
+
+        user_id = int(request.session.get('_auth_user_id'))
+        bulletin_id = int(request.GET['bulletin_id'])
+
+        # 判断用户是否已读当前公告
+        read_log = UserBulletin.objects.filter(user_id=user_id, bulletin_id=bulletin_id)
+        if read_log:
+            # 当前公告已读，修改最后一次阅读时间
+            read_log[0].last_time = timezone.now()
+            read_log[0].save()
+        else:
+            # 未读，新增阅读记录，更新session
+            user_bulletin = UserBulletin()
+            user_bulletin.bulletin_id = bulletin_id
+            user_bulletin.user_id = user_id
+            user_bulletin.save()
+
+            rss = request.session.get('read_list')
+            rss.append(bulletin_id)
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
