@@ -441,7 +441,7 @@ class AssetBackView(LoginRequiredMixin, View):
         if ret_info.get('id'):
             asset_use = AssetUseLog.objects.filter(id=ret_info.get('id')).first()
             back_count = ret_info.get('backCount')
-            if back_count:
+            if back_count or back_count==0:
                 if int(back_count) <= int(asset_use.useCount):
                     # status = asset.get_status_display()  # TODO 状态是否修改
                     asset_use.back_creator = request.user

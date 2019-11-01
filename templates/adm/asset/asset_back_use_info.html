@@ -61,7 +61,7 @@
                         <label class="col-sm-2 control-label">归还数量</label>
                         <div class="col-sm-3">
                             <div class="input-group">
-                                <input class="form-control" name="assetCount" type="Number" min="1" id="backCount"
+                                <input class="form-control" name="assetCount" type="Number" min="0" id="backCount"
                                        max="{{ asset_use.useCount }}" value="{{ asset_use.useCount }}"/>
                                 <span class="input-group-addon">{{ asset.assetUnit }}</span>
                             </div>
@@ -95,7 +95,7 @@
             }
             var useCount = Number({{ asset_use.useCount }});
             var backCount = Number($("#backCount").val());
-            if (backCount <= 0) {
+            if (backCount < 0) {
                 layer.alert("归还数量为正整数", {icon: 5});
                 return
             }
