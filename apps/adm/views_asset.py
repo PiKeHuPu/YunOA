@@ -402,7 +402,8 @@ class AssetUseInfoView(LoginRequiredMixin, View):
                     asset_use.asset_id = asset.id
                     asset_use.operator = request.user.name
                     asset_use.useCount = use_count
-                    asset_use.use_time = use_time
+                    if use_time:
+                        asset_use.use_time = use_time
                     asset_use.title = ret_info.get('title', '')
                     asset.assetCount = int(asset.assetCount) - int(use_count)
                     asset_use.save()
