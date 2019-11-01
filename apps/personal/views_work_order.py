@@ -405,6 +405,9 @@ class WorkOrderAppUpdateView(LoginRequiredMixin, View):
             # 获取申请人近十条申请记录
             user_id = work_order.cretor_id
             user_orders = WorkOrder.objects.filter(Q(cretor_id=user_id) & ~Q(id=request.GET.get('id'))).order_by("-create_time")[:10]
+            for i in user_orders:
+                if len(i.title) >= 10:
+                    i.title = i.title[:10] + "..."
             ret['user_orders'] = user_orders
 
         return render(request, 'personal/workorder/workorder_app_update.html', ret)
@@ -1075,6 +1078,9 @@ class CostAppUpdateView(LoginRequiredMixin, View):
             # 获取申请人近十条报销申请记录
             user_id = ap.cretor_id
             businessApplys = BusinessApply.objects.filter(Q(cretor_id=user_id) & ~Q(workorder_id=request.GET.get('id')) & ~Q(status=-1)).order_by("-create_time")[:10]
+            for i in businessApplys:
+                if len(i.title) >= 10:
+                    i.title = i.title[:10] + "..."
             ret['businessApplys'] = businessApplys
 
         ret.update({
