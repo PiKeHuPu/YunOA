@@ -248,6 +248,32 @@
                     </div>
                     <!-- /.box-body -->
                 </div>
+
+                <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th colspan="4" style="width:500px; font-size: 18px">申请人最近10条其他申请记录</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="text-align: center; font-weight: bolder">申请名称</td>
+                                <td style="text-align: center; font-weight: bolder">金额</td>
+                                <td style="text-align: center; font-weight: bolder">申请时间</td>
+                            </tr>
+                            {% for user_order in user_orders %}
+                            <tr>
+                                <td>{{ user_order.title }}</td>
+                                <td>{{ user_order.cost }}</td>
+                                <td style="text-align: center">{{ user_order.create_time }}</td>
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+                    </table>
+                </div>
+
                 <!-- /. message box -->
             </div>
             <!-- /.col -->
@@ -259,84 +285,89 @@
 
     <!-- /.content -->
 </body>
-<script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
-<script src="{% static 'plugins/datatables/dataTables.const.js' %}"></script>
-<script src="{% static 'plugins/datatables/moment.min.js' %}"></script>
-<script src="{% static 'js/plugins/layer/layer.js' %}"></script>
-<script type="text/javascript">
-    $(function () {
-        $('#PERSONAL-WORKORDER').addClass('active');
-        $('#{{ menu.code }}').addClass('active');
-
-    });
-
-    var oDataTable = null;
-    $(function () {
-        oDataTable = initTable();
-
-        function initTable() {
-            var oTable = $('#dtbList').DataTable($.extend(true, {"scrollx": true},
-                DATATABLES_CONSTANT.DATA_TABLES.DEFAULT_OPTION,
-                {
-                    ajax: {
-                        "url": "{% url 'adm-equipment:list' %}",
-                        "data": function (d) {
-                            d.customer = "{{ work_order.customer_id }}";
-                        }
-                    },
-                    columns: [
-                        {
-                            data: "id",
-                            width: "5%",
-                        },
-                        {
-                            data: "number",
-                            width: "10%",
-                        },
-
-
-                        {
-                            data: "equipment_type__name",
-                        },
-                        {
-                            data: "equipment_model",
-                        },
-                        {
-                            data: "buy_date",
-                        },
-                        {
-                            data: "warranty_date",
-                        },
-
-                        {
-                            data: "id",
+<!-- jQuery 2.2.3 -->
+<script src="/static/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<!-- Bootstrap 3.3.6 -->
+<script src="/static/bootstrap/js/bootstrap.min.js"></script>
+<!-- AdminLTE App -->
+<script src="/static/dist/js/app.min.js"></script>
+<script src="/static/dist/js/glo-mess.js"></script>
+<script src="/static/js/plugins/layer/layer.js"></script>
+<script src="/static/plugins/bootstrap-treeview/bootstrap-treeview.js"></script>
+{#<script type="text/javascript">#}
+{#    $(function () {#}
+{#        $('#PERSONAL-WORKORDER').addClass('active');#}
+{#        $('#{{ menu.code }}').addClass('active');#}
+{##}
+{#    });#}
+{##}
+{#    var oDataTable = null;#}
+{#    $(function () {#}
+{#        oDataTable = initTable();#}
+{##}
+{#        function initTable() {#}
+{#            var oTable = $('#dtbList').DataTable($.extend(true, {"scrollx": true},#}
+{#                DATATABLES_CONSTANT.DATA_TABLES.DEFAULT_OPTION,#}
+{#                {#}
+{#                    ajax: {#}
+{#                        "url": "{% url 'adm-equipment:list' %}",#}
+{#                        "data": function (d) {#}
+{#                            d.customer = "{{ work_order.customer_id }}";#}
+{#                        }#}
+{#                    },#}
+{#                    columns: [#}
+{#                        {#}
+{#                            data: "id",#}
+{#                            width: "5%",#}
+{#                        },#}
+{#                        {#}
+{#                            data: "number",#}
+{#                            width: "10%",#}
+{#                        },#}
+{##}
+{##}
+{#                        {#}
+{#                            data: "equipment_type__name",#}
+{#                        },#}
+{#                        {#}
+{#                            data: "equipment_model",#}
+{#                        },#}
+{#                        {#}
+{#                            data: "buy_date",#}
+{#                        },#}
+{#                        {#}
+{#                            data: "warranty_date",#}
+{#                        },#}
+{##}
+{#                        {#}
+{#                            data: "id",#}
                             {#width : "10%",#}
-                            bSortable: "false",
-                            render: function (data, type, row, meta) {
-                                var ret = "<button title='编辑' onclick='doEquipmentUpdate("
-                                    + data + ")'><i class='glyphicon glyphicon-pencil'></i></button>";
-                                return ret;
-                            }
-                        }],
-                }));
-            return oTable;
-        }
-
-
-    });
-
-    function openFile() {
-        layer.open({
-                type: 2,
-                title: "{{ work_order.number }}",
-                shadeClose: false,
-                maxmin: true,
-                area: ['640px', '480px'],
-                content: ["{{ MEDIA_URL }}{{ work_order.file_content }}"],
-                end: function () {
-                }
-            });
-    }
-
-</script>
+{#                            bSortable: "false",#}
+{#                            render: function (data, type, row, meta) {#}
+{#                                var ret = "<button title='编辑' onclick='doEquipmentUpdate("#}
+{#                                    + data + ")'><i class='glyphicon glyphicon-pencil'></i></button>";#}
+{#                                return ret;#}
+{#                            }#}
+{#                        }],#}
+{#                }));#}
+{#            return oTable;#}
+{#        }#}
+{##}
+{##}
+{#    });#}
+{##}
+{#    function openFile() {#}
+{#        layer.open({#}
+{#                type: 2,#}
+{#                title: "{{ work_order.number }}",#}
+{#                shadeClose: false,#}
+{#                maxmin: true,#}
+{#                area: ['640px', '480px'],#}
+{#                content: ["{{ MEDIA_URL }}{{ work_order.file_content }}"],#}
+{#                end: function () {#}
+{#                }#}
+{#            });#}
+{#    }#}
+{##}
+{#</script>#}
 </html>
