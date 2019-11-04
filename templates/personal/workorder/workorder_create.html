@@ -81,6 +81,9 @@
                     <legend>
                         <div class="form-group has-feedback">
                             <div class="col-sm-8" id="back_info_name">立项申请</div>
+                            <div style="position: absolute; margin-left: 200px" id="ao_div">
+                                <input type="checkbox" style="zoom: 130%" id="ao" onchange="applyOnly()"><span style="font-size: 18px">无需报销</span>
+                            </div>
                         </div>
                     </legend>
                     <div class="form-group has-feedback">
@@ -243,6 +246,7 @@
                 }
             });
         }
+
     </script>
     <script src="{% static 'appjs/personal/workorder_create.js' %}"></script>
 

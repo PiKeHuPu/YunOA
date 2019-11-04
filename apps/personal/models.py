@@ -67,6 +67,7 @@ class WorkOrder(models.Model):
     bank_info = models.CharField(max_length=300, blank=True, null=True, verbose_name='开户行')
     advance = models.CharField(max_length=10, choices=advance_choices, default='0', verbose_name='是否预支') # 0 否， 1 预
     adv_payment = models.CharField(max_length=10, choices=payment_choices, default='0', verbose_name='完成预付款') # 0 否， 1 预
+    is_apply_only = models.BooleanField(default=False, verbose_name="是否无需报销")
     # 出差审批 1
     people = models.CharField(max_length=300, blank=True, null=True, verbose_name='随行人员')
     transport = models.CharField(max_length=300, blank=True, null=True, choices=transport_choices, verbose_name='交通工具')

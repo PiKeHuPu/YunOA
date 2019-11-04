@@ -59,17 +59,47 @@ var type_select = new Vue({
     }
 });
 
+function applyOnly(){
+    var is_only = document.getElementById("ao");
+    if (is_only.checked) {
+        document.getElementById("bank-account").readOnly="true";
+        document.getElementById("payee").readOnly="true";
+        document.getElementById("bank-info").readOnly="true";
+        document.getElementById("invoice-type").disabled="true";
+    } else {
+        document.getElementById("bank-account").readOnly=false;
+        document.getElementById("payee").readOnly=false;
+        document.getElementById("bank-info").readOnly=false;
+        document.getElementById("invoice-type").disabled=false;
+    }
+}
+
 function showInfo() {
-    if ($("#order-type option:checked").val() == '0') {
+    if ($("#order-type option:checked").val() == '0'  && $("#advance").val() == '0') {
+        $("#ao_div").hide();
+        $("#ao").prop("checked", false);
+        applyOnly();
         apply_info.seen = true;
         $("#back_info_name").text('立项申请');
         travel_info.seen = false;
     }
-    if ($("#order-type option:checked").val() == '1' && $("#advance").val() == '0') {
+    else if ($("#order-type option:checked").val() == '0'  && $("#advance").val() == '1') {
+        $("#ao_div").show();
+        apply_info.seen = true;
+        $("#back_info_name").text('立项申请');
+        travel_info.seen = false;
+    }
+    else if ($("#order-type option:checked").val() == '1' && $("#advance").val() == '0') {
+        $("#ao_div").hide();
+        $("#ao").prop("checked", false);
+        applyOnly();
         apply_info.seen = false;
         travel_info.seen = true;
         datimeP();
     } else if ($("#order-type option:checked").val() == '1' && $("#advance").val() == '1') {
+        $("#ao_div").hide();
+        $("#ao").prop("checked", false);
+        applyOnly();
         apply_info.seen = true;
         $("#back_info_name").text('预支信息');
         travel_info.seen = true;
@@ -154,6 +184,7 @@ function verify() {
         bank_account = $("#bank-account").val(),
         payee = $("#payee").val(),
         bank_info = $("#bank-info").val(),
+        apply_only = $("#ao").is(":checked"),
 
 
         people = $("#people").val(),
@@ -174,21 +205,42 @@ function verify() {
         return false
     }
     if (type == '0' || advance == '1') {
-        if (isError(invoice_type, '请选择发票类型')) {
-            return false
-        } else if (isError(bank_account, '请输入银行账号')) {
-            return false
-        } else if (bank_account.length < 5 || bank_account.length > 30) {
-            layer.alert('留意银行卡号长度', {icon: 5});
-            return false
-        } else if (!r_num.exec(bank_account)) {
-            layer.alert('银行卡号必须全为数字', {icon: 5});
-            return false
-        } else if (isError(payee, '请输入收款方')) {
-            return false
-        } else if (isError(bank_info, '请输入开户行')) {
-            return false
+        // console.log(apply_only);
+        if (apply_only) {
+
+        } else {
+            if (isError(invoice_type, '请选择发票类型')) {
+                return false
+            } else if (isError(bank_account, '请输入银行账号')) {
+                return false
+            } else if (bank_account.length < 5 || bank_account.length > 30) {
+                layer.alert('留意银行卡号长度', {icon: 5});
+                return false
+            } else if (!r_num.exec(bank_account)) {
+                layer.alert('银行卡号必须全为数字', {icon: 5});
+                return false
+            } else if (isError(payee, '请输入收款方')) {
+                return false
+            } else if (isError(bank_info, '请输入开户行')) {
+                return false
+            }
+            if (isError(invoice_type, '请选择发票类型')) {
+                return false
+            } else if (isError(bank_account, '请输入银行账号')) {
+                return false
+            } else if (bank_account.length < 5 || bank_account.length > 30) {
+                layer.alert('留意银行卡号长度', {icon: 5});
+                return false
+            } else if (!r_num.exec(bank_account)) {
+                layer.alert('银行卡号必须全为数字', {icon: 5});
+                return false
+            } else if (isError(payee, '请输入收款方')) {
+                return false
+            } else if (isError(bank_info, '请输入开户行')) {
+                return false
+            }
         }
+
     } else if (type == '1') {
         if (isError(transport, '情选择交通工具')) {
             return false
@@ -230,6 +282,7 @@ function verify() {
         payee: payee,
         bank_info: bank_info,
         advance: advance,
+        apply_only: apply_only,
 
         people: tem_people,
         transport: transport,

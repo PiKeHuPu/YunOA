@@ -31,6 +31,14 @@
                             <textarea class="form-control" name="cost" id="desc" type="textarea"
                                       style="margin: 0px 3px 0px 0px; height: 486px;resize: vertical">{% if cashier == '1' %}预付款成功{% endif %}</textarea>
                             <br>
+
+{#                            无需报销提示#}
+                            {% if is_apply_only %}
+                                <div>
+                                    <span style="color: red">当前申请预付款完成后结束，无报销流程</span><br>
+                                </div>
+                            {% endif %}
+
                             <div class="text-center">
                                 {% if cashier == '0' %}
                                     <button type="button" class="btn btn-primary" data-toggle="modal"

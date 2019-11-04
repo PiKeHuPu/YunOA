@@ -243,11 +243,15 @@ class WorkOrderCreateView(LoginRequiredMixin, View):
         work_order.structure = request.user.department
         advance = ret_data.get('advance')
         work_order.advance = advance
+        print(ret_data.get("apply_only"))
         if ret_data.get('type') == '0' or advance == '1':  # 立项审批
-            work_order.invoice_type = ret_data.get('invoice_type')
-            work_order.payee = ret_data.get('payee')
-            work_order.bank_account = ret_data.get('bank_account')
-            work_order.bank_info = ret_data.get('bank_info')
+            if ret_data.get('apply_only'):
+                work_order.is_apply_only = ret_data.get('apply_only')
+            else:
+                work_order.invoice_type = ret_data.get('invoice_type')
+                work_order.payee = ret_data.get('payee')
+                work_order.bank_account = ret_data.get('bank_account')
+                work_order.bank_info = ret_data.get('bank_info')
 
         if ret_data.get('type') == '1':  # 出差审批
             work_order.people = ret_data.get('people')
@@ -410,6 +414,8 @@ class WorkOrderAppUpdateView(LoginRequiredMixin, View):
                     i.title = i.title[:10] + "..."
             ret['user_orders'] = user_orders
 
+            ret['is_apply_only'] = work_order.is_apply_only
+
         return render(request, 'personal/workorder/workorder_app_update.html', ret)
 
     def post(self, request):
@@ -466,8 +472,11 @@ class WorkOrderAppUpdateView(LoginRequiredMixin, View):
                                                  structure=request.user.department
                                                  )
                         work_order.adv_payment = '1'
-                        work_order.status = '4'  # 付款完成
-                        apply(work_order, current_user_id)
+                        if work_order.is_apply_only:
+                            work_order.status = '6'  # 付款完成结束
+                        else:
+                            work_order.status = '4'  # 付款完成
+                            apply(work_order, current_user_id)
                     order_log.save()
                     work_order.save()
                     res['status'] = 'success'
