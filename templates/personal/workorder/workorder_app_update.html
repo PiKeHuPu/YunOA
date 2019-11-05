@@ -264,11 +264,11 @@
                                     <td style="text-align: center; font-weight: bolder">申请时间</td>
                                 </tr>
                                 {% for user_order in user_orders %}
-                                <tr>
-                                    <td>{{ user_order.title }}</td>
-                                    <td>{{ user_order.cost }}</td>
-                                    <td style="text-align: center">{{ user_order.create_time }}</td>
-                                </tr>
+                                    <tr>
+                                        <td><a onclick="showDetail({{ user_order.id }})">{{ user_order.title }}</a></td>
+                                        <td>{{ user_order.cost }}</td>
+                                        <td style="text-align: center">{{ user_order.create_time }}</td>
+                                    </tr>
                                 {% endfor %}
 
                             </tbody>
@@ -360,6 +360,18 @@
                 end: function () {
                 }
             });
+        }
+
+        function showDetail(id) {
+            layer.open({
+                type: 2,
+                title: "详情",
+                shadeClose: true,
+                maxmin: true,
+                area: ['640px', '700px'],
+                content: ["{% url 'personal-workorder-app-other-detail' %}" + '?id=' + id],
+
+            })
         }
     </script>
 

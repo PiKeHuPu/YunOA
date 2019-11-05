@@ -62,6 +62,8 @@ urlpatterns = [
     url(r'^personal/workorder_app/$', order.WorkOrderAppView.as_view(), name="personal-workorder-app"),
     url(r'^personal/workorder_app/update', order.WorkOrderAppUpdateView.as_view(),
         name="personal-workorder-app-update"),  # 更新立项审批
+    url(r'^personal/workorder_app/other/detail', order.WorkOrderAppOtherDetailView.as_view(),
+        name="personal-workorder-app-other-detail"),
     ## 历史
     url(r'^personal/workorder_app/log', order.WorkOrderAppLogView.as_view(),
         name="personal-workorder-app-log"),  # 立项/报销审批历史
