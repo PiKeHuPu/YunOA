@@ -1351,3 +1351,43 @@ class WorkOrderAppOtherDetailView(LoginRequiredMixin, View):
             else:
                 ret['ban'] = 'ban'
         return render(request, r'personal\workorder\workorder_app_other_detail.html', ret)
+
+
+class ApplyCostAppOtherDetailView(LoginRequiredMixin, View):
+    """
+    审批报销 弹窗内点击其他报销显示的详情页
+    """
+    def get(self, request):
+        ret = dict()
+        ret["id"] = request.GET.get("id")
+        ap = get_object_or_404(BusinessApply, id=request.GET.get("id"))
+        ret["ap"] = ap
+        people = ap.people
+        if people:
+            ret['people'] = [people]
+            if '|' in people:
+                tem_people = people.split('|')
+                people_obj = User.objects.filter(id__in=tem_people).values('id', 'name')
+                ret['people'] = people_obj
+        invoice_type = ap.invoice_type
+        if invoice_type:
+            ret['invoice_type'] = []
+            in_dict = to_dict(ap.invoice_choices)
+            if '|' in invoice_type:
+                tem = invoice_type.split('|')
+                for i in tem:
+                    ret['invoice_type'].append(in_dict.get(i))
+            else:
+                ret['invoice_type'] = [in_dict.get(invoice_type)]
+
+        transport = ap.transport
+        if transport:
+            ret['transport'] = []
+            tr_dict = to_dict(ap.transport_choices)
+            if '|' in transport:
+                tem = transport.split('|')
+                for i in tem:
+                    ret['transport'].append(tr_dict.get(i))
+            else:
+                ret['transport'] = [tr_dict.get(transport)]
+        return render(request, 'personal/workorder/apply_app_other_detail.html', ret)

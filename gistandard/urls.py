@@ -76,6 +76,8 @@ urlpatterns = [
     url(r'^personal/workorder_ap_cost/list', order.APListView.as_view(), name="personal-workorder_ap_cost-list"),
     url(r'^personal/workorder_ap_cost/$', order.ApplyCostView.as_view(), name="personal-workorder_ap_cost"),
     url(r'^personal/workorder_ap_cost_app/$', order.ApplyCostAppView.as_view(), name="personal-workorder_ap_cost_app"),
+    url(r'^personal/workorder_ap_cost_app/other_detail$', order.ApplyCostAppOtherDetailView.as_view(),
+        name="personal-workorder_ap_cost_app-other_detail"),
     url(r'^personal/workorder_ap_cost_app/update', order.CostAppUpdateView.as_view(),
         name="personal-workorder_ap_cost_app-update"),  # 更新报销审批
     url(r'^update_detail', order.CostAppUpdateDetailView.as_view(),

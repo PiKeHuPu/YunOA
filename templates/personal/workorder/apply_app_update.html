@@ -283,14 +283,15 @@
                                 </tr>
                                 {% for businessApply in businessApplys %}
                                 <tr>
-                                    <td>{{ businessApply.title }}</td>
+                                    <td><a onclick="showApplyDetail({{ businessApply.id }})">{{ businessApply.title }}</a></td>
                                     <td>{{ businessApply.all_fee }}</td>
                                     <td style="text-align: center">{{ businessApply.create_time }}</td>
                                 </tr>
                                 {% endfor %}
-
                             </tbody>
                         </table>
+                        <br>
+                        <br>
                     </div>
 
 
@@ -379,6 +380,17 @@
                     end: function () {
                     }
                 });
+        }
+
+        function showApplyDetail(id) {
+            layer.open({
+                type: 2,
+                title: "详情",
+                shadeClose: true,
+                maxmin: true,
+                area: ['640px', '700px'],
+                content: ["{% url 'personal-workorder_ap_cost_app-other_detail' %}" + "?id=" + id]
+            })
         }
     </script>
 
