@@ -77,7 +77,7 @@ class LoginView(View):
                     # 获取当前用户id
                     user_id = request.session.get('_auth_user_id')
                     # 获取当前用户已读公告
-                    read_bulletin = UserBulletin.objects.filter(user_id=user_id)
+                    read_bulletin = UserBulletin.objects.filter(user_id=user_id, bulletin__status='1')
                     # 获取当前用户已读公告的id列表
                     read_list = []
                     for i in read_bulletin:
