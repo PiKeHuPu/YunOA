@@ -106,6 +106,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 <script>
     var bulletin_info_bool = true;  // 初始没有获取公告信息
     var read_list = []; // 用户已读公告id列表
+    var unread_bullerin_num = -1; // 用户未读公告数量
     function getBulletin() {
         if ($("#control_bulletin").attr("class").search("open") == -1) {
             if (bulletin_info_bool) {
@@ -208,8 +209,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             $.ajax({
                                 type: 'get',
                                 url: "{% url 'database_update' %}",
-                                data : bulletin_id,
-                                success : function(result) {
+                                data: bulletin_id,
+                                success: function(result) {
                                     getBulletin();
                                 },
                             });
@@ -218,6 +219,28 @@ scratch. This page gets rid of all links and provides the needed markup only.
                     });
         layer.full(lay);
     }
+
+    $(function () {
+        $.ajax({
+            async: false,
+            url: '{% url "unread_bulletin" %}',
+            type: 'get',
+            success: function (msg) {
+                unread_bullerin_num = msg.unread_bulletin_num;
+            },
+        });
+
+        if (unread_bullerin_num == -1 | unread_bullerin_num == 0) {
+            $("#info-icon").html("<i class=\"fa fa-envelope-o\"></i>");
+            $("#show_info").attr('hidden', 'true');
+            $("#no_info").attr('hidden', false);
+        } else {
+            $("#info-icon").html("<i class=\"fa fa-envelope\" style='color:red;'></i>");
+            $("#info0").html(unread_bullerin_num);
+            $("#no_info").attr('hidden', 'true');
+        }
+
+    });
 
 </script>
 

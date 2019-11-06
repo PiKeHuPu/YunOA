@@ -21,7 +21,7 @@ from utils.mixin_utils import LoginRequiredMixin
 from rbac.models import Role
 from users.models import Structure
 from system.models import SystemSetup
-from bulletin.models import UserBulletin
+from bulletin.models import UserBulletin, Bulletin
 
 
 class UserBackend(ModelBackend):
@@ -83,10 +83,15 @@ class LoginView(View):
                     for i in read_bulletin:
                         read_list.append(i.bulletin_id)
                     # 获取当前用户已读公告数量
-                    bulletin_num = read_bulletin.count()
-                    # 利用session传递公告id列表
+                    user_bulletin_num = read_bulletin.count()
+                    # 获取当前所有公告数量
+                    bulletin = Bulletin.objects.filter(status='1')
+                    bulletin_num = len(bulletin)
+                    # 用户未读公告数量
+                    unread_bulletin_num = bulletin_num - user_bulletin_num
+                    # 利用session传递已读公告id列表和未读公告数量
                     request.session['read_list'] = read_list
-                    # print(read_list, '+++++++++++++++++++++++++++++++++++++++')
+                    request.session['unread_bulletin_num'] = unread_bulletin_num
 
                     return HttpResponseRedirect(redirect_to)
                 else:

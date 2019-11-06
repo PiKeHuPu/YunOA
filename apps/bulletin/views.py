@@ -190,6 +190,19 @@ class DatabaseUpdateView(LoginRequiredMixin, View):
             user_bulletin.user_id = user_id
             user_bulletin.save()
 
+            # 用户未读公告数量减一
+            request.session['unread_bulletin_num'] = request.session.get('unread_bulletin_num') - 1
+
             rss = request.session.get('read_list')
             rss.append(bulletin_id)
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
+
+
+class UnreadBulletinView(LoginRequiredMixin, View):
+    """
+    未读公告提醒
+    """
+    def get(self, request):
+        ret = dict()
+        ret['unread_bulletin_num'] = request.session.get('unread_bulletin_num')
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
