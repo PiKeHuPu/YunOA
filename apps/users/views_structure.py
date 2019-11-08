@@ -151,6 +151,8 @@ class StructureAdmView(LoginRequiredMixin, View):
             #     structure.userprofile_set.add(user)
             adm_list = ",".join(id_list)
             structure.adm_list = adm_list
-            structure.save()
+        else:
+            structure.adm_list = None
+        structure.save()
         res['result'] = True
         return HttpResponse(json.dumps(res), content_type='application/json')
