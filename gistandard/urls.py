@@ -69,6 +69,11 @@ urlpatterns = [
         name="personal-workorder-app-log"),  # 立项/报销审批历史
     url(r'^personal/app/log$', order.APPLogListView.as_view(),
         name="personal-app-log"),  # 报销历史list
+    # 本部门申请记录(管理员可见)
+    url(r'^personal/app/de_log$', order.APPDeLogListView.as_view(),
+        name="personal-app-de_log"),  # 部门记录
+    url(r'^personal/app/log_content$', order.APPLogListContentView.as_view(),
+        name="personal-app-log-content"),  # 部门记录列表
     ## 报销
     url(r'^personal/workorder_ap_cost/update', order.ApplyCostUpdateView.as_view(),
         name="personal-workorder_ap_cost-update"),

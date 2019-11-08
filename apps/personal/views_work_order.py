@@ -341,7 +341,15 @@ class WorkOrderDetailView(LoginRequiredMixin, View):
             user_list.extend(admin_user_list)
 
             # 和工单无关联的用户禁止通过手动指定ID的形式非法获取数据
-            if request.user.id in user_list:
+            # 当前申请人id
+            cretor_id = work_order.cretor_id
+            structure_id = User.objects.values("department_id").get(id=cretor_id)["department_id"]
+            try:
+                adm_list = Structure.objects.values("adm_list").get(id=structure_id)["adm_list"].split(",")
+            except:
+                adm_list = []
+            print(adm_list)
+            if (request.user.id in user_list) or (str(request.user.id) in adm_list):
                 ret['work_order'] = work_order
                 # ret['work_order_record'] = work_order_record
                 ret['work_order_log'] = work_order_log
@@ -1034,7 +1042,15 @@ class ApDetailView(LoginRequiredMixin, View):
             user_list.extend(admin_user_list)
             user_list.extend(admin_user_list)  # 管理员也可以查看  TODO 等待测试
 
-            if request.user.id in user_list:
+            # 当前申请人id
+            cretor_id = work_order.cretor_id
+            structure_id = User.objects.values("department_id").get(id=cretor_id)["department_id"]
+            try:
+                adm_list = Structure.objects.values("adm_list").get(id=structure_id)["adm_list"].split(",")
+            except:
+                adm_list = []
+            # print(adm_list)
+            if (request.user.id in user_list) or (str(request.user.id) in adm_list):
                 ret['work_order'] = work_order
                 ret['work_order_log'] = work_order_log
             else:
@@ -1391,3 +1407,48 @@ class ApplyCostAppOtherDetailView(LoginRequiredMixin, View):
             else:
                 ret['transport'] = [tr_dict.get(transport)]
         return render(request, 'personal/workorder/apply_app_other_detail.html', ret)
+
+
+class APPDeLogListView(LoginRequiredMixin, View):
+    """
+    部门申请记录
+    """
+    def get(self, request):
+        ret = Menu.getMenuByRequestUrl(url=request.path_info)
+        # app_log = WorkOrderLog.objects.filter(creator=request.user)
+        type_list = to_list(WorkOrder.type_choices)
+        record_list = to_list(WorkOrderLog.record_type_choices)
+        ret['type_list'] = type_list
+        ret['record_list'] = record_list
+        return render(request, 'personal/workorder/workorder_app_de_log.html', ret)
+
+
+class APPLogListContentView(LoginRequiredMixin, View):
+    """
+    部门记录列表
+    """
+    def get(self, request):
+        # 判断当前用户是否是部门管理员
+        user_id = str(request.user.id)
+        structure_id = []
+        structure_list = Structure.objects.all()
+        for s in structure_list:
+            if s.adm_list:
+                adm_list = s.adm_list.split(",")
+                if user_id in adm_list:
+                    structure_id.append(s.id)
+
+        if len(structure_id) != 0:
+            # print(structure_id)
+            fields = ['number', 'id', 'title', 'status', 'type', 'structure__title', 'create_time', 'cretor__name', 'type', 'cost']
+            filters = dict(structure_id__in=structure_id)
+            if request.GET.get('number'):
+                filters['number'] = request.GET.get('number')
+            if request.GET.get('app_type'):
+                filters['type'] = request.GET.get('app_type')
+            if request.GET.get('cretor'):
+                filters['cretor__name'] = request.GET.get('cretor')
+            ret = dict(data=list(WorkOrder.objects.filter(**filters).values(*fields).order_by('-create_time')))
+        else:
+            ret = dict(data=[])
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')

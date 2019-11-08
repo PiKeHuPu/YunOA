@@ -1,0 +1,285 @@
+{% extends "base-left.html" %}
+{% load staticfiles %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugins/datatables/jquery.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+    <!-- iCheck for checkboxes and radio inputs -->
+{% endblock %}
+
+{% block content %}
+
+    <!-- Content Header (Page header) -->
+
+    <section class="content-header margin-bottom">
+        <ol class="breadcrumb">
+            <li><a href=""><i class="fa fa-dashboard"></i>办公平台</a></li>
+            <li class="active"><a href="{% url 'personal' %}">我的工作台</a></li>
+            <li class="active"><a href="#">审批历史</a></li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div id="devlist">
+            <div class="box box-primary" id="liebiao">
+                <div class="box-header">
+                    <div class="btn-group pull-left">&nbsp</div>
+                    <div class="btn-group pull-left">
+                        <button type="button" id="btnRefresh" class="btn btn-default">
+                            <i class="glyphicon glyphicon-refresh"></i>刷新
+                        </button>
+                    </div>
+                    <div class="btn-group pull-left">&nbsp</div>
+                </div>
+                <div class="box-header">
+                    <form class="form-inline" id="queryForm">
+                        <div class="form-group searchArea margin-r-5 margin-top-5">
+                            <label>申请单号：</label>
+                            <input type="text" name="number" class="form-control inputText" id="number"
+                                   placeholder="请输入工单号">
+                        </div>
+                        <div class="form-group searchArea margin-r-5 margin-top-5">
+                            <label>申请人：</label>
+                            <input type="text" name="cretor" class="form-control inputText" id="cretor"
+                                   placeholder="请输入申请人">
+                        </div>
+                        <div class="form-group searchArea margin-r-5 margin-top-5">
+                            <label>审批类型：</label>
+                            <select class="form-control inputText select2" name="app_type" id="app_type">
+                                <option></option>
+                                {% for type in type_list %}
+                                    <option value= {{ type.item }}>{{ type.value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <button type="button" id="btnWorkorderSearch" class="btn btn-default">
+                            <i class="glyphicon glyphicon-search"></i>查询
+                        </button>
+                    </form>
+                </div>
+                <div class="box-body">
+                    <table id="dtbList" class="display" cellspacing="0" width="100%">
+                        <thead>
+                        <tr valign="middle">
+                            <th><input type="checkbox" id="checkAll"></th>
+                            <th>申请单号</th>
+                            <th>事项</th>
+                            <th>审批类型</th>
+                            <th>审批进程</th>
+                            <th>申请部门</th>
+                            <th>申请人</th>
+                            <th>申请金额</th>
+                            <th>审批时间</th>
+                            <th>查看</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <br> <br>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- /.content -->
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables/dataTables.const.js' %}"></script>
+    <script src="{% static 'plugins/datatables/moment.min.js' %}"></script>
+    <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+    <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+    <!-- iCheck 1.0.1 -->
+    <script type="text/javascript">
+        $(function () {
+            $('#PERSONAL-WORKORDER').addClass('active');
+            $('#{{ menu.code }}').addClass('active');
+
+        });
+    </script>
+
+    <script type="text/javascript">
+        var oDataTable = null;
+
+        $(function () {
+            oDataTable = initTable();
+
+            function initTable() {
+                var oTable = $('#dtbList').DataTable($.extend(true, {"scrollx":true},
+                    DATATABLES_CONSTANT.DATA_TABLES.DEFAULT_OPTION,
+                    {
+                        ajax: {
+                            "url": "{% url 'personal-app-log-content' %}",
+                            "data": function (d) {
+                                d.main_url = "{{ menu.url }}";
+                                d.number = $("#number").val();
+                                d.app_type = $("#app_type").val();
+                                d.cretor = $("#cretor").val()
+                            }
+                        },
+                        columns: [
+                            DATATABLES_CONSTANT.DATA_TABLES.COLUMN.CHECKBOX,
+                            {
+                                data: "id",
+                                render: function (data, type, row, meta) {
+                                    var ret = "<a href=\"javascript:void(0);\" onclick='doDetail("
+                                        + data + ")'>" + row.number + "</a>";
+
+                                    return ret;
+                                }
+
+                            },
+                            {
+                                data: "title",
+                                render:function (data, type, row, meta) {
+                                    return data.slice(0,10)
+                                }
+                            },
+                            {
+                                data: "type",
+                                render: function (data, type, row, meta) {
+                                    if (data == 0) {
+                                        var ret = "<button class='btn btn-primary btn-xs'>立项审批</button>";
+                                        return ret;
+                                    }
+                                    if (data == 1) {
+                                        var ret = "<button class='btn btn-warning btn-xs'>出差审批</button>";
+                                        return ret;
+
+                                    }
+
+                                }
+                            },
+                            {
+                                data: "status",
+                                render: function (data, type, row, meta) {
+                                    if (data == 0) {
+                                        var ret = "<button class='btn btn-danger btn-xs'>等待审批</button>";
+                                        return ret;
+                                    }
+                                    else if (data == 1) {
+                                        var ret = "<button class='btn btn-info btn-xs'>审批中</button>";
+                                        return ret;
+
+                                    }
+                                    else if (data == 2) {
+                                        var ret = "<button class='btn btn-success btn-xs'>审批完成</button>";
+                                        return ret;
+                                    }
+                                    else if (data == 3) {
+                                        var ret = "<button class='btn btn-warning btn-xs'>审批被退回</button>";
+                                        return ret;
+                                    }
+                                    else if (data == 4) {
+                                        var ret = "<button class='btn btn-success btn-xs'>预付款完成</button>";
+                                        return ret;
+                                    }
+                                    else if (data == 5) {
+                                        var ret = "<button class='btn btn-info btn-xs'>等待预付款</button>";
+                                        return ret;
+                                    }
+                                    else if (data == 6) {
+                                        var ret = "<button class='btn btn-success btn-xs'>报销完成</button>";
+                                        return ret;
+                                    }
+                                }
+                            },
+                            {
+                                data: "structure__title",
+                            },
+                            {
+                                data: "cretor__name",
+                            },
+                            {
+                                data: "cost",
+                            },
+                            {
+                                data: "create_time",
+                                 render: function (data, type, full, meta) {
+                                    return moment(data).format("YYYY-MM-DD HH:mm");
+                                }
+                            },
+                            {
+                                data: "id",
+                                bSortable: "false",
+
+                                render: function (data, type, row, meta) {
+                                    var ret = "<button title='详情' onclick='doDetail("
+                                        + data + ")'><i class='glyphicon glyphicon-list-alt'></i></button>";
+                                    return ret;
+                                }
+                            }],
+                    }));
+                return oTable;
+            }
+
+            $("#btnWorkorderSearch").click(function () {
+                oDataTable.ajax.reload();
+            });
+
+            //checkbox全选
+            $("#checkAll").on("click", function () {
+                if ($(this).prop("checked") === true) {
+                    $("input[name='checkList']").prop("checked", $(this).prop("checked"));
+                    $('#example tbody tr').addClass('selected');
+                } else {
+                    $("input[name='checkList']").prop("checked", false);
+                    $('#example tbody tr').removeClass('selected');
+                }
+            });
+
+
+            $("#btnCreate").click(function () {
+                var div = layer.open({
+                    type: 2,
+                    title: '创建审批',
+                    shadeClose: false,
+                    maxmin: true,
+                    area: ['800px', '600px'],
+                    content: "{% url 'personal-workorder-create' %}",
+                    end: function () {
+                        //关闭时做的事情
+                        oDataTable.ajax.reload();
+                    }
+                });
+                layer.full(div)
+            });
+
+            $("#btnRefresh").click(function () {
+                oDataTable.ajax.reload();
+            });
+
+
+        });
+
+        $("#btnLog").click(function () {
+                layer.open({
+                    type: 2,
+                    title: '审批历史',
+                    shadeClose: false,
+                    maxmin: true,
+                    area: ['550px', '720px'],
+                    content: ["{% url 'personal-workorder-app-log' %}" + '?type=1'],
+                    end: function () {
+
+                    }
+                });
+            });
+        // 报销
+        function doDetail(id) {
+            window.location.href = "{% url 'personal-workorder-detail' %}?id=" + id;
+        }
+
+
+    </script>
+    <script>
+        $(function () {
+            //Initialize Select2 Elements
+            $(".select2").select2();
+        });
+    </script>
+{% endblock %}
