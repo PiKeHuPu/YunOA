@@ -124,12 +124,10 @@ $(function() {
 									bSortable : "false",
 									render : function(data, type, row, meta) {
 										var ret="";
-										var ret="<button title='详情-编辑' onclick='doUpdate("
-										+ data + ")'><i class='glyphicon glyphicon-pencil'></i></button>";
-										ret=ret+"<button title='关联用户' onclick='doAddUser("
-                                            + data + ")'><i class='glyphicon glyphicon-user'></i></button>";
-										 ret=ret+"<button title='删除' onclick='doDelete("
-                                            + data + ")'><i class='glyphicon glyphicon-trash'></i></button>";
+										var ret="<button title='详情-编辑' onclick='doUpdate("+ data + ")'><i class='glyphicon glyphicon-pencil'></i></button>";
+										ret=ret+"<button title='关联用户' onclick='doAddUser("+ data + ")'><i class='glyphicon glyphicon-user'></i></button>";
+										 ret=ret+"<button title='修改管理员' onclick='doAddAdm("+ data + ")'><i class='fa fa-user-plus'></i></button>";
+										 ret=ret+"<button title='删除' onclick='doDelete("+ data + ")'><i class='glyphicon glyphicon-trash'></i></button>";
 										return ret;
 									}
 								} ],
@@ -274,6 +272,20 @@ function doAddUser(id){
 			window.location.reload();
 		}
 	});
+}
+
+// 修改管理员
+function doAddAdm(id){
+    layer.open({
+        type: 2,
+        title: '修改管理员',
+        maxmin: 'true',
+        area: [ '800px', '600px' ],
+        content: ['{% url "system-basic:structure-add_adm" %}' + '?id=' + id, 'no'],
+        end: function () {
+            window.location.reload();
+        }
+    })
 }
 
 </script>

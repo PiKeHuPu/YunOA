@@ -12,7 +12,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 from .forms import StructureUpdateForm
 from utils.mixin_utils import LoginRequiredMixin
-from users.models import Structure
+from users.models import Structure, UserProfile
 from rbac.models import Menu
 from system.models import SystemSetup
 
@@ -111,3 +111,37 @@ class Structure2UserView(LoginRequiredMixin, View):
         res['result'] = True
         return HttpResponse(json.dumps(res), content_type='application/json')
 
+
+class StructureAdmView(LoginRequiredMixin, View):
+    """
+    组织架构添加部门管理员
+    """
+    def get(self, request):
+        if 'id' in request.GET and request.GET['id']:
+            structure = get_object_or_404(Structure, pk=int(request.GET.get('id')))
+            try:
+                adm_list = structure.adm_list.split(",")
+            except:
+                adm_list = []
+            added_adms = User.objects.filter(id__in=adm_list)
+            all_adms = User.objects.exclude(username='admin')
+            un_add_adms = set(all_adms).difference(added_adms)
+            ret = dict(structure=structure, added_users=added_adms, un_add_users=list(un_add_adms))
+        return render(request, 'system/structure/structure-adm.html', ret)
+
+
+    def post(self, request):
+        res = dict(result=False)
+        id_list = None
+        structure = get_object_or_404(Structure, pk=int(request.POST.get('id')))
+        if 'to' in request.POST and request.POST['to']:
+            # print(request.POST.getlist('to', []))
+            id_list = request.POST.getlist('to', [])
+        if id_list:
+            # for user in User.objects.filter(id__in=id_list):
+            #     structure.userprofile_set.add(user)
+            adm_list = ",".join(id_list)
+            structure.adm_list = adm_list
+            structure.save()
+        res['result'] = True
+        return HttpResponse(json.dumps(res), content_type='application/json')
