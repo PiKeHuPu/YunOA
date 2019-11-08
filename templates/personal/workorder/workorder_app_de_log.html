@@ -136,7 +136,12 @@
                             {
                                 data: "title",
                                 render:function (data, type, row, meta) {
-                                    return data.slice(0,10)
+                                    if (data.length <= 10) {
+                                        return data;
+                                    } else {
+                                        return data.slice(0,10) + "..."
+                                    }
+
                                 }
                             },
                             {
