@@ -35,8 +35,17 @@ class StructureListView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        fields = ['id', 'title', 'type', 'parent__title']
+        fields = ['id', 'title', 'type', 'parent__title', 'adm_list']
         ret = dict(data=list(Structure.objects.values(*fields)))
+        # print(ret)
+        for data in ret["data"]:
+            try:
+                adm_id = data["adm_list"].split(",")
+            except:
+                adm_id = []
+            adm_name = User.objects.values("name").filter(id__in=adm_id)
+            adm_list = ",".join([n["name"] for n in adm_name])
+            data["adm_list"] = adm_list
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
 
 
