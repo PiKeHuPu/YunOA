@@ -24,4 +24,5 @@ urlpatterns = [
     url(r'^structure/detail$', views_structure.StructureDetailView.as_view(), name="structure-detail"),
     url(r'^structure/delete$', views_structure.StructureDeleteView.as_view(), name="structure-delete"),
     url(r'^structure/add_user$', views_structure.Structure2UserView.as_view(), name="structure-add_user"),
+    url(r'^structure/add_adm$', views_structure.StructureAdmView.as_view(), name="structure-add_adm"),
 ]
