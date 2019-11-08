@@ -46,6 +46,7 @@ class Structure(models.Model):
     title = models.CharField(max_length=60, verbose_name="名称")
     type = models.CharField(max_length=20, choices=type_choices, default="department", verbose_name="类型")
     parent = models.ForeignKey("self", null=True, blank=True, verbose_name="父类架构")
+    adm_list = models.CharField(max_length=50, null=True, blank=True, verbose_name="部门管理员")
 
     class Meta:
         verbose_name = "组织架构"
