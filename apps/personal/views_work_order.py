@@ -1260,8 +1260,10 @@ class WorkOrderAppLogView(LoginRequiredMixin, View):
         ret = Menu.getMenuByRequestUrl(url=request.path_info)
         # app_log = WorkOrderLog.objects.filter(creator=request.user)
         type_list = to_list(WorkOrderLog.type_choices)
+        item_type_list = to_list(WorkOrderLog.item_type_choices)
         record_list = to_list(WorkOrderLog.record_type_choices)
         ret['type_list'] = type_list
+        ret['item_type_list'] = item_type_list
         ret['record_list'] = record_list
         return render(request, 'personal/workorder/workorder_app_log.html', ret)
 
@@ -1271,13 +1273,16 @@ class APPLogListView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        fields = ['id', 'order_id__id', 'order_id__number', 'order_id__title', 'type', 'order_id__structure__title',
+        fields = ['id', 'order_id__id', 'order_id__number', 'order_id__title', 'order_id__type',
+                  'type', 'order_id__structure__title',
                   'create_time',  'order_id__cretor__name', 'record_type', 'order_id__cost']
         filters = dict(creator = request.user)
         if request.GET.get('number'):
             filters['order_id__number'] = request.GET.get('number')
         if request.GET.get('record_type'):
             filters['record_type'] = request.GET.get('record_type')
+        if request.GET.get('item_type'):
+            filters['order_id__type'] = request.GET.get('item_type')
         if request.GET.get('app_type'):
             filters['type'] = request.GET.get('app_type')
         if request.GET.get('cretor'):

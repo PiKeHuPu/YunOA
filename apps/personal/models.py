@@ -120,6 +120,7 @@ class WorkOrderLog(models.Model):
     """
     record_type_choices = CHOICES['WorkOrderLog_record_type']
     type_choices = CHOICES['WorkOrderLog_type']
+    item_type_choices = CHOICES['WorkOrder_type0']
     order_id = models.ForeignKey(WorkOrder, verbose_name='申报表id')
     record_type = models.CharField(max_length=10, choices=record_type_choices, verbose_name='审批意见')
     type = models.CharField(max_length=10, choices=type_choices, verbose_name='日志类型', default='0')   # ‘0’，审批， ‘1’， 报销

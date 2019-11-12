@@ -54,6 +54,17 @@
                                 {% endfor %}
                             </select>
                         </div>
+
+                        <div class="form-group searchArea margin-r-5 margin-top-5">
+                            <label>事项类型：</label>
+                            <select class="form-control inputText select2" name="item_type" id="item_type">
+                                <option></option>
+                                {% for type0 in item_type_list %}
+                                    <option value= {{ type0.item }}>{{ type0.value }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
                         <div class="form-group searchArea margin-r-5 margin-top-5">
                             <label>审批类型：</label>
                             <select class="form-control inputText select2" name="app_type" id="app_type">
@@ -135,8 +146,9 @@
                                 d.main_url = "{{ menu.url }}";
                                 d.number = $("#number").val();
                                 d.record_type = $("#record_type").val();
+                                d.item_type = $("#item_type").val();
                                 d.app_type = $("#app_type").val();
-                                d.cretor = $("#cretor").val()
+                                d.cretor = $("#cretor").val();
                             }
                         },
                         columns: [
