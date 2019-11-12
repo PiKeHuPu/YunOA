@@ -1,3 +1,5 @@
+{% load staticfiles %}
+
 <!DOCTYPE html>
 <html lang="zh">
 <head>
@@ -283,4 +285,34 @@
 
     <!-- /.content -->
 </body>
+<!-- jQuery 2.2.3 -->
+<script src="/static/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<!-- Bootstrap 3.3.6 -->
+<script src="/static/bootstrap/js/bootstrap.min.js"></script>
+<!-- AdminLTE App -->
+<script src="/static/dist/js/app.min.js"></script>
+<script src="/static/dist/js/glo-mess.js"></script>
+<script src="/static/js/plugins/layer/layer.js"></script>
+<script src="/static/plugins/bootstrap-treeview/bootstrap-treeview.js"></script>
+<script type="text/javascript">
+    $(function () {
+        $('#PERSONAL-WORKORDER').addClass('active');
+        $('#{{ menu.code }}').addClass('active');
+
+    });
+
+    function openFile() {
+        var index = layer.open({
+                type: 2,
+                title: "{{ ap.workorder.number }}",
+                shadeClose: false,
+                maxmin: true,
+                area: ['640px', '480px'],
+                content: ["{{ MEDIA_URL }}{{ ap.file_content }}"],
+                end: function () {
+                }
+            });
+        layer.full(index)
+    }
+</script>
 </html>

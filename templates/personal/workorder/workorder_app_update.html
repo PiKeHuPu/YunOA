@@ -16,44 +16,6 @@
 
         <section class="content">
             <div class="row" {% if ban %}hidden{% endif %}>
-                <div class="col-md-2">
-                    <div class="box box-primary">
-                        <div class="box-header with-border">
-                            <h3 class="box-title">{% if cashier == '0' %}审批意见{% else %}完成付款{% endif %}</h3>
-                            <div class="box-tools">
-                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
-                                        class="fa fa-minus"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="box-body no-padding">
-
-                            <textarea class="form-control" name="cost" id="desc" type="textarea"
-                                      style="margin: 0px 3px 0px 0px; height: 486px;resize: vertical">{% if cashier == '1' %}预付款成功{% endif %}</textarea>
-                            <br>
-
-{#                            无需报销提示#}
-                            {% if is_apply_only %}
-                                <div>
-                                    <span style="color: red">当前申请预付款完成后结束，无报销流程</span><br>
-                                </div>
-                            {% endif %}
-
-                            <div class="text-center">
-                                {% if cashier == '0' %}
-                                    <button type="button" class="btn btn-primary" data-toggle="modal"
-                                            onclick="updateOpin('disagree')">不同意
-                                    </button>
-                                {% endif %}
-                                <button type="button" class="btn btn-danger" onclick="updateOpin('agree')">
-                                    {% if cashier == '1' %}完成预付款{% else %}同意{% endif %}
-                                </button>
-                            </div>
-                        </div>
-                        <!-- /.box-body -->
-                    </div>
-                    <!-- /. box -->
-                </div>
                 <!-- /.col -->
                 <div class="col-md-6">
                     <div class="box box-primary">
@@ -68,7 +30,7 @@
                         <div class="box-body">
 
                             <textarea class="form-control" name="cost" id="desc" type="textarea" disabled="disabled"
-                                      style="margin: 0px 10px 0px 0px; height: 250px; resize:vertical;">{{ work_order.title|safe }}</textarea>
+                                      style="margin: 0px 10px 0px 0px; height: 200px; resize:vertical;">{{ work_order.title|safe }}</textarea>
                             <br>
                             {% if work_order.file_content %}
                                 <td>
@@ -186,13 +148,49 @@
                                     </tbody>
                                 </table>
                             </div>
-                            <div class="box-footer ">
-
-                            </div>
-
+{#                            <div class="box-footer ">#}
+{#                            </div>#}
                         </div>
                         <!-- /.box-body -->
                     </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">{% if cashier == '0' %}审批意见{% else %}完成付款{% endif %}</h3>
+                            <div class="box-tools">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                        class="fa fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="box-body no-padding">
+
+                            <textarea class="form-control" name="cost" id="desc" type="textarea"
+                                      style="margin: 0px 3px 0px 0px; height: 210px;resize: vertical">{% if cashier == '1' %}预付款成功{% endif %}</textarea>
+                            <br>
+
+{#                            无需报销提示#}
+                            {% if is_apply_only %}
+                                <div>
+                                    <span style="color: red">当前申请预付款完成后结束，无报销流程</span><br>
+                                </div>
+                            {% endif %}
+
+                            <div class="text-center">
+                                {% if cashier == '0' %}
+                                    <button type="button" class="btn btn-primary" data-toggle="modal"
+                                            onclick="updateOpin('disagree')">不同意
+                                    </button>
+                                {% endif %}
+                                <button type="button" class="btn btn-danger" onclick="updateOpin('agree')">
+                                    {% if cashier == '1' %}完成预付款{% else %}同意{% endif %}
+                                </button>
+                            </div>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                    <!-- /. box -->
                 </div>
                 <div class="col-md-4">
                     <!-- /. end worklist_details box -->
@@ -281,7 +279,7 @@
             </div>
             <!-- /.col -->
 
-        </div>
+
         <!-- /.row -->
         </section>
 
@@ -295,7 +293,6 @@
     <script src="{% static 'plugins/datatables/moment.min.js' %}"></script>
     <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
     <script type="text/javascript">
-
         function updateOpin(opinion) {
             var desc = $('#desc').val();
             var data = {
@@ -368,7 +365,8 @@
                 title: "详情",
                 shadeClose: true,
                 maxmin: true,
-                area: ['640px', '700px'],
+                area: ['640px', '580px'],
+                fixed:false,
                 content: ["{% url 'personal-workorder-app-other-detail' %}" + '?id=' + id],
 
             })
