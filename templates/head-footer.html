@@ -67,7 +67,7 @@
                             <!-- Menu Toggle Button -->
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                 <!-- The user image in the navbar-->
-                                <img src="/media/{{ request.user.image }}" class="user-image" alt="用户头像">
+                                <img src="/media/{{ request.user.image }}" class="user-image" alt="用户头像" onerror="this.src='/media/image/default.jpg'">
                                 <!-- hidden-xs hides the username on small devices so only the image appears. -->
                                 <span class="hidden-xs">{{ request.user.name }}</span>
                                 <!--上面 request.user 会返回用户姓名，user.models.UserProfile.Meta定义该值-->
@@ -76,7 +76,7 @@
                             <ul class="dropdown-menu">
                             <!-- The user image in the menu -->
                             <li class="user-header">
-                                <img src="/media/{{ request.user.image }}" class="img-circle" alt="User Image">
+                                <img src="/media/{{ request.user.image }}" class="img-circle" alt="User Image" onerror="this.src='/media/image/default.jpg'">
 
                                 <p>
                                     <!--gender字段定义的choices类型，想要获取字段的value,使用get_gender_display-->
