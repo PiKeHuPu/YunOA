@@ -26,6 +26,7 @@ from personal import views as personal_views
 from personal import views_work_order as order
 from adm.views_asset import AssetUseHtmlView, AssetUseInfoView, AssetBackView
 from bulletin import views as bulletin_views
+from oilWear import views as oilWear_views
 
 
 urlpatterns = [
@@ -40,6 +41,7 @@ urlpatterns = [
     url(r'^system/basic/', include('users.urls', namespace='system-basic')),
     url(r'^system/rbac/', include('rbac.urls', namespace='system-rbac')),
     url(r'^system/tools/', include('system.urls', namespace='system-tools')),
+    url(r'^system/oilWear/', include('oilWear.urls', namespace='system-oilWear')),
     url(r'^system/personal/', include('personal.urls', namespace='system-personal')),
     # 资产模块
     url(r'^adm/$', AdmView.as_view(), name="adm-main"),
@@ -116,4 +118,6 @@ urlpatterns = [
 
     # 未读公告提醒
     url(r'system/bulletin/unread_bulletin$', bulletin_views.UnreadBulletinView.as_view(), name="unread_bulletin"),
+
+    # 油耗表
 ]
