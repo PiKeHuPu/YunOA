@@ -118,10 +118,10 @@ $(function() {
 									bSortable : "false",
 									render : function(data, type, row, meta) {
 										var ret="<button title='编辑' onclick='doUpdate("
-										+ data + ")'><i class='glyphicon glyphicon-pencil'></i></button>"
-                                        var ret1 = "<button title='修改管理员' onclick='doUpdate("
+										+ data + ")'><i class='glyphicon glyphicon-pencil'></i></button>";
+                                        var ret1 = "<button title='修改管理员' onclick='doAddAdm("
 										+ data + ")'><i class='glyphicon glyphicon-user'></i></button>";
-										var ret2 = "<button title='删除' onclick='doUpdate("
+										var ret2 = "<button title='删除' onclick='doDelete("
 										+ data + ")'><i class='glyphicon glyphicon-trash'></i></button>";
 										return ret + ret1 + ret2;
 									}
@@ -179,9 +179,38 @@ function doUpdate(id){
 	});
 }
 
+// 修改管理员
+function doAddAdm(id){
+    layer.open({
+        type: 2,
+        title: '修改管理员',
+        maxmin: 'true',
+        area: [ '800px', '600px' ],
+        content: ['{% url "system-oilWear:vehicle_adm" %}' + '?id=' + id, 'no'],
+        end: function () {
+            window.location.reload();
+        }
+    })
+}
 
+// 删除载具
+function doDelete(id) {
+    var con = confirm("确定删除该车辆吗？");
+    if (con === true){
+        $.ajax({
+            type: 'post',
+            url: '{% url "system-oilWear:vehicle_delete" %}',
+            data: {"id": id},
+            success: function (data) {
+                if (data.success){
+                    alert('删除成功');
+                    window.location.reload()
+                }
+        }
+    })
+    }
 
-
+}
 
 </script>
 {% endblock %}

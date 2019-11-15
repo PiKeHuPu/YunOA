@@ -17,16 +17,16 @@
             <div class="form-group has-feedback">
                 <label class="col-sm-2 control-label">车型</label>
                 <div class="col-sm-3">
-                    <input class="form-control" name="vehicle_type" type="text" value="{{ vehicle.type }}"/>
+                    <input class="form-control" name="vehicle_type" id="vehicle_type" type="text" value="{{ vehicle.type }}" maxlength="30"/>
                 </div>
                 <label class="col-sm-2 control-label">车牌号</label>
                 <div class="col-sm-3">
-                    <input class="form-control" name="license_plate" type="text" value="{{ vehicle.license_plate }}"/>
+                    <input class="form-control" name="license_plate" id="license_plate" type="text" value="{{ vehicle.license_plate }}" maxlength="10"/>
                 </div>
                 <br><br>
                 <label class="col-sm-2 control-label">所属部门</label>
                 <div class="col-sm-3">
-                    <input class="form-control" name="department" type="text" value="{{ vehicle.department }}"/>
+                    <input class="form-control" name="department" id="department" type="text" value="{{ vehicle.department }}" maxlength="20"/>
                 </div>
                 <label class="col-sm-2 control-label">管理员</label>
                   <div class="col-sm-3">
@@ -58,23 +58,32 @@
 <script type="text/javascript">
 
 	$("#btnSave").click(function(){
-		var data = $("#addForm").serialize();
-		$.ajax({
-			type: $("#addForm").attr('method'),
-			url : "{% url 'system-oilWear:vehicle_create' %}",
-			data : data,
-			cache: false,
-			success : function(msg) {
-				if (msg.result){
-					layer.alert('数据保存成功！', {icon: 1},function(index){
-					    parent.layer.closeAll(); //关闭所有弹窗
-                    });
-				}else{
-					layer.alert('数据保存失败', {icon: 5});
-                    //$('errorMessage').html(msg.message)
-				}
-			}
-		});
+        if($("#vehicle_type").val()=="")
+        {
+            alert("请填写车型")
+        } else if ($("#license_plate").val()==""){
+	        alert("请填写车牌号")
+        } else if ($("#department").val()==""){
+            alert("请填写所属部门")
+        } else{
+           var data = $("#addForm").serialize();
+           $.ajax({
+               type: $("#addForm").attr('method'),
+               url : "{% url 'system-oilWear:vehicle_create' %}",
+               data : data,
+               cache: false,
+               success : function(msg) {
+                   if (msg.result){
+                       layer.alert('数据保存成功！', {icon: 1},function(index){
+                           parent.layer.closeAll(); //关闭所有弹窗
+                       });
+                   }else{
+                       layer.alert('数据保存失败', {icon: 5});
+                       //$('errorMessage').html(msg.message)
+                   }
+               }
+           });
+        }
 	});
 
 
