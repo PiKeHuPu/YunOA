@@ -34,6 +34,20 @@
                     </button>
                 </div>
             </div>
+
+            <div class="box-header">
+                    <form class="form-inline" id="queryForm">
+                        <div class="form-group searchArea margin-r-5 margin-top-5">
+                            <label>车牌号：</label>
+                            <input type="text" name="number" class="form-control inputText" id="number"
+                                   placeholder="请输入车牌号">
+                        </div>
+                        <button type="button" id="btnWorkorderSearch" class="btn btn-default">
+                            <i class="glyphicon glyphicon-search"></i>查询
+                        </button>
+                    </form>
+            </div>
+
             <div class="box-body">
                 <table id="dtbList" class="display" cellspacing="0" width="100%">
                     <thead>
@@ -86,7 +100,7 @@ $(function() {
 							ajax : {
 								"url":"{% url 'system-oilWear:vehicle_list' %}",
 								"data":function ( d ) {
-									//d.select=$("#select").val();
+									d.number = $("#number").val();
 								}
 						},
 						columns : [
@@ -130,6 +144,10 @@ $(function() {
 						}));
 		return oTable;
 	}
+
+    $("#btnWorkorderSearch").click(function () {
+        oDataTable.ajax.reload();
+    });
 
 	//checkbox全选
     $("#checkAll").on("click", function () {

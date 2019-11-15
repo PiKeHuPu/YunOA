@@ -78,7 +78,11 @@ class VehicleListView(LoginRequiredMixin, View):
 
     def get(self, request):
         fields = ['id', 'license_plate', 'department', 'type', 'create_time']
-        ret = dict(data=list(Vehicle.objects.values(*fields).filter(is_delete=False).order_by('id')))
+        filters = dict()
+        if request.GET.get('number'):
+            filters['license_plate'] = request.GET.get('number')
+
+        ret = dict(data=list(Vehicle.objects.filter(**filters).values(*fields).filter(is_delete=False).order_by('-create_time')))
         # 获取载具管理员
         for car in ret['data']:
             operator_list = Operator.objects.filter(vehicle_id=car['id'])
