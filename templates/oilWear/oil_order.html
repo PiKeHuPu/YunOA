@@ -1,0 +1,166 @@
+{% extends "base-left.html" %}
+{% load staticfiles %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugins/datatables/jquery.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+    <!-- iCheck for checkboxes and radio inputs -->
+{% endblock %}
+
+{% block content %}
+
+    <!-- Content Header (Page header) -->
+
+    <section class="content-header margin-bottom">
+        <ol class="breadcrumb">
+            <li><a href=""><i class="fa fa-dashboard"></i>办公平台</a></li>
+            <li class="active"><a href="{% url 'personal' %}">我的工作台</a></li>
+            <li class="active"><a href="#">油耗记录</a></li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div id="devlist">
+            <div class="box box-primary" id="liebiao">
+                <div class="box-header">
+                    <div class="btn-group pull-left">&nbsp</div>
+                    <div class="btn-group pull-left">
+                        <button type="button" id="btnCreate" class="btn btn-primary ">
+                            <i class="glyphicon glyphicon-plus"></i>新增
+                        </button>
+
+                    </div>
+                    <div class="btn-group pull-left">&nbsp</div>
+                    <div class="btn-group pull-left">
+                        <button type="button" id="btnRefresh" class="btn btn-default">
+                            <i class="glyphicon glyphicon-refresh"></i>刷新
+                        </button>
+                    </div>
+                </div>
+                <div class="box-header">
+                    <form class="form-inline" id="queryForm">
+                        <div class="form-group searchArea margin-r-5 margin-top-5">
+                            <label>车牌号：</label>
+                            <input type="text" name="number" class="form-control inputText" id="number"
+                                   placeholder="请输入工单号">
+                        </div>
+                        <button type="button" id="btnWorkorderSearch" class="btn btn-default">
+                            <i class="glyphicon glyphicon-search"></i>查询
+                        </button>
+                    </form>
+                </div>
+                <div class="box-body">
+                    <table id="dtbList" class="display" cellspacing="0" width="100%">
+                        <thead>
+                        <tr valign="middle">
+                            <th><input type="checkbox" id="checkAll"></th>
+                            <th>车牌号</th>
+                            <th>车型</th>
+                            <th>部门</th>
+                            <th>提交人</th>
+                            <th>加油日期</th>
+                            <th>公里数</th>
+                            <th>加油量(升)</th>
+                            <th>油量单价</th>
+                            <th>金额</th>
+                            <th>备注</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <br> <br>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- /.content -->
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables/dataTables.const.js' %}"></script>
+    <script src="{% static 'plugins/datatables/moment.min.js' %}"></script>
+    <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+    <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+    <!-- iCheck 1.0.1 -->
+    <script type="text/javascript">
+        $(function () {
+            $('#OIL-ORDER').addClass('active');
+            $('#OIL-ORDER-VIEW').addClass('active');
+
+        });
+    </script>
+
+    <script type="text/javascript">
+        var oDataTable = null;
+        var data = [
+            {% for menu in menu_list %}
+                {
+                    "vehicle_id__license_plate": "{{ menu.vehicle.license_plate }}",
+                    "vehicle_id__type": "{{ menu.vehicle.type }}",
+                    "vehicle_id__department": "{{ menu.vehicle.department }}",
+                    "operator__name": "{{ menu.operator.name }}",
+                    "refuel_time": "{{ menu.refuel_time }}",
+                    "mileage": "{{ menu.mileage }}",
+                    "weight": "{{ menu.weight }}",
+                    "price": "{{ menu.price }}",
+                    "amount": "{{ menu.amount }}",
+                    "remark": "{{ menu.remark }}",
+                },
+            {% endfor %}
+        ];
+        $(function () {
+            oDataTable = initTable();
+            function initTable() {
+                var oTable = $('#dtbList').DataTable(
+                    $.extend(true, {"scrollX": true},
+                    DATATABLES_CONSTANT.DATA_TABLES.DEFAULT_OPTION,
+                    {
+                        data: data,
+                        columns: [
+                            DATATABLES_CONSTANT.DATA_TABLES.COLUMN.CHECKBOX,
+                            {
+                                data: "vehicle_id__license_plate",
+                            },
+                            {
+                                data: "vehicle_id__type",
+                            },
+                            {
+                                data: "vehicle_id__department",
+                            },
+                            {
+                                data: "operator__name",
+                            },
+                            {
+                                data: "refuel_time",
+                            },
+                            {
+                                data: "mileage",
+                            },
+                            {
+                                data: "weight",
+                            },
+                            {
+                                data: "price",
+                            },
+                            {
+                                data: "amount",
+                            },
+                            {
+                                data: "remark",
+                            }],
+                    }));
+                return oTable;
+            }
+        });
+
+        $(function () {
+            //Initialize Select2 Elements
+            $(".select2").select2();
+        });
+    </script>
+{% endblock %}

@@ -5,12 +5,14 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
+from django.test.testcases import to_list
 from django.views import View
 
+from personal.models import WorkOrder
 from rbac.models import Menu
 from system.models import SystemSetup
 from users.models import UserProfile
-from .models import Vehicle, Operator
+from .models import Vehicle, Operator, OilWear
 
 User = get_user_model()
 
@@ -153,3 +155,14 @@ class VehicleDeleteView(LoginRequiredMixin, View):
         vehicle.save()
         res['success'] = True
         return HttpResponse(json.dumps(res), content_type='application/json')
+
+
+class OilOrderView(LoginRequiredMixin, View):
+    """
+    油耗表
+    """
+    def get(self, request):
+        ret = dict()
+        menu_list = OilWear.objects.all()
+        ret["menu_list"] = menu_list
+        return render(request, "oilWear/oil_order.html", ret)

@@ -22,7 +22,7 @@ class OilWear(models.Model):
     油耗表
     """
     vehicle = models.ForeignKey(Vehicle, verbose_name="载具")
-    operator = models.CharField(max_length=10, verbose_name="提交人")
+    operator = models.ForeignKey(User, verbose_name="提交人")
     refuel_time = models.DateField(verbose_name="加油时间")
     operate_time = models.DateTimeField(auto_now_add=True, verbose_name="操作时间")
     mileage = models.FloatField(verbose_name="加油前公里数")

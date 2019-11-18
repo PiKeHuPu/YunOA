@@ -107,6 +107,8 @@ urlpatterns = [
     url(r'^personal/asset/use/info$', AssetUseHtmlView.as_view(), name="personal-asset-use-html"),
     url(r'^personal/asset/use$', AssetUseInfoView.as_view(), name="personal-asset-use"),
     url(r'^personal/asset/use/back$', AssetBackView.as_view(), name="personal-asset-use-back"),
+    # 油耗表
+    url(r'^personal/oilWear/', include('oilWear.oilWear_urls', namespace='personal-oilWear')),
     ## 公告栏
     url(r'system/bulletin/create$', bulletin_views.CreateView.as_view(), name="bulletin_create"),
     url(r'system/bulletin/show$', bulletin_views.ShowView.as_view(), name="bulletin_show"),
