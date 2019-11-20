@@ -104,7 +104,7 @@ class LoginView(View):
                 return render(request, "system/users/login.html", ret)
 
         else:
-            msg = "用户名和密码不能够为空！"
+            msg = "请完整填写信息！"
             ret = {"msg": msg, "login_form": login_form}
             return render(request, "system/users/login.html", ret)
 
