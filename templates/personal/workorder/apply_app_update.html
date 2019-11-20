@@ -333,15 +333,15 @@
     <script type="text/javascript">
 
         function updateOpin(opinion) {
-            var desc = $('#desc').val();
+            var desc0 = $('#desc0').val();
             var data = {
                 'opinion': opinion,
                 'id': '{{ ap.id }}',
-                'desc': desc,
+                'desc0': desc0,
                 'type': '{{ ap.type }}',
                 'structure': '{{ ap.structure.id }}'
             };
-            if (opinion == 'disagree' && desc == '') {
+            if (opinion == 'disagree' && desc0 == '') {
                 layer.alert('不同意，请写下审批意见', {icon: 5});
                 return
             }
