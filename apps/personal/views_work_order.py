@@ -450,7 +450,7 @@ class WorkOrderAppUpdateView(LoginRequiredMixin, View):
                     work_order.status = '5'  # 等待付款
                 order_log = WorkOrderLog(order_id=work_order,
                                          record_type='0',
-                                         desc=ret_data.get('desc', ''),
+                                         desc=ret_data.get('desc0', ''),
                                          creator=request.user,
                                          structure=request.user.department
                                          )
@@ -460,7 +460,7 @@ class WorkOrderAppUpdateView(LoginRequiredMixin, View):
                 work_order.status = '3'
                 order_log = WorkOrderLog(order_id=work_order,
                                          record_type='1',
-                                         desc=ret_data.get('desc', ''),
+                                         desc=ret_data.get('desc0', ''),
                                          creator=request.user,
                                          structure=request.user.department
                                          )
@@ -475,7 +475,7 @@ class WorkOrderAppUpdateView(LoginRequiredMixin, View):
                         # 记录审批log
                         order_log = WorkOrderLog(order_id=work_order,
                                                  record_type='0',
-                                                 desc=ret_data.get('desc', ''),
+                                                 desc=ret_data.get('desc0', ''),
                                                  creator=request.user,
                                                  structure=request.user.department
                                                  )
@@ -1149,7 +1149,7 @@ class CostAppUpdateView(LoginRequiredMixin, View):
                 order_log = WorkOrderLog(order_id=ap.workorder,
                                          type='1',
                                          record_type='0',
-                                         desc=ret_data.get('desc', ''),
+                                         desc=ret_data.get('desc0', ''),
                                          creator=request.user,
                                          structure=request.user.department
                                          )
@@ -1159,7 +1159,7 @@ class CostAppUpdateView(LoginRequiredMixin, View):
                 order_log = WorkOrderLog(order_id=ap.workorder,
                                          type='1',
                                          record_type='1',
-                                         desc=ret_data.get('desc', ''),
+                                         desc=ret_data.get('desc0', ''),
                                          creator=request.user,
                                          structure=request.user.department
                                          )
@@ -1180,7 +1180,7 @@ class CostAppUpdateView(LoginRequiredMixin, View):
                         order_log = WorkOrderLog(order_id=ap.workorder,
                                                  type='1',
                                                  record_type='0',
-                                                 desc=ret_data.get('desc', ''),
+                                                 desc=ret_data.get('desc0', ''),
                                                  creator=request.user,
                                                  structure=request.user.department
                                                  )

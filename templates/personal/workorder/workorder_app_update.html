@@ -166,7 +166,7 @@
                         </div>
                         <div class="box-body no-padding">
 
-                            <textarea class="form-control" name="cost" id="desc" type="textarea"
+                            <textarea class="form-control" name="cost" id="desc0" type="textarea"
                                       style="margin: 0px 3px 0px 0px; height: 210px;resize: vertical">{% if cashier == '1' %}预付款成功{% endif %}</textarea>
                             <br>
 
@@ -294,15 +294,15 @@
     <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
     <script type="text/javascript">
         function updateOpin(opinion) {
-            var desc = $('#desc').val();
+            var desc0 = $('#desc0').val();
             var data = {
                 'opinion': opinion,
                 'id': '{{ work_order.id }}',
-                'desc': desc,
+                'desc0': desc0,
                 'type': '{{ work_order.type }}',
                 'structure': '{{ work_order.structure.id }}'
             };
-            if (opinion == 'disagree' && desc == '') {
+            if (opinion == 'disagree' && desc0 == '') {
                 layer.alert('不同意，请写下审批意见', {icon: 5});
                 return
             }
