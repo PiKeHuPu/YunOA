@@ -70,9 +70,11 @@
                                         <input class="form-control" name="name" type="text" value="{{ user.name }}"/>
                                     </div>
                                     <label class="col-sm-2 control-label">性别</label>
+
                                     <div class="col-sm-3">
-                                        <select class="form-control" name="gender">
-                                            <option value={{ user.gender }}> {{ user.get_gender_display }} </option>
+                                        <select class="form-control" name="gender">\
+
+                                            <option value="" disabled selected hidden>{{ user.get_gender_display }}</option>
                                             <option value="male">男</option>
                                             <option value="famale">女</option>
                                         </select>
