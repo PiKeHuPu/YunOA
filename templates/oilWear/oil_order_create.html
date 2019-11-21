@@ -1,0 +1,128 @@
+{% extends 'base-layer.html' %}
+{% load staticfiles %}
+{% block css %}
+<link rel="stylesheet" href="{%static 'plugins/select2/select2.min.css' %}">
+<link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-datetimepicker.min.css' %}">
+<!-- iCheck for checkboxes and radio inputs -->
+{% endblock %}
+{% block main %}
+<div class="box box-danger">
+	<form class="form-horizontal" id="addForm" method="post">
+		{% csrf_token %}
+		<input type="hidden" name='id' value="{{ vehicle.id }}" />
+		<div class="box-body">
+          <fieldset>
+            <div class="form-group has-feedback">
+                <label class="col-sm-2 control-label">车牌号</label>
+                <div class="col-sm-3">
+                    <select class="form-control select2" name="license_plate" id="license_plate">
+                        {% for rel in rels %}
+                        <option value={{ rel.vehicle.id }} > {{ rel.vehicle.license_plate }}&nbsp;&nbsp;{{ rel.vehicle.department }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <label class="col-sm-2 control-label">加油日期</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="refuel_time" id="refuel_time" type="text" autocomplete="off"/>
+                </div>
+                <br><br>
+                <label class="col-sm-2 control-label">加油前公里数</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="mileage" id="mileage" type='number' step="0.01" min="0"/>
+                </div>
+
+                <label class="col-sm-2 control-label">加油量(升)</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="weight" id="weight" type='number' step="0.01" min="0"/>
+                </div>
+                <br><br>
+                <label class="col-sm-2 control-label">油量单价(升)</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="price" id="price" type='number' step="0.01" min="0"/>
+                </div>
+
+                <label class="col-sm-2 control-label">金额</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="amount" id="amount" type='number' step="0.01" min="0"/>
+                </div>
+                <br><br>
+                <label class="col-sm-2 control-label">备注</label>
+                <div class="col-sm-3">
+                    <textarea name="remark" id="remark" cols="73" rows="2" maxlength="50"></textarea>
+                </div>
+            </div>
+          </fieldset>
+        </div>
+
+		<div class="box-footer ">
+			<div class="row span7 text-center ">
+              <button type="button" id="btnCancel" class="btn btn-default margin-right " >重置</button>
+              <button type="button" id="btnSave" class="btn btn-info margin-right " >保存</button>
+			</div>
+		    </div>
+    	</form>
+    </div>
+
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
+<script type="text/javascript">
+    $("#refuel_time").datetimepicker({
+        format: 'yyyy-mm-dd',
+        language: 'zh',
+        autoclose: 1,
+        forceParse: 0,
+        minView: 2,
+    });
+
+	$("#btnSave").click(function(){
+        if($("#refuel_time").val()=="")
+        {
+            alert("请选择加油日期")
+        } else if ($("#mileage").val()==""){
+	        alert("请输入加油前公里数")
+        } else if ($("#weight").val()==""){
+            alert("请输入加油量")
+        } else if ($("#price").val()==""){
+            alert("请输入油量单价")
+        } else if ($("#amount").val()==""){
+            alert("请输入金额")
+        } else{
+           var data = $("#addForm").serialize();
+           $.ajax({
+               type: $("#addForm").attr('method'),
+               url : "{% url 'oil_order_create' %}",
+               data : data,
+               cache: false,
+               success : function(msg) {
+                   if (msg.result){
+                       layer.alert('数据保存成功！', {icon: 1},function(index){
+                           parent.layer.closeAll(); //关闭所有弹窗
+                       });
+                   }else{
+                       layer.alert('数据保存失败', {icon: 5});
+                       //$('errorMessage').html(msg.message)
+                   }
+               },
+           });
+        }
+	});
+
+
+	/*点取消刷新新页面*/
+    $("#btnCancel").click(function () {
+	    window.location.reload();
+
+    });
+
+  $(function () {
+    //Initialize Select2 Elements
+    $(".select2").select2();
+  });
+
+</script>
+
+{% endblock %}

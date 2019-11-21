@@ -5,7 +5,13 @@
     <link rel="stylesheet" href="{% static 'plugins/datatables/jquery.dataTables.min.css' %}">
     <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-datetimepicker.min.css' %}">
     <!-- iCheck for checkboxes and radio inputs -->
+    <style>
+        .stst{
+            color: red;
+        }
+    </style>
 {% endblock %}
 
 {% block content %}
@@ -16,7 +22,7 @@
         <ol class="breadcrumb">
             <li><a href=""><i class="fa fa-dashboard"></i>办公平台</a></li>
             <li class="active"><a href="{% url 'personal' %}">我的工作台</a></li>
-            <li class="active"><a href="#">油耗记录</a></li>
+            <li class="active"><a href="#">油耗统计</a></li>
         </ol>
     </section>
     <!-- Main content -->
@@ -24,12 +30,6 @@
         <div id="devlist">
             <div class="box box-primary" id="liebiao">
                 <div class="box-header">
-                    <div class="btn-group pull-left">&nbsp</div>
-                    <div class="btn-group pull-left">
-                        <button type="button" id="btnCreate" class="btn btn-primary">
-                            <i class="glyphicon glyphicon-plus"></i>新增
-                        </button>
-                    </div>
                     <div class="btn-group pull-left">&nbsp</div>
                     <div class="btn-group pull-left">
                         <button type="button" id="btnRefresh" class="btn btn-default">
@@ -44,14 +44,26 @@
                             <select class="form-control select2" name="license_plate" id="license_plate" style="width: 200px">
                                 <option value=""></option>
                                 {% for vehicle in vehicle_list %}
-                                <option value={{ vehicle.id }} > {{ vehicle.license_plate }}&nbsp;&nbsp;{{ vehicle.department }}</option>
+                                <option value={{ vehicle.id }}> {{ vehicle.license_plate }}&nbsp;&nbsp;{{ vehicle.department }}</option>
                                 {% endfor %}
                             </select>
                         </div>
+
+                        <div class="form-group searchArea margin-r-5 margin-top-5">
+                            <label style="font-weight: bolder; margin-left: 15px">开始日期：</label>
+                            <input class="form-control timepick" name="start_time" id="start_time" type="text" autocomplete="off"/>
+                        </div>
+
+                        <div class="form-group searchArea margin-r-5 margin-top-5">
+                            <label style="font-weight: bolder; margin-left: 15px">结束日期：</label>
+                            <input class="form-control timepick" name="end_time" id="end_time" type="text" autocomplete="off"/>
+                        </div>
+
                         <button type="button" id="btnSearch" class="btn btn-default">
                             <i class="glyphicon glyphicon-search"></i>查询
                         </button>
                     </form>
+                    <p id="ststr" style="text-align: center; margin-top: 25px; font-weight: bolder; color: #ff5768">请选择车辆与时间后点击查询</p>
                 </div>
                 <div class="box-body">
                     <table id="dtbList" class="display" cellspacing="0" width="100%">
@@ -67,6 +79,7 @@
                             <th>加油量(升)</th>
                             <th>油量单价</th>
                             <th>金额</th>
+                            <th>提交日期</th>
                             <th>备注</th>
                         </tr>
                         </thead>
@@ -89,16 +102,26 @@
     <script src="{% static 'plugins/datatables/moment.min.js' %}"></script>
     <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
     <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
     <!-- iCheck 1.0.1 -->
     <script type="text/javascript">
         $(function () {
             $('#OIL-ORDER').addClass('active');
-            $('#OIL-ORDER-VIEW').addClass('active');
+            $('#OIL-STATISTIC-VIEW').addClass('active');
 
         });
     </script>
 
     <script type="text/javascript">
+        $(".timepick").datetimepicker({
+            format: 'yyyy-mm-dd',
+            language: 'zh',
+            autoclose: 1,
+            forceParse: 0,
+            minView: 2,
+        });
+
+        var statistic_str = "";
         var oDataTable = null;
         $(function () {
             oDataTable = initTable();
@@ -109,10 +132,12 @@
                     {
                         ajax: {
                             type: "post",
-                            url: "{% url "personal-oilWear:oil_order" %}",
+                            url: "{% url "personal-oilWear:oil_statistic" %}",
                             data: function (d) {
                                 d.license_plate = $("#license_plate").val();
-                            }
+                                d.start_time = $("#start_time").val();
+                                d.end_time = $("#end_time").val();
+                            },
                         },
                         columns: [
                             DATATABLES_CONSTANT.DATA_TABLES.COLUMN.CHECKBOX,
@@ -144,6 +169,12 @@
                                 data: "amount",
                             },
                             {
+                                data: "operate_time",
+                                render: function (data, type, full, meta) {
+                                    return moment(data).format("YYYY-MM-DD HH:mm");
+                                }
+                            },
+                            {
                                 data: "remark",
                             }],
                     }));
@@ -151,20 +182,29 @@
             }
 
             $("#btnSearch").click(function () {
-                oDataTable.ajax.reload();
-            });
-
-            $("#btnCreate").click(function () {
-                layer.open({
-                    type: 2,
-                    maxmin: true,
-                    title: "新增油耗记录",
-                    area: ["800px", "315px"],
-                    content: "{% url 'oil_order_create' %}",
-                    end: function () {
-                        window.location.reload()
-                    }
+                if ($("#license_plate").val()=="") {
+                    alert("请选择车牌号")
+                } else if ($("#start_time").val()=="") {
+                    alert("请选择开始日期")
+                } else if ($("#end_time").val()=="") {
+                    alert("请选择结束日期")
+                } else {
+                    $.ajax({
+                        type: "post",
+                        url: "{% url "personal-oilWear:oil_statistic" %}",
+                        data: {license_plate: $("#license_plate").val(),
+                               start_time: $("#start_time").val(),
+                               end_time: $("#end_time").val()},
+                        success: function (ret) {
+                            console.log(ret);
+                            if (ret.success) {
+                                $("#ststr").css("color", "black");
+                                $("#ststr").html(ret.statistic_str)
+                            }
+                        }
                     });
+                    oDataTable.ajax.reload();
+                }
             });
 
             $("#btnRefresh").click(function () {

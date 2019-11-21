@@ -22,6 +22,7 @@ import xadmin
 from apps.users.views_user import LoginView, IndexView, LogoutView
 from system.views import SystemView
 from adm.views import AdmView
+from oilWear.views import OilOrderCreateView
 from personal import views as personal_views
 from personal import views_work_order as order
 from adm.views_asset import AssetUseHtmlView, AssetUseInfoView, AssetBackView
@@ -109,6 +110,7 @@ urlpatterns = [
     url(r'^personal/asset/use/back$', AssetBackView.as_view(), name="personal-asset-use-back"),
     # 油耗表
     url(r'^personal/oilWear/', include('oilWear.oilWear_urls', namespace='personal-oilWear')),
+    url(r'^oil/order/create', OilOrderCreateView.as_view(), name="oil_order_create"),
     ## 公告栏
     url(r'system/bulletin/create$', bulletin_views.CreateView.as_view(), name="bulletin_create"),
     url(r'system/bulletin/show$', bulletin_views.ShowView.as_view(), name="bulletin_show"),
@@ -120,6 +122,4 @@ urlpatterns = [
 
     # 未读公告提醒
     url(r'system/bulletin/unread_bulletin$', bulletin_views.UnreadBulletinView.as_view(), name="unread_bulletin"),
-
-    # 油耗表
 ]
