@@ -183,9 +183,9 @@ class OilOrderView(LoginRequiredMixin, View):
         user_id = request.session.get("_auth_user_id")
 
         if oilWearManager(user_id):
-            vehicle_list = Vehicle.objects.all()
+            vehicle_list = Vehicle.objects.filter(is_delete=False)
         else:
-            vehicle_id = list(Operator.objects.values("vehicle_id").filter(operator_id=user_id))
+            vehicle_id = list(Operator.objects.values("vehicle_id").filter(operator_id=user_id, vehicle__is_delete=False))
             vehicle_id_list = set()
             for i in vehicle_id:
                 vehicle_id_list.add(i["vehicle_id"])
@@ -203,7 +203,7 @@ class OilOrderView(LoginRequiredMixin, View):
         fields = ["id", "vehicle_id__license_plate", "vehicle_id__type", "vehicle_id__department", "operator__name", "refuel_time", "mileage", "weight", "price", "amount", "remark", 'operate_time']
 
         user_id = request.session.get("_auth_user_id")
-        vehicle_id = list(Operator.objects.values("vehicle_id").filter(operator_id=user_id))
+        vehicle_id = list(Operator.objects.values("vehicle_id").filter(operator_id=user_id, vehicle__is_delete=False))
         vehicle_id_list = set()
         for i in vehicle_id:
             vehicle_id_list.add(i["vehicle_id"])
@@ -213,7 +213,7 @@ class OilOrderView(LoginRequiredMixin, View):
             filters["vehicle_id"] = request.POST.get("license_plate")
 
         if oilWearManager(user_id):
-            ret = dict(data=list(OilWear.objects.filter(**filters).values(*fields).order_by('-operate_time')))
+            ret = dict(data=list(OilWear.objects.filter(**filters, vehicle__is_delete=False).values(*fields).order_by('-operate_time')))
         else:
             ret = dict(data=list(OilWear.objects.filter(**filters, vehicle_id__in=vehicle_id_list).values(*fields).order_by('-operate_time')))
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
@@ -228,9 +228,9 @@ class OilOrderCreateView(LoginRequiredMixin, View):
         ret = dict()
         user_id = request.session.get("_auth_user_id")
         if oilWearManager(user_id):
-            rels = Operator.objects.all()
+            rels = Operator.objects.filter(vehicle__is_delete=False)
         else:
-            rels = Operator.objects.filter(operator_id=user_id)
+            rels = Operator.objects.filter(operator_id=user_id, vehicle__is_delete=False)
         ret["rels"] = rels
         return render(request, "oilWear/oil_order_create.html", ret)
 
@@ -270,9 +270,9 @@ class OilStatisticView(LoginRequiredMixin, View):
         ret = dict()
         user_id = request.session.get("_auth_user_id")
         if oilWearManager(user_id):
-            vehicle_list = Vehicle.objects.all()
+            vehicle_list = Vehicle.objects.filter(is_delete=False)
         else:
-            vehicle_id = list(Operator.objects.values("vehicle_id").filter(operator_id=user_id))
+            vehicle_id = list(Operator.objects.values("vehicle_id").filter(operator_id=user_id, vehicle__is_delete=False))
             vehicle_id_list = set()
             for i in vehicle_id:
                 vehicle_id_list.add(i["vehicle_id"])
