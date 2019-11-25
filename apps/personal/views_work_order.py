@@ -306,7 +306,7 @@ class WorkOrderCreateView(LoginRequiredMixin, View):
 
 
 class WorkOrderDetailView(LoginRequiredMixin, View):
-    # 审批详情
+    # 申请详情
     def get(self, request):
         ret = dict()
 
@@ -318,11 +318,15 @@ class WorkOrderDetailView(LoginRequiredMixin, View):
             work_order = get_object_or_404(WorkOrder, pk=request.GET['id'])
             work_order_log = work_order.workorderlog_set.filter(type='0').order_by('create_time')  # 关联表查询方法
             people = work_order.people
+            print(11111111111111111)
+            print(people)
             if people:
-                ret['people'] = [people]
                 if '|' in people:
                     tem_people = people.split('|')
                     people_obj = User.objects.filter(id__in=tem_people).values('id', 'name')
+                    ret['people'] = people_obj
+                else:
+                    people_obj = User.objects.filter(id=people).values('id', 'name')
                     ret['people'] = people_obj
 
             try:
@@ -348,7 +352,6 @@ class WorkOrderDetailView(LoginRequiredMixin, View):
                 adm_list = Structure.objects.values("adm_list").get(id=structure_id)["adm_list"].split(",")
             except:
                 adm_list = []
-            print(adm_list)
             if (request.user.id in user_list) or (str(request.user.id) in adm_list):
                 ret['work_order'] = work_order
                 # ret['work_order_record'] = work_order_record
@@ -998,10 +1001,12 @@ class ApDetailView(LoginRequiredMixin, View):
             ret['ap'] = ap
             people = ap.people
             if people:
-                ret['people'] = [people]
                 if '|' in people:
                     tem_people = people.split('|')
                     people_obj = User.objects.filter(id__in=tem_people).values('id', 'name')
+                    ret['people'] = people_obj
+                else:
+                    people_obj = User.objects.filter(id=people).values('id', 'name')
                     ret['people'] = people_obj
             invoice_type = ap.invoice_type
             if invoice_type:
@@ -1076,10 +1081,12 @@ class CostAppUpdateView(LoginRequiredMixin, View):
             ret['ap'] = ap
             people = ap.people
             if people:
-                ret['people'] = [people]
                 if '|' in people:
                     tem_people = people.split('|')
                     people_obj = User.objects.filter(id__in=tem_people).values('id', 'name')
+                    ret['people'] = people_obj
+                else:
+                    people_obj = User.objects.filter(id=people).values('id', 'name')
                     ret['people'] = people_obj
             invoice_type = ap.invoice_type
             if invoice_type:
@@ -1211,10 +1218,12 @@ class CostAppUpdateDetailView(LoginRequiredMixin, View):
             work_order_log = work_order.workorderlog_set.filter(type='0').order_by('create_time')  # 关联表查询方法
             people = work_order.people
             if people:
-                ret['people'] = [people]
                 if '|' in people:
                     tem_people = people.split('|')
                     people_obj = User.objects.filter(id__in=tem_people).values('id', 'name')
+                    ret['people'] = people_obj
+                else:
+                    people_obj = User.objects.filter(id=people).values('id', 'name')
                     ret['people'] = people_obj
 
             try:
