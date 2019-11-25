@@ -2,9 +2,11 @@
 {% load staticfiles %}
 
 {% block css %}
+
     <link rel="stylesheet" href="{% static 'plugins/datatables/jquery.dataTables.min.css' %}">
     <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+
     <!-- iCheck for checkboxes and radio inputs -->
 {% endblock %}
 
@@ -77,11 +79,11 @@
                     </form>
                 </div>
                 <div class="box-body">
-                    <table id="dtbList" class="display" cellspacing="0" width="100%">
-                        <thead>
+                    <table id="dtbList" class="display" cellspacing="0" width="100%" style="overflow-x: auto;width: 100%">
+                        <thead style="width: 100%">
                         <tr valign="middle">
                             <th><input type="checkbox" id="checkAll"></th>
-                            <th>申请单号</th>
+                            <th style="width: 20px">申请单号</th>
                             <th>事项</th>
                             <th>审批类型</th>
                             <th>审批状态</th>
@@ -92,7 +94,7 @@
                             <th>操作</th>
                         </tr>
                         </thead>
-                        <tbody>
+                        <tbody style="width: 100px">
                         </tbody>
                     </table>
                     <br> <br>
@@ -106,6 +108,7 @@
 {% endblock %}
 
 {% block javascripts %}
+   
     <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
     <script src="{% static 'plugins/datatables/dataTables.const.js' %}"></script>
     <script src="{% static 'plugins/datatables/moment.min.js' %}"></script>
