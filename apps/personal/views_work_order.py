@@ -400,10 +400,12 @@ class WorkOrderAppUpdateView(LoginRequiredMixin, View):
             ret['work_order'] = work_order
             people = work_order.people
             if people:
-                ret['people'] = [people]
                 if '|' in people:
                     tem_people = people.split('|')
                     people_obj = User.objects.filter(id__in=tem_people).values('id', 'name')
+                    ret['people'] = people_obj
+                else:
+                    people_obj = User.objects.filter(id=people).values('id', 'name')
                     ret['people'] = people_obj
             ret.update({
                 'users_dict': users,
