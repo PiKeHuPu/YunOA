@@ -282,7 +282,7 @@ iframe {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    padding: 43px 88px 30px 150px;
+    padding: 23px 88px 30px 140px;
 }
 
 
@@ -463,13 +463,13 @@ input.input100 {
 
 @media (max-width: 576px) {
     .login100-form {
-        padding: 43px 15px 57px 117px;
+        padding: 23px 15px 57px 117px;
     }
 }
 
 @media (max-width: 480px) {
     .login100-form {
-        padding: 43px 15px 57px 15px;
+        padding: 23px 15px 57px 15px;
     }
 
     .label-input100 {
