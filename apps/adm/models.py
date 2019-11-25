@@ -53,8 +53,7 @@ class AssetType(models.Model):
     资产仓库
     """
     name = models.CharField(max_length=30, verbose_name="仓库名称", help_text="仓库名称")
-    structure = models.ForeignKey(Structure, related_name='assetType', blank=True, null=True, on_delete=models.SET_NULL,
-                                  verbose_name='资产到期提醒部门')
+    structure = models.ForeignKey(Structure, related_name='assetType', blank=True, null=True, on_delete=models.SET_NULL, verbose_name='资产到期提醒部门')
     desc = models.TextField(blank=True, null=True, verbose_name="备注")
 
 
@@ -214,3 +213,21 @@ class Equipment(models.Model):
 
 
 
+class AssetDepartment(models.Model):
+    """
+    资产部门
+    """
+    name = models.CharField(max_length=20, verbose_name="名称")
+    administrator = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, verbose_name="资产管理员")
+    super_adm = models.BooleanField(default=False, verbose_name="是否有全部部门管理权限")
+    is_delete = models.BooleanField(default=False, verbose_name="是否删除")
+
+
+class AssetWarehouse(models.Model):
+    """
+    资产仓库
+    """
+    name = models.CharField(max_length=20, verbose_name="名称")
+    department = models.ForeignKey(AssetDepartment, on_delete=models.CASCADE, verbose_name="所属资产部门")
+    remark = models.TextField(blank=True, null=True, verbose_name="备注")
+    is_delete = models.BooleanField(default=False, verbose_name="是否删除")
