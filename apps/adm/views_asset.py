@@ -57,7 +57,7 @@ class AssetListView(LoginRequiredMixin, View):
             filters['status'] = request.GET['status']
         if 'brand' in request.GET and request.GET['brand']:
             filters['brand'] = request.GET['brand']
-        ret = dict(data=list(Asset.objects.filter(**filters).values(*fields)))
+        ret = dict(data=list(Asset.objects.filter(**filters).values(*fields).order_by("-add_time")))
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
 
 
@@ -214,7 +214,7 @@ class AssetUseFlowListView(LoginRequiredMixin, View):
             filters['asset__status'] = request.GET['status']
         if request.GET.get('asset__brand'):
             filters['asset__brand'] = request.GET['asset__brand']
-        ret = dict(data=list(AssetUseLog.objects.filter(**filters).values(*fields)))
+        ret = dict(data=list(AssetUseLog.objects.filter(**filters).values(*fields).order_by("-add_time")))
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
 
 
