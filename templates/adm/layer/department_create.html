@@ -11,21 +11,29 @@
 		<div class="box-body">
           <fieldset>
             <legend>
-              <h4>车辆信息</h4>
+              <h4>部门信息</h4>
             </legend>
-            <div class="form-group has-feedback">
+            <div class="form-group has-feedback" style="overflow-x: hidden">
+                <input type="text" id="assetDepartment_id" name="assetDepartment_id" value="{{ assetDepartment.id }}" hidden>
+
                 <label class="col-sm-2 control-label">部门名称</label>
                 <div class="col-sm-3">
-                    <input class="form-control" name="department" id="department" type="text" value="{{ vehicle.department }}" maxlength="20"/>
+                    <input class="form-control" name="department" id="department" type="text" value="{{ assetDepartment.name }}" maxlength="20"/>
                 </div>
+                <br><br><br>
                 <label class="col-sm-2 control-label">管理员</label>
                   <div class="col-sm-3">
-                    <select class="form-control select2" name="operator">
-                        <option value="{{ operator.id }}">{{ operator.name }}</option>
+                    <select class="form-control select2" name="operator" id="operator">
+                        <option value="{{ assetDepartment.administrator.id }}">{{ assetDepartment.administrator.name }}</option>
                         {% for user in users %}
                         <option value={{ user.id }} > {{ user.name }} </option>
                         {% endfor %}
                   </select>
+                </div>
+
+                <div class="col-sm-3">
+                    <input name="admin" id="admin" type="checkbox" style="zoom: 150%"/>
+                    <label style="font-size: 17px; font-weight: bolder">所有部门管理权限</label>
                 </div>
             </div>
           </fieldset>
@@ -48,27 +56,28 @@
 <script type="text/javascript">
 
 	$("#btnSave").click(function(){
-        if($("#vehicle_type").val()=="")
+        if($("#department").val()=="")
         {
-            alert("请填写车型")
-        } else if ($("#license_plate").val()==""){
-	        alert("请填写车牌号")
-        } else if ($("#department").val()==""){
-            alert("请填写所属部门")
+            alert("请填写部门名称")
         } else{
-           var data = $("#addForm").serialize();
+           var data = {"department": $("#department").val(),
+                        "operator": $("#operator").val(),
+                        "admin": $('#admin').is(':checked'),
+                        "id": $('#assetDepartment_id').val()
+           };
+           console.log(data);
            $.ajax({
                type: $("#addForm").attr('method'),
-               url : "{% url 'system-oilWear:vehicle_create' %}",
+               url : "{% url 'adm-department-create' %}",
                data : data,
                cache: false,
                success : function(msg) {
                    if (msg.result){
-                       layer.alert('数据保存成功！', {icon: 1},function(index){
+                       layer.alert('保存成功！', {icon: 1},function(index){
                            parent.layer.closeAll(); //关闭所有弹窗
                        });
                    }else{
-                       layer.alert('数据保存失败', {icon: 5});
+                       layer.alert('保存失败', {icon: 5});
                        //$('errorMessage').html(msg.message)
                    }
                }
@@ -80,7 +89,6 @@
 	/*点取消刷新新页面*/
     $("#btnCancel").click(function () {
 	    window.location.reload();
-
     });
 
   $(function () {
@@ -89,5 +97,4 @@
   });
 
 </script>
-
 {% endblock %}
