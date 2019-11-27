@@ -316,10 +316,8 @@ class WorkOrderDetailView(LoginRequiredMixin, View):
         admin_user_list = []
         if 'id' in request.GET and request.GET['id']:
             work_order = get_object_or_404(WorkOrder, pk=request.GET['id'])
-            work_order_log = work_order.workorderlog_set.filter(type='0').order_by('create_time')  # 关联表查询方法
+            work_order_log = work_order.workorderlog_set.all().order_by('create_time')  # 关联表查询方法
             people = work_order.people
-            print(11111111111111111)
-            print(people)
             if people:
                 if '|' in people:
                     tem_people = people.split('|')
@@ -1056,7 +1054,7 @@ class ApDetailView(LoginRequiredMixin, View):
                 adm_list = Structure.objects.values("adm_list").get(id=structure_id)["adm_list"].split(",")
             except:
                 adm_list = []
-            # print(adm_list)
+            print(user_list)
             if (request.user.id in user_list) or (str(request.user.id) in adm_list):
                 ret['work_order'] = work_order
                 ret['work_order_log'] = work_order_log
