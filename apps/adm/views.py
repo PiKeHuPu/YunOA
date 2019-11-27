@@ -8,7 +8,7 @@ from django.views.generic.base import View
 
 from adm.models import AssetDepartment, AssetWarehouse
 from utils.mixin_utils import LoginRequiredMixin
-from rbac.models import Menu
+from rbac.models import Menu, Role
 from system.models import SystemSetup
 
 User = get_user_model()
@@ -47,6 +47,7 @@ class DepartmentCreateView(LoginRequiredMixin, View):
         users = User.objects.filter(is_active=1, is_staff=0)
         ret['users'] = users
         return render(request, "adm/layer/department_create.html", ret)
+
     def post(self, request):
         ret = dict()
         department_id = request.POST.get("id")
@@ -63,6 +64,11 @@ class DepartmentCreateView(LoginRequiredMixin, View):
             assetDepartment.administrator_id = administrator
             assetDepartment.super_adm = super_department
             assetDepartment.save()
+
+            if administrator:
+                role = Role.objects.get(title="仓库管理")
+                user = User.objects.get(id=administrator)
+                role.userprofile_set.add(user)
             ret['result'] = True
         else:
             ret['result'] = False
