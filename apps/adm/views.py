@@ -95,6 +95,21 @@ class WarehouseView(LoginRequiredMixin, View):
     """
     def get(self, request):
         ret = dict()
+        user_id = request.session.get("_auth_user_id")
+        departments = AssetDepartment.objects.filter(administrator_id=user_id)
+        for department in departments:
+            if department.super_adm:
+                department_list = AssetDepartment.objects.filter(is_delete=False)
+                break
+        else:
+            department_list = departments
+
+        warehouse_list = []
+        for department in department_list:
+            if department.assetwarehouse_set.filter(is_delete=False):
+                for i in department.assetwarehouse_set.filter(is_delete=False):
+                    warehouse_list.append(i)
+        ret['warehouse_list'] = warehouse_list
         return render(request, "adm/layer/warehouse.html", ret)
 
 
@@ -106,8 +121,8 @@ class WarehouseCreateView(LoginRequiredMixin, View):
         ret = dict()
         id = request.GET.get("id")
         if id:
-            department = AssetWarehouse.objects.get(id=id).department
-            ret["department"] = department
+            warehouse = AssetWarehouse.objects.get(id=id)
+            ret["warehouse"] = warehouse
 
         user_id = request.session.get("_auth_user_id")
         departments = AssetDepartment.objects.filter(is_delete=False, administrator_id=user_id)
@@ -141,4 +156,18 @@ class WarehouseCreateView(LoginRequiredMixin, View):
             ret["result"] = True
         else:
             ret["result"] = False
+        return HttpResponse(json.dumps(ret), content_type='application/json')
+
+
+class WarehouseDeleteView(LoginRequiredMixin, View):
+    """
+    删除仓库
+    """
+    def get(self, request):
+        ret = dict()
+        id = request.GET.get("id")
+        warehouse = AssetWarehouse.objects.get(id=id)
+        warehouse.is_delete = True
+        warehouse.save()
+        ret["result"] = True
         return HttpResponse(json.dumps(ret), content_type='application/json')

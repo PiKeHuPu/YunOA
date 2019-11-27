@@ -38,9 +38,9 @@
                     <thead>
                     <tr valign="middle">
                         <th>ID</th>
-                        <th>部门名称</th>
-                        <th>物资管理员</th>
-                        <th>管理权限</th>
+                        <th>仓库名称</th>
+                        <th>所属部门</th>
+                        <th>备注</th>
                         <th>操作</th>
                     </tr>
                     </thead>
@@ -75,12 +75,12 @@
 var oDataTable=null;
 $(function() {
     var data = [
-        {% for assetDepartment in assetDepartments %}
+        {% for warehouse in warehouse_list %}
             {
-                "id": "{{ assetDepartment.id }}",
-                "name": "{{ assetDepartment.name }}",
-                "administrator": "{{ assetDepartment.administrator.name }}",
-                "super_adm": "{{ assetDepartment.super_adm }}"
+                "id": "{{ warehouse.id }}",
+                "name": "{{ warehouse.name }}",
+                "department": "{{ warehouse.department.name }}",
+                "remark": "{{ warehouse.remark }}"
             },
         {% endfor %}
     ],
@@ -98,18 +98,10 @@ $(function() {
                         data: "name",
                     },
                     {
-                        data: "administrator",
+                        data: "department",
                     },
                     {
-                        data: "super_adm",
-                        render: function (data) {
-                            if (data=="True") {
-                                var ret = "是";
-                            } else {
-                                var ret = "否";
-                            }
-                            return ret;
-                        }
+                        data: "remark",
                     },
                     {
                         data: "id",
@@ -152,7 +144,7 @@ function doUpdate(id){
 		shadeClose : false,
     	maxmin : true,
 		area : [ '800px', '350px' ],
-		content : [ "{% url 'adm-department-create' %}"+'?id='+id, 'no' ],
+		content : [ "{% url 'adm-warehouse-create' %}"+'?id='+id, 'no' ],
 		end : function() {
 			window.location.reload()
 		}
@@ -160,11 +152,11 @@ function doUpdate(id){
 }
 
 function doDelete(id) {
-    var check = confirm("确定删除该部门吗？");
+    var check = confirm("确定删除该仓库吗？");
     if (check) {
         $.ajax({
             type: "get",
-            url: "{% url 'adm-department-delete' %}",
+            url: "{% url 'adm-warehouse-delete' %}",
             data: {"id": id},
             success: function (ret) {
                 if (ret.result) {

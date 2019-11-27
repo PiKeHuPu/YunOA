@@ -14,16 +14,16 @@
               <h4>仓库信息</h4>
             </legend>
             <div class="form-group has-feedback" style="overflow-x: hidden">
-                <input type="text" id="warehouse_id" name="warehouse_id" value="{{ assetDepartment.id }}" hidden>
+                <input type="text" id="warehouse_id" name="warehouse_id" value="{{ warehouse.id }}" hidden>
 
                 <label class="col-sm-2 control-label">仓库名称</label>
                 <div class="col-sm-3">
-                    <input class="form-control" name="warehouse" id="warehouse" type="text" value="{{ assetDepartment.name }}" maxlength="20"/>
+                    <input class="form-control" name="warehouse" id="warehouse" type="text" value="{{ warehouse.name }}" maxlength="20"/>
                 </div>
                 <label class="col-sm-2 control-label">所属部门</label>
                   <div class="col-sm-3">
                     <select class="form-control select2" name="department_id" id="department_id">
-                        <option value="{{ department.id }}">{{ department.name }}</option>
+                        <option value="{{ warehouse.department_id }}">{{ warehouse.department.name }}</option>
                         {% for department in department_list %}
                         <option value={{ department.id }} > {{ department.name }} </option>
                         {% endfor %}
@@ -32,7 +32,7 @@
                 <br><br><br>
                 <label class="col-sm-2 control-label">备注</label>
                 <div class="col-sm-3">
-                    <input class="form-control" name="remark" id="remark" type="text" style="width:490px"/>
+                    <input class="form-control" name="remark" id="remark" type="text" style="width:490px" value="{{ warehouse.remark }}"/>
                 </div>
             </div>
           </fieldset>
