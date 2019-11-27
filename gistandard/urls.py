@@ -21,7 +21,8 @@ import xadmin
 
 from apps.users.views_user import LoginView, IndexView, LogoutView
 from system.views import SystemView
-from adm.views import AdmView, DepartmentManageView, DepartmentCreateView, DepartmentDeleteView
+from adm.views import AdmView, DepartmentManageView, DepartmentCreateView, DepartmentDeleteView, WarehouseView, \
+    WarehouseCreateView
 from oilWear.views import OilOrderCreateView
 from personal import views as personal_views
 from personal import views_work_order as order
@@ -52,6 +53,8 @@ urlpatterns = [
     url(r'^adm/department', DepartmentManageView.as_view(), name='adm-department'),
     url(r'^adm/create', DepartmentCreateView.as_view(), name='adm-department-create'),
     url(r'^adm/delete', DepartmentDeleteView.as_view(), name='adm-department-delete'),
+    url(r'^adm/warehouse', WarehouseView.as_view(), name='adm-warehouse'),
+    url(r'^adm/whCreate', WarehouseCreateView.as_view(), name='adm-warehouse-create'),
     # 工作台模块
     ## 审批报销
     url(r'^personal/$', personal_views.PersonalView.as_view(), name="personal"),

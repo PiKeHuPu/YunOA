@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic.base import View
 
-from adm.models import AssetDepartment
+from adm.models import AssetDepartment, AssetWarehouse
 from utils.mixin_utils import LoginRequiredMixin
 from rbac.models import Menu
 from system.models import SystemSetup
@@ -80,4 +80,59 @@ class DepartmentDeleteView(LoginRequiredMixin, View):
         assetDepartment.is_delete = True
         assetDepartment.save()
         ret['result'] = True
+        return HttpResponse(json.dumps(ret), content_type='application/json')
+
+
+class WarehouseView(LoginRequiredMixin, View):
+    """
+    资产仓库管理
+    """
+    def get(self, request):
+        ret = dict()
+        return render(request, "adm/layer/warehouse.html", ret)
+
+
+class WarehouseCreateView(LoginRequiredMixin, View):
+    """
+    新建资产仓库
+    """
+    def get(self, request):
+        ret = dict()
+        id = request.GET.get("id")
+        if id:
+            department = AssetWarehouse.objects.get(id=id).department
+            ret["department"] = department
+
+        user_id = request.session.get("_auth_user_id")
+        departments = AssetDepartment.objects.filter(is_delete=False, administrator_id=user_id)
+        if departments:
+            for department in departments:
+                if department.super_adm:
+                    department_list = AssetDepartment.objects.filter(is_delete=False)
+                    break
+            else:
+                department_list = departments
+        else:
+            department_list = []
+        ret["department_list"] = department_list
+        return render(request, "adm/layer/warehouse_create.html", ret)
+
+    def post(self, request):
+        ret = dict()
+        id = request.POST.get("id")
+        name = request.POST.get("name")
+        department_id = request.POST.get("department_id")
+        remark = request.POST.get("remark")
+        if name and department_id:
+            if id:
+                warehouse = AssetWarehouse.objects.get(id=id)
+            else:
+                warehouse = AssetWarehouse()
+            warehouse.name = name
+            warehouse.department_id = department_id
+            warehouse.remark = remark
+            warehouse.save()
+            ret["result"] = True
+        else:
+            ret["result"] = False
         return HttpResponse(json.dumps(ret), content_type='application/json')

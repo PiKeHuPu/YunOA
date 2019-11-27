@@ -1,0 +1,101 @@
+{% extends 'base-layer.html' %}
+{% load staticfiles %}
+{% block css %}
+<link rel="stylesheet" href="{%static 'plugins/select2/select2.min.css' %}">
+<!-- iCheck for checkboxes and radio inputs -->
+{% endblock %}
+{% block main %}
+<div class="box box-danger">
+	<form class="form-horizontal" id="addForm" method="post">
+		{% csrf_token %}
+		<div class="box-body">
+          <fieldset>
+            <legend>
+              <h4>仓库信息</h4>
+            </legend>
+            <div class="form-group has-feedback" style="overflow-x: hidden">
+                <input type="text" id="warehouse_id" name="warehouse_id" value="{{ assetDepartment.id }}" hidden>
+
+                <label class="col-sm-2 control-label">仓库名称</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="warehouse" id="warehouse" type="text" value="{{ assetDepartment.name }}" maxlength="20"/>
+                </div>
+                <label class="col-sm-2 control-label">所属部门</label>
+                  <div class="col-sm-3">
+                    <select class="form-control select2" name="department_id" id="department_id">
+                        <option value="{{ department.id }}">{{ department.name }}</option>
+                        {% for department in department_list %}
+                        <option value={{ department.id }} > {{ department.name }} </option>
+                        {% endfor %}
+                  </select>
+                </div>
+                <br><br><br>
+                <label class="col-sm-2 control-label">备注</label>
+                <div class="col-sm-3">
+                    <input class="form-control" name="remark" id="remark" type="text" style="width:490px"/>
+                </div>
+            </div>
+          </fieldset>
+        </div>
+
+		<div class="box-footer ">
+			<div class="row span7 text-center ">
+              <button type="button" id="btnCancel" class="btn btn-default margin-right " >重置</button>
+              <button type="button" id="btnSave" class="btn btn-info margin-right " >保存</button>
+			</div>
+		    </div>
+    	</form>
+    </div>
+
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+<script type="text/javascript">
+
+	$("#btnSave").click(function(){
+        if($("#warehouse").val()=="")
+        {
+            alert("请填写仓库名称")
+        } else if ($("#department_id").val()=="") {
+            alert("请选择所属部门")
+        } else{
+           var data = {"name": $("#warehouse").val(),
+                        "department_id": $("#department_id").val(),
+                        "remark": $('#remark').val(),
+                        "id": $('#warehouse_id').val()
+           };
+           console.log(data);
+           $.ajax({
+               type: $("#addForm").attr('method'),
+               url : "{% url 'adm-warehouse-create' %}",
+               data : data,
+               cache : false,
+               success : function(msg) {
+                   if (msg.result){
+                       layer.alert('保存成功！', {icon: 1},function(index){
+                           parent.layer.closeAll(); //关闭所有弹窗
+                       });
+                   }else{
+                       layer.alert('保存失败', {icon: 5});
+                       //$('errorMessage').html(msg.message)
+                   }
+               }
+           });
+        }
+	});
+
+
+	/*点取消刷新新页面*/
+    $("#btnCancel").click(function () {
+	    window.location.reload();
+    });
+
+  $(function () {
+    //Initialize Select2 Elements
+    $(".select2").select2();
+  });
+
+</script>
+{% endblock %}
