@@ -166,7 +166,7 @@ function doUpdate(id){
 }
 
 function doDelete(id) {
-    var check = confirm("确定删除该仓库吗？");
+    var check = confirm("删除该仓库后仓库内所有资产也将删除，确定删除吗？");
     if (check) {
         $.ajax({
             type: "get",
