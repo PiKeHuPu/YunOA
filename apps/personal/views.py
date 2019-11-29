@@ -85,7 +85,10 @@ class UserInfoView(LoginRequiredMixin, View):
         user = User.objects.get(id=user_id)
         user.name = request.POST.get("name")
         user.gender = request.POST.get("gender")
-        user.birthday = request.POST.get("birthday")
+        if request.POST.get("birthday"):
+            user.birthday = request.POST.get("birthday")
+        else:
+            user.birthday = None
         user.username = request.POST.get("username")
         user.mobile = request.POST.get("mobile")
         user.email = request.POST.get("email")
