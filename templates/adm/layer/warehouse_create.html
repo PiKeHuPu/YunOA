@@ -20,6 +20,7 @@
                 <div class="col-sm-3">
                     <input class="form-control" name="warehouse" id="warehouse" type="text" value="{{ warehouse.name }}" maxlength="20"/>
                 </div>
+                <br><br>
                 <label class="col-sm-2 control-label">所属部门</label>
                   <div class="col-sm-3">
                     <select class="form-control select2" name="department_id" id="department_id">
@@ -29,7 +30,9 @@
                         {% endfor %}
                   </select>
                 </div>
-                <br><br><br>
+                <input type="checkbox" name="is_all_view" id="is_all_view" style="zoom: 150%" {% if warehouse.is_all_view %}checked{% endif %}/>
+                <span style="font-size: 120%; font-weight: bolder">所有部门可见</span>
+                <br><br>
                 <label class="col-sm-2 control-label">备注</label>
                 <div class="col-sm-3">
                     <input class="form-control" name="remark" id="remark" type="text" style="width:490px" value="{{ warehouse.remark }}"/>
@@ -63,6 +66,7 @@
         } else{
            var data = {"name": $("#warehouse").val(),
                         "department_id": $("#department_id").val(),
+                        "is_all_view": $("#is_all_view").is(':checked'),
                         "remark": $('#remark').val(),
                         "id": $('#warehouse_id').val()
            };

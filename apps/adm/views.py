@@ -159,6 +159,7 @@ class WarehouseCreateView(LoginRequiredMixin, View):
         name = request.POST.get("name")
         department_id = request.POST.get("department_id")
         remark = request.POST.get("remark")
+        is_all_view = request.POST.get("is_all_view")
         if name and department_id:
             if id:
                 warehouse = AssetWarehouse.objects.get(id=id)
@@ -166,6 +167,7 @@ class WarehouseCreateView(LoginRequiredMixin, View):
                 warehouse = AssetWarehouse()
             warehouse.name = name
             warehouse.department_id = department_id
+            warehouse.is_all_view = is_all_view.startswith('t')
             warehouse.remark = remark
             warehouse.save()
             ret["result"] = True
@@ -253,4 +255,13 @@ class AssetAjaxView(LoginRequiredMixin, View):
             option_str = "<option value=" + str(warehouse.id) + ">" + warehouse.name + "</option>"
             warehouse_list += option_str
         ret['warehouse_list'] = warehouse_list
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
+
+
+class AssetListView(LoginRequiredMixin, View):
+    """
+    资产列表
+    """
+    def get(self, request):
+        ret = dict()
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")

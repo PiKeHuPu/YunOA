@@ -231,6 +231,7 @@ class AssetWarehouse(models.Model):
     department = models.ForeignKey(AssetDepartment, on_delete=models.CASCADE, verbose_name="所属资产部门")
     remark = models.TextField(blank=True, null=True, verbose_name="备注")
     is_delete = models.BooleanField(default=False, verbose_name="是否删除")
+    is_all_view = models.BooleanField(default=False, verbose_name="是否所有人可见")
 
 
 class AssetInfo(models.Model):

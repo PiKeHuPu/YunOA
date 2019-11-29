@@ -40,6 +40,7 @@
                         <th>ID</th>
                         <th>仓库名称</th>
                         <th>所属部门</th>
+                        <th>所有部门可见</th>
                         <th>备注</th>
                         <th>操作</th>
                     </tr>
@@ -80,6 +81,7 @@ $(function() {
                 "id": "{{ warehouse.id }}",
                 "name": "{{ warehouse.name }}",
                 "department": "{{ warehouse.department.name }}",
+                "is_all_view": "{{ warehouse.is_all_view }}",
                 "remark": "{{ warehouse.remark }}"
             },
         {% endfor %}
@@ -99,6 +101,18 @@ $(function() {
                     },
                     {
                         data: "department",
+                    },
+                    {
+                        data: "is_all_view",
+                        render: function (data) {
+                            var ret = "";
+                            if (data == "True") {
+                                ret = "是";
+                            } else {
+                                ret = "否";
+                            }
+                            return ret;
+                        }
                     },
                     {
                         data: "remark",
