@@ -20,9 +20,10 @@ from gistandard.settings import MEDIA_ROOT
 import xadmin
 
 from apps.users.views_user import LoginView, IndexView, LogoutView
+from personal.views import Direction
 from system.views import SystemView
 from adm.views import AdmView, DepartmentManageView, DepartmentCreateView, DepartmentDeleteView, WarehouseView, \
-    WarehouseCreateView, WarehouseDeleteView
+    WarehouseCreateView, WarehouseDeleteView, AssetView, AssetCreateView, AssetAjaxView
 from oilWear.views import OilOrderCreateView
 from personal import views as personal_views
 from personal import views_work_order as order
@@ -38,6 +39,8 @@ urlpatterns = [
     # 用户登录
     url(r'^login/$', LoginView.as_view(), name='login'),
     url(r'^logout/$', LogoutView.as_view(), name="logout"),
+    # 操作说明
+    url(r'^direction/$', Direction.as_view(), name='direction'),
     # 系统模块
     url(r'^system/$', SystemView.as_view(), name="system"),
     url(r'^system/basic/', include('users.urls', namespace='system-basic')),
@@ -56,6 +59,9 @@ urlpatterns = [
     url(r'^adm/warehouse', WarehouseView.as_view(), name='adm-warehouse'),
     url(r'^adm/whCreate', WarehouseCreateView.as_view(), name='adm-warehouse-create'),
     url(r'^adm/whDelete', WarehouseDeleteView.as_view(), name='adm-warehouse-delete'),
+    url(r'^adm/n_asset', AssetView.as_view(), name='adm-n-asset'),
+    url(r'^adm/n_create', AssetCreateView.as_view(), name='adm-n-create'),
+    url(r'^adm/ajax', AssetAjaxView.as_view(), name='adm-ajax'),
     # 工作台模块
     ## 审批报销
     url(r'^personal/$', personal_views.PersonalView.as_view(), name="personal"),

@@ -231,3 +231,31 @@ class AssetWarehouse(models.Model):
     department = models.ForeignKey(AssetDepartment, on_delete=models.CASCADE, verbose_name="所属资产部门")
     remark = models.TextField(blank=True, null=True, verbose_name="备注")
     is_delete = models.BooleanField(default=False, verbose_name="是否删除")
+
+
+class AssetInfo(models.Model):
+    """
+    资产信息
+    """
+    asset_status = (
+        ("0", "闲置"),
+        ("1", "在用"),
+        ("2", "维修"),
+        ("3", "报废"),
+        ("4", "售出")
+    )
+    number = models.CharField(max_length=20, unique=True, verbose_name="资产编号")
+    name = models.CharField(max_length=50, verbose_name="资产名称")
+    department = models.ForeignKey(AssetDepartment, on_delete=models.CASCADE, verbose_name="所属部门")
+    warehouse = models.ForeignKey(AssetWarehouse, on_delete=models.CASCADE, verbose_name="所属仓库")
+    quantity = models.IntegerField(verbose_name="数量")
+    status = models.CharField(choices=asset_status, max_length=5, default="0", verbose_name="资产状态")
+    user = models.ForeignKey(User, related_name="asset_user", on_delete=models.SET_NULL, null=True, blank=True, verbose_name="使用人")
+    operator = models.ForeignKey(User, related_name="asset_operator", on_delete=models.DO_NOTHING, verbose_name="录入人")
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name="录入时间")
+    due_time = models.DateField(null=True, blank=True, verbose_name="到期时间")
+    is_delete = models.BooleanField(default=False, verbose_name="是否删除")
+    unit = models.CharField(max_length=20, verbose_name="单位")
+    type = models.CharField(max_length=20, verbose_name="型号")
+    remark = models.TextField(max_length=500, verbose_name="备注信息")
+

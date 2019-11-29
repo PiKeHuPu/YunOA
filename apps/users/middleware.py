@@ -25,7 +25,7 @@ class MenuMiddleware(MiddlewareMixin):
                                                       'permissions__icon',
                                                       'permissions__code',
                                                       'permissions__parent').distinct()
-            permission_url_list = []
+            permission_url_list = ['/direction/']
             permission_menu_list = []
 
             for item in permissions_item_list:

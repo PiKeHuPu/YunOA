@@ -1,17 +1,51 @@
 import json
 
 from django.contrib.auth import get_user_model
+from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic.base import View
 
-from adm.models import AssetDepartment, AssetWarehouse
+from adm.models import AssetDepartment, AssetWarehouse, AssetInfo
 from utils.mixin_utils import LoginRequiredMixin
 from rbac.models import Menu, Role
 from system.models import SystemSetup
 
 User = get_user_model()
+
+
+def department_admin(user_id):
+    """
+    返回用户可管理的资产部门列表
+    :param user_id:
+    :return:
+    """
+    departments = AssetDepartment.objects.filter(is_delete=False, administrator_id=user_id)
+    if departments:
+        for department in departments:
+            if department.super_adm:
+                department_list = AssetDepartment.objects.filter(is_delete=False)
+                break
+        else:
+            department_list = departments
+    else:
+        department_list = []
+    return department_list
+
+
+def warehouse_admin(department_list):
+    """
+    通过部门列表返回仓库列表
+    :param department_list:
+    :return:
+    """
+    warehouse_list = []
+    for department in department_list:
+        if department.assetwarehouse_set.filter(is_delete=False):
+            for i in department.assetwarehouse_set.filter(is_delete=False):
+                warehouse_list.append(i)
+    return warehouse_list
 
 
 class AdmView(LoginRequiredMixin, View):
@@ -96,19 +130,10 @@ class WarehouseView(LoginRequiredMixin, View):
     def get(self, request):
         ret = dict()
         user_id = request.session.get("_auth_user_id")
-        departments = AssetDepartment.objects.filter(administrator_id=user_id)
-        for department in departments:
-            if department.super_adm:
-                department_list = AssetDepartment.objects.filter(is_delete=False)
-                break
-        else:
-            department_list = departments
 
-        warehouse_list = []
-        for department in department_list:
-            if department.assetwarehouse_set.filter(is_delete=False):
-                for i in department.assetwarehouse_set.filter(is_delete=False):
-                    warehouse_list.append(i)
+        department_list = department_admin(user_id)
+        warehouse_list = warehouse_admin(department_list)
+
         ret['warehouse_list'] = warehouse_list
         return render(request, "adm/layer/warehouse.html", ret)
 
@@ -123,18 +148,8 @@ class WarehouseCreateView(LoginRequiredMixin, View):
         if id:
             warehouse = AssetWarehouse.objects.get(id=id)
             ret["warehouse"] = warehouse
-
         user_id = request.session.get("_auth_user_id")
-        departments = AssetDepartment.objects.filter(is_delete=False, administrator_id=user_id)
-        if departments:
-            for department in departments:
-                if department.super_adm:
-                    department_list = AssetDepartment.objects.filter(is_delete=False)
-                    break
-            else:
-                department_list = departments
-        else:
-            department_list = []
+        department_list = department_admin(user_id)
         ret["department_list"] = department_list
         return render(request, "adm/layer/warehouse_create.html", ret)
 
@@ -171,3 +186,71 @@ class WarehouseDeleteView(LoginRequiredMixin, View):
         warehouse.save()
         ret["result"] = True
         return HttpResponse(json.dumps(ret), content_type='application/json')
+
+
+class AssetView(LoginRequiredMixin, View):
+    """
+    资产信息
+    """
+    def get(self, request):
+        ret = dict()
+
+        return render(request, "adm/layer/asset.html", ret)
+
+
+class AssetCreateView(LoginRequiredMixin, View):
+    """
+    录入资产
+    """
+    def get(self, request):
+        ret = dict()
+        user_id = request.session.get("_auth_user_id")
+        department_list = department_admin(user_id)
+        ret['department_list'] = department_list
+        return render(request, "adm/layer/asset_create.html", ret)
+
+    def post(self, request):
+        ret = dict()
+        user_id = request.session.get("_auth_user_id")
+        try:
+            id = request.POST.get("id")
+            if id:
+                asset = AssetInfo.objects.get(id=id)
+            else:
+                asset = AssetInfo()
+            asset.number = request.POST.get("number")
+            if AssetInfo.objects.filter(number=request.POST.get("number")):
+                ret['asset_form_errors'] = "资产编号已存在"
+                raise AttributeError
+            asset.name = request.POST.get("name")
+            asset.department_id = request.POST.get("department")
+            asset.warehouse_id = request.POST.get("warehouse")
+            asset.quantity = request.POST.get("quantity")
+            asset.operator_id = user_id
+            if request.POST.get("due_time"):
+                asset.due_time = request.POST.get("due_time")
+            asset.unit = request.POST.get("unit")
+            asset.type = request.POST.get("type")
+            asset.remark = request.POST.get("remark")
+            asset.save()
+            ret['status'] = "success"
+        except:
+            ret['status'] = "fail"
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
+
+
+class AssetAjaxView(LoginRequiredMixin, View):
+    """
+    资产ajax
+    """
+    def get(self, request):
+        ret = dict()
+        department_id = request.GET.get("department_id")
+        department = AssetDepartment.objects.get(id=department_id)
+        warehouses = department.assetwarehouse_set.filter(is_delete=False)
+        warehouse_list = ""
+        for warehouse in warehouses:
+            option_str = "<option value=" + str(warehouse.id) + ">" + warehouse.name + "</option>"
+            warehouse_list += option_str
+        ret['warehouse_list'] = warehouse_list
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")

@@ -80,7 +80,7 @@ class UserInfoView(LoginRequiredMixin, View):
         return render(request, 'personal/userinfo/user_info.html')
 
     def post(self, request):
-        ret = dict(status="fail")
+        ret = dict(status="success")
         user = User.objects.get(id=request.POST['id'])
         user_update_form = UserUpdateForm(request.POST, instance=user)
         if user_update_form.is_valid():
@@ -143,3 +143,8 @@ class PhoneBookView(LoginRequiredMixin, View):
         fields = ['name', 'mobile', 'email', 'post', 'department__title', 'image']
         ret = dict(linkmans=list(User.objects.exclude(username='admin').filter(is_active=1).values(*fields)))
         return render(request, 'personal/phonebook/phonebook.html', ret)
+
+
+class Direction(View):
+    def get(self, request):
+        return render(request, 'direction.html')
