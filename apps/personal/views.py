@@ -80,16 +80,23 @@ class UserInfoView(LoginRequiredMixin, View):
         return render(request, 'personal/userinfo/user_info.html')
 
     def post(self, request):
-        ret = dict(status="fail")
-        user = User.objects.get(id=request.POST['id'])
-        user_update_form = UserUpdateForm(request.POST, instance=user)
-        if user_update_form.is_valid():
-            user_update_form.save()
-            ret = {"status": "success"}
+        ret = dict()
+        user_id = request.POST.get("id")
+        user = User.objects.get(id=user_id)
+        user.name = request.POST.get("name")
+        user.gender = request.POST.get("gender")
+        if request.POST.get("birthday"):
+            user.birthday = request.POST.get("birthday")
         else:
-            pattern = '<li>.*?<ul class=.*?><li>(.*?)</li>'
-            er = str(user_update_form.errors)
-            ret['errors_info'] = re.findall(pattern, er)[0]
+            user.birthday = None
+        user.username = request.POST.get("username")
+        user.mobile = request.POST.get("mobile")
+        user.email = request.POST.get("email")
+        user.bank_card = request.POST.get("bank_card")
+        user.bank_name = request.POST.get("bank_name")
+        user.bank_user_name = request.POST.get("bank_user_name")
+        user.save()
+        ret["status"] = "success"
         return HttpResponse(json.dumps(ret), content_type='application/json')
 
 
