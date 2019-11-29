@@ -57,7 +57,7 @@
                 <div class="box box-primary">
                     <form class="form-horizontal" id="addForm" method="post">
                         {% csrf_token %}
-                        <input type="hidden" name='id' value="{{ user.id }}"/>
+                        <input type="hidden" name='id' id="id" value="{{ user.id }}"/>
                         <input type="hidden" name='user' value="save"/>
                         <div class="box-body">
                             <fieldset>
@@ -67,16 +67,21 @@
                                 <div class="form-group has-feedback">
                                     <label class="col-sm-2 control-label">姓名</label>
                                     <div class="col-sm-3">
-                                        <input class="form-control" name="name" type="text" value="{{ user.name }}"/>
+                                        <input class="form-control" name="name" id="name" type="text" value="{{ user.name }}"/>
                                     </div>
                                     <label class="col-sm-2 control-label">性别</label>
 
                                     <div class="col-sm-3">
-                                        <select class="form-control" name="gender">\
+                                        <select class="form-control" name="gender" id="gender">\
 
-                                            <option value="" disabled selected hidden>{{ user.get_gender_display }}</option>
-                                            <option value="male">男</option>
-                                            <option value="famale">女</option>
+                                            {% if user.gender == 'male' %}
+                                                <option value="male">男</option>
+                                                <option value="famale">女</option>
+                                            {% else %}
+                                                <option value="famale">女</option>
+                                                <option value="male">男</option>
+                                            {% endif %}
+
                                         </select>
                                     </div>
 
@@ -85,13 +90,13 @@
                                 <div class="form-group has-feedback">
                                     <label class="col-sm-2 control-label">生日</label>
                                     <div class="col-sm-3">
-                                        <input type="text" class="form-control pull-right form_datetime" name="birthday"
+                                        <input type="text" class="form-control pull-right form_datetime" name="birthday" id="birthday"
                                                value="{{ user.birthday|date:"Y-m-d" }}"/>
                                     </div>
                                     <label class="col-sm-2 control-label">用户名</label>
                                     <div class="col-sm-3">
                                         <input type="text" class="form-control" name="username"
-                                               value="{{ user.username }}"/>
+                                               id="username" value="{{ user.username }}"/>
                                     </div>
                                 </div>
                                 <legend>
@@ -100,13 +105,14 @@
                                 <div class="form-group has-feedback">
                                     <label class="col-sm-2 control-label">手机</label>
                                     <div class="col-sm-3">
-                                        <input class="form-control" name="mobile" type="text"
-                                               value="{{ user.mobile }}"/>
+                                        <input class="form-control" name="mobile" id="mobile" type="text" value="{{ user.mobile }}" onblur="checkphone()"/>
+                                        <span id="message0"></span>
                                     </div>
                                     <label class="col-sm-2 control-label">邮箱</label>
                                     <div class="col-sm-3">
-                                        <input class="form-control" name="email" type="text" value="{{ user.email }}"/>
+                                        <input class="form-control" name="email" id="email" type="text" value="{{ user.email }}" onblur="checkemail()"/>
                                     </div>
+                                    <span id="message"></span>
                                 </div>
                                 <legend>
                                     <h4>职员信息</h4>
@@ -144,20 +150,19 @@
                             <div class="form-group has-feedback">
                                 <label class="col-sm-2 control-label">银行卡号</label>
                                 <div class="col-sm-3">
-                                    <input class="form-control" name="bank_card" type="text" value="{{ user.bank_card }}"/>
+                                    <input class="form-control" name="bank_card" id="bank_card" type="text" value="{{ user.bank_card }}"/>
                                 </div>
                                 <label class="col-sm-2 control-label">开户银行</label>
                                 <div class="col-sm-3">
-                                    <input class="form-control" name="bank_name" type="text" value="{{ user.bank_name }}"/>
+                                    <input class="form-control" name="bank_name" id="bank_name" type="text" value="{{ user.bank_name }}"/>
                                 </div>
                             </div>
                             <div class="form-group has-feedback">
                                 <label class="col-sm-2 control-label">银行卡用户名</label>
                                 <div class="col-sm-3">
-                                    <input class="form-control" name="bank_user_name" type="text" value="{{ user.bank_user_name }}"/>
+                                    <input class="form-control" name="bank_user_name" id="bank_user_name" type="text" value="{{ user.bank_user_name }}"/>
                                 </div>
                             </div>
-
                         </div>
                         <div class="box-footer ">
                             <div class="row span7 text-center ">
@@ -214,25 +219,89 @@
         });
     </script>
     <script type="text/javascript">
-        //修改用户信息
-        $("#btnSave").click(function () {
-            var data = $("#addForm").serialize();
-            $.ajax({
-                type: $("#addForm").attr('method'),
-                url: "{% url 'personal-user_info' %}",
-                data: data,
-                cache: false,
-                success: function (msg) {
-                    if (msg.status == 'success') {
-                        layer.alert('数据保存成功！', {icon: 1}, function (index) {
-                            parent.layer.closeAll(); //关闭所有弹窗
-                        });
-                    } else if (msg.status == 'fail') {
-                        layer.alert(msg.errors_info, {icon: 5});
+         // 邮箱验证
+         function checkemail() {
+            var obj = document.getElementById("email");
+            if(obj.value != ""){
+                var str = obj.value;
+                if(str.indexOf("@") != -1 && str.indexOf(".") != -1){
+                    var a = str.split("@");
+                    if(a[0].length > 0){
+                        if(a[1].length > 0){
+                            var b = a[1].split(".");
+                            if(b[0].length > 0){
+                                if(b[1].length > 1){
+                                    document.getElementById("message").innerHTML = "";
+                                    return true;
+                                }
+                                else{
+                                    document.getElementById("message").innerHTML = "<font color='red'>错误，.后面必须要有至少2个字符！！！</font>";
+                                }
+                            }
+                            else{
+                                document.getElementById("message").innerHTML = "<font color='red'>错误，@和.之间必须要有至少1个字符！！！</font>";
+                            }
+                        }
+                        else{
+                            document.getElementById("message").innerHTML = "<font color='red'>错误，@后面必须要有至少1个字符！！！</font>";
+                        }
                     }
-                    return;
+                    else{
+                        document.getElementById("message").innerHTML = "<font color='red'>错误，@前面必须要有至少1个字符！！！</font>";
+                    }
                 }
-            });
+                else{
+                    document.getElementById("message").innerHTML = "<font color='red'>错误，邮箱需要包含@和.字符！！！</font>";
+                }
+            }
+        }
+
+        // 手机号码验证
+        function checkphone() {
+            var value = $("#mobile").val();
+            if (value != '') {
+                var reg = /^1[3456789]\d{9}$/;
+                var re = new RegExp(reg);
+                if (!re.test(value)) {
+                    $("#message0").html("<font color='red'>手机号格式不正确</font>")
+                } else {
+                    $("#message0").html("");
+                    return true;
+                }
+            } else {
+                $("#message0").html("<font color='red'>请输入手机号</font>")
+            }
+        }
+         //修改用户信息
+        $("#btnSave").click(function () {
+            if (!checkphone()) {
+                alert("请输入正确的手机号码")
+            } else if ($("#email").val()=="") {
+                alert("请输入邮箱")
+            } else if ($("#name").val()=="") {
+                alert("请输入姓名")
+            } else if ($("#username").val()=="") {
+                alert("请输入用户名")
+            } else if (!checkemail()) {
+                alert("请输入正确的邮箱")
+            } else {
+                var data = $("#addForm").serialize();
+                $.ajax({
+                    type: $("#addForm").attr('method'),
+                    url: "{% url 'personal-user_info' %}",
+                    data: data,
+                    cache: false,
+                    success: function (msg) {
+                        if (msg.status == 'success') {
+                            layer.alert('数据保存成功！', {icon: 1}, function (index) {
+                                parent.layer.closeAll(); //关闭所有弹窗
+                            });
+                        } else if (msg.status == 'fail') {
+                            layer.alert(msg.errors_info, {icon: 5});
+                        }
+                    }
+                });
+            }
         });
 
         //修改用户密码弹窗
@@ -248,17 +317,16 @@
         }
 
         /*input 时间输入选择*/
+         var date = new Date();
         $(".form_datetime").datetimepicker({
             language: 'zh',
             minView: 'month', //选择范围知道日期，不选择时分
-            //weekStart: 1,
-            //todayBtn:  1,
             autoclose: 1,
             todayHighlight: 1,
-            //startView: 2,
             forceParse: 0,
             showMeridian: 1,
-            format: 'yyyy-mm-dd'
+            format: 'yyyy-mm-dd',
+            endDate:date
         }).on('changeDate', function (ev) {
             $(this).datetimepicker('hide');
         });
