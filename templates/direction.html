@@ -1,15 +1,241 @@
+{% load staticfiles %}
 <!DOCTYPE html>
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
     <title>YunOA操作说明</title>
     <style>
-        h1{
+        li {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        ul {
+            margin: 5px;
+            padding: 5px;
+        }
+
+        .inbox {
+            width: 95%;
+        }
+
+        .over {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+        }
+
+        .logoImg{
+            margin-left: 30px;
+        }
+
+        .tempContainer {
+            position: fixed;
+            width: 100%;
+            margin-right: 0px;
+            margin-left: 0px;
             text-align: center;
+            z-index: 101;
+        }
+        a{
+            font-size: 18px;
+            text-decoration:none;
+            color: #0c0c0c;
         }
     </style>
 </head>
 <body>
-    <h1>目录</h1>
+
+{#浮动盒子#}
+<div class="fixedBox"
+     style="z-index:10;width:180px;height:80vh;position:fixed;right:40px;top:50px;background:#f0ffe5;">
+    <ul href="#title">
+        <a href="#title">OA系统使用方法</a>
+{#        <li style="left: 2px">#}
+{#            <a href="#title" style="font-size: 18px">#}
+{#                <cite style="">OA系统使用方法</cite>#}
+{#            </a>#}
+{#        </li>#}
+        <li style="">
+            <a href="#lxsqsyff  " >
+                新增立项申请
+            </a>
+        </li>
+        <li style="">
+            <a href="#lxsp" >
+                立项审批
+            </a>
+        </li>
+        <li style="">
+            <a href="#ccsp" >
+                出差审批
+            </a>
+        </li>
+        <li style="">
+            <a href="#sqjl" >
+                查看申请记录
+            </a>
+        </li>
+        <li style="" >
+            <a href="#pc" >
+                个人中心使用方法
+            </a>
+        </li>
+        <li style="">
+            <a href="#enter pc" >
+                进入个人中心
+            </a>
+        </li>
+        <li style="">
+            <a href="#pc" >
+                个人中心
+            </a>
+        </li>
+        <li style="">
+            <a href="#bulletin" >
+                查看公告
+            </a>
+        </li>
+
+    </ul>
+</div>
+<div class="xbox" style="width:80%;top: 20px;right:200px">
+    <div class="inbox" id="title" style="margin-left: 15px">
+        <h3>云谷办公平台使用方法</h3>
+        <p>云谷办公平台的网址为：http://39.104.118.239:9090，点击查看大图，大图点击可取消</p>
+    </div>
+    <div class="inbox" id="lxsq" style="margin-left: 15px">
+        <h3>立项申请的使用方法</h3>
+        <p id="lxsqsyff">1.在登录后，点击左侧的申请管理，在点击新建，步骤如下图所示</p>
+        <div class="over" ></div><!--背景层-->
+        <div class=tempContainer></div>
+        <div class="logoImg amplifyImg"><!--注意：此处的amlifyImg不可少-->
+            <img style="height: 300px;width: 400px" src="{% static 'image/1-1.png' %}"/>
+        </div>
+        <p>2.会进入如下页面，请按照步骤填写，退出请点击右上角的关闭按钮</p>
+        <div class="logoImg amplifyImg"><!--注意：此处的amlifyImg不可少-->
+            <img style="height: 300px;width: 300px" src="{% static 'image/1-2.png' %}"/>
+        </div>
+        <p id="lxsp">3.立项审批办理方法，请按照下图所示步骤进行填写，退出请点击右上角的关闭按钮</p>
+        <div class="logoImg amplifyImg" ><!--注意：此处的amlifyImg不可少-->
+            <img style="height: 300px;width: 300px" src="{% static 'image/1-3.png' %}"/>
+        </div>
+        <p id="lxsp">3.1如果立项审批为预支类型，且无需报销说明如下图</p>
+        <div class="logoImg amplifyImg" ><!--注意：此处的amlifyImg不可少-->
+            <img style="height: 300px;width: 300px" src="{% static 'image/1-3-1.png' %}"/>
+        </div>
+        <p id="ccsp">4.出差审批办理方法，请按照下图所示步骤进行填写，退出请点击右上角的关闭按钮</p>
+        <div class="logoImg amplifyImg" ><!--注意：此处的amlifyImg不可少-->
+            <img style="height: 300px;width: 300px" src="{% static 'image/1-4.png' %}"/>
+        </div>
+        <p id="sqjl">5.查看当前的申请记录，以及报销</p>
+        <div class="logoImg amplifyImg" ><!--注意：此处的amlifyImg不可少-->
+            <img style="height: 300px;width: 150px" src="{% static 'image/1-7.png' %}"/>
+        </div>
+        <p id="sqjl1">5.在我的工作台查看当前的申请记录，以及报销</p>
+        <div class="logoImg amplifyImg" ><!--注意：此处的amlifyImg不可少-->
+            <img style="height: 200px;width: 400px" src="{% static 'image/1-8.png' %}"/>
+        </div>
+
+
+    </div>
+    <div class="personal center" id="pc" style="margin-left: 15px">
+        <h3>个人中心使用用方法</h3>
+        <p id="enter pc">1.进入个人中心的方法</p>
+        <div class="logoImg amplifyImg"><!--注意：此处的amlifyImg不可少-->
+            <img style="height: 200px;width: 450px" src="{% static 'image/1-9.png' %}"/>
+        </div>
+        <p id="pc">2.个人中心页面</p>
+        <div class="logoImg amplifyImg"><!--注意：此处的amlifyImg不可少-->
+            <img style="height: 200px;width: 450px" src="{% static 'image/1-10.png' %}"/>
+        </div>
+    </div>
+    <div style="margin-left: 15px">
+        <h3>查看公司公告</h3>
+        <p id="bulletin">查看公司公告方法</p>
+        <div class="logoImg amplifyImg"><!--注意：此处的amlifyImg不可少-->
+            <img style="height: 200px;width: 450px" src="{% static 'image/1-11.png' %}"/>
+        </div>
+    </div>
+</div>
+
 </body>
+
 </html>
+<!-- jQuery 2.2.3 -->
+<script src="/static/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<script>
+    var imgsObj = $('.amplifyImg img');//需要放大的图像
+    if (imgsObj) {
+        $.each(imgsObj, function () {
+            $(this).click(function () {
+                var currImg = $(this);
+                coverLayer(1);
+                var tempContainer = $('<div class=tempContainer></div>');//图片容器
+                with (tempContainer) {//width方法等同于$(this)
+                    appendTo("body");
+                    var windowWidth = $(window).width();
+                    var windowHeight = $(window).height();
+                    //获取图片原始宽度、高度
+                    var orignImg = new Image();
+                    orignImg.src = currImg.attr("src");
+                    var currImgWidth = orignImg.width;
+                    var currImgHeight = orignImg.height;
+                    if (currImgWidth < windowWidth) {//为了让图片不失真，当图片宽度较小的时候，保留原图
+                        if (currImgHeight < windowHeight) {
+                            var topHeight = (windowHeight - currImgHeight) / 2;
+                            if (topHeight > 35) {/*此处为了使图片高度上居中显示在整个手机屏幕中：因为在android,ios的微信中会有一个title导航，35为title导航的高度*/
+                                topHeight = topHeight - 35;
+                                css('top', topHeight);
+                            } else {
+                                css('top', 0);
+                            }
+                            html('<img border=0 src=' + currImg.attr('src') + '>');
+                        } else {
+                            css('top', 0);
+                            html('<img border=0 src=' + currImg.attr('src') + ' height=' + windowHeight + '>');
+                        }
+                    } else {
+                        var currImgChangeHeight = (currImgHeight * windowWidth) / currImgWidth;
+                        if (currImgChangeHeight < windowHeight) {
+                            var topHeight = (windowHeight - currImgChangeHeight) / 2;
+                            if (topHeight > 35) {
+                                topHeight = topHeight - 35;
+                                css('top', topHeight);
+                            } else {
+                                css('top', 0);
+                            }
+                            html('<img border=0 src=' + currImg.attr('src') + ' width=' + windowWidth + ';>');
+                        } else {
+                            css('top', 0);
+                            html('<img border=0 src=' + currImg.attr('src') + ' width=' + windowWidth + '; height=' + windowHeight + '>');
+                        }
+                    }
+                }
+                tempContainer.click(function () {
+                    $(this).remove();
+                    coverLayer(0);
+                });
+            });
+        });
+    } else {
+
+    }
+
+    //使用禁用蒙层效果
+    function coverLayer(tag) {
+        with ($('.over')) {
+            if (tag == 1) {
+                css('height', $(document).height());
+                css('display', 'block');
+                css('opacity', 1);
+                css("background-color", "black");
+            } else {
+                css('display', 'none');
+            }
+        }
+    }
+</script>

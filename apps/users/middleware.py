@@ -43,6 +43,7 @@ class MenuMiddleware(MiddlewareMixin):
 
                     }
                     permission_menu_list.append(menu)
+            #print(permission_url_list)
 
             request_url = request.path_info
             top_menu = []

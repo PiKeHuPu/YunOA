@@ -25,27 +25,12 @@
   <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
   <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
   <![endif]-->
-
     <style type="text/css">
         * {
             margin: 0;
             padding: 0;
         }
 
-        .box {
-            width: 300px;
-            margin: 0 auto;
-        {#border: 1px solid #ff6700;#} overflow: hidden;
-        }
-
-        .animate {
-            padding-left: 20px;
-            font-size: 12px;
-            color: #000;
-            display: inline-block;
-            white-space: nowrap;
-            animation: 10s wordsLoop linear infinite normal;
-        }
 
         @keyframes wordsLoop {
             0% {
@@ -76,28 +61,16 @@
         <div class="wrap-login100">
             <div class="login100-form-title" style="background-image:url('{% static "bg-01.jpg" %}')">
                 <span class="login100-form-title-1">云谷办公平台</span>
-
             </div>
-
             <form class="login100-form validate-form" action="" method="post">
-                {#                    <span class="animate" style="margin-bottom: 20px;font-size: 20px;font-family: 楷体">#}
-                {#                        凡事有章可循#}
-                {#                        凡事有据可查#}
-                {#                        凡事有人监督#}
-                {#                        凡事有人负责#}
-                {#                    </span>#}
                 <div style="margin-bottom: 15px; margin-left: 0px">
-                    <marquee direction="left" onmouseout="this.start()" scrollamount="5px" onmouseover="this.stop()"
-                             loop="5000" height="23px">
+                    <marquee direction="left" onmouseout="this.start()" scrollamount="5px" onmouseover="this.stop()" loop="5000" height="23px">
                         <p style="font-family: 楷体;font-size: 18px;font-weight: bold;margin-bottom: 3px">凡事有章可循 凡事有据可查 凡事有人监督 凡事有人负责</p>
-
                     </marquee>
                 </div>
-
                 <div class="wrap-input100 validate-input m-b-26 {% if login_form.errors.username %}has-error{% endif %}">
                     <span class="label-input100">账户</span>
-                    <input name="username" class="form-control" placeholder="用户名或手机号"
-                           value="{{ login_form.username.value }}" style="border-radius: 5px;">
+                    <input name="username" class="form-control" placeholder="用户名或手机号" value="{{ login_form.username.value }}" style="border-radius: 5px;">
                     <!--type="email"前端控制email输入验证-->
                     <span class="focus-input100"></span>
                 </div>
@@ -120,12 +93,10 @@
                             登录
                         </button>
                     </div>
-
                     <!-- /.col -->
                 </div>
                 {% csrf_token %}
             </form>
-
             <!-- /.login-box-body -->
         </div>
 
