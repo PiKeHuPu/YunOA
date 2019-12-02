@@ -130,9 +130,14 @@
                                 data: "workorder__number",
                             },
                             {
-                                data: "title",
+                                data: "t_title",
                                 render:function (data, type, row, meta) {
-                                    return data.slice(0,10)
+                                    if (data=="") {
+                                        var ret = row.title
+                                    } else {
+                                        var ret = row.t_title
+                                    }
+                                    return ret.slice(0,10)
                                 }
                             },
                             {

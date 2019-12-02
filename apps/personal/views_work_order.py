@@ -161,7 +161,7 @@ class WorkOrderListView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        fields = ['id', 'number', 'title', 'type', 'status', 'start_time', 'end_time', 'structure__title',
+        fields = ['id', 'number', 'title', 'type', 'status', 'start_time', 'end_time', 'structure__title', "t_title",
                   'create_time', 'advance', 'adv_payment', 'cretor__name', 'cost']
         filters = dict()
         if request.GET.get('number'):
@@ -237,13 +237,13 @@ class WorkOrderCreateView(LoginRequiredMixin, View):
             work_order.number = auto_timestamp('WO')
         work_order.title = ret_data.get('title')
         work_order.type = ret_data.get('type')
+        work_order.t_title = ret_data.get('t_title')
         work_order.status = '0'  # 等待审批
         work_order.cost = ret_data.get('cost')
         work_order.cretor = request.user
         work_order.structure = request.user.department
         advance = ret_data.get('advance')
         work_order.advance = advance
-        print(ret_data.get("apply_only"))
         if ret_data.get('type') == '0' or advance == '1':  # 立项审批
             if ret_data.get('apply_only'):
                 work_order.is_apply_only = ret_data.get('apply_only')
@@ -853,7 +853,7 @@ class APListView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        fields = ['id', 'workorder__number', 'workorder__id', 'title', 'type', 'status', 'structure__title',
+        fields = ['id', 'workorder__number', 'workorder__id', 'title', 'type', 'status', 'structure__title', 't_title',
                   'create_time', 'workorder__advance', 'cretor__name', 'all_fee']
         filters = dict()
         if request.GET.get('number'):
@@ -932,6 +932,7 @@ class ApplyCostUpdateView(LoginRequiredMixin, View):
         else:
             ap = BusinessApply()
         ap.title = ret_data.get('title')
+        ap.t_title = ret_data.get('t_title')
         ap.type = ret_data.get('type')
         ap.status = '0'  # 等待审批
         ap.all_fee = ret_data.get('all_fee')

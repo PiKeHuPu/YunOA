@@ -185,6 +185,7 @@ function verify() {
         payee = $("#payee").val(),
         bank_info = $("#bank-info").val(),
         apply_only = $("#ao").is(":checked"),
+        t_title = $("#t_title").val(),
 
 
         people = $("#people").val(),
@@ -197,7 +198,9 @@ function verify() {
 
     var r_num = /^\d*$/; //全数字
 
-    if (isError(title, '请填写工作内容')) {
+    if (isError(t_title, '请输入申请标题')) {
+        return false
+    } else if (isError(title, '请填写工作内容')) {
         return false
     } else if (isError(type, '请选择审批类型')) {
         return false
@@ -283,6 +286,7 @@ function verify() {
         bank_info: bank_info,
         advance: advance,
         apply_only: apply_only,
+        t_title: t_title,
 
         people: tem_people,
         transport: transport,
@@ -336,7 +340,6 @@ $("#btnSave").click(function () {
                     parent.layer.closeAll(); //关闭所有弹窗
                 });
             }
-            return;
         }
     });
 

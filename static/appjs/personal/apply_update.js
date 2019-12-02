@@ -133,8 +133,7 @@ function temData(data) {
 
 
 function verify() {
-    var
-        title = $("#title").val(),
+    var title = $("#title").val(),
         type = ap_type,
         all_fee = $("#all_fee").val(),
 
@@ -143,7 +142,9 @@ function verify() {
         bank_account = $("#bank-account").val(),
         payee = $("#payee").val(),
         bank_info = $("#bank-info").val(),
-        detail = $("#detail").val();  // 费用明细
+        detail = $("#detail").val(),  // 费用明细
+        t_title = $("#t_title").val();
+
     var tem_invoice = temData(invoice_type);
 
     if (ap_type == '1') {    // 出差
@@ -167,7 +168,9 @@ function verify() {
 
     var r_num = /^\d*$/; //全数字
 
-    if (isError(title, '请填写工作内容')) {
+    if (isError(t_title, '请填写申请标题')) {
+        return false
+    } else if (isError(title, '请填写工作内容')) {
         return false
     } else if (isError(all_fee, '请填写总费用')) {
         return false
@@ -223,8 +226,9 @@ function verify() {
         bank_account: bank_account,
         payee: payee,
         bank_info: bank_info,
-        detail: detail
-    }
+        detail: detail,
+        t_title: t_title
+    };
     if (ap_type == '1') {
         retData['people'] = tem_people;
         retData['transport'] = tem_transport;
@@ -243,7 +247,7 @@ function verify() {
 
     return retData
 
-};
+}
 
 
 var url = "/personal/workorder_ap_cost/update";
@@ -253,7 +257,7 @@ $("#btnSave").click(function () {
     if (data === false) {
         return
     }
-    console.log(data)
+    console.log(data);
     $.ajax({
         type: 'POST',
         url: url,
@@ -288,7 +292,6 @@ $("#btnSave").click(function () {
                     parent.layer.closeAll(); //关闭所有弹窗
                 });
             }
-            return;
         }
     });
 
