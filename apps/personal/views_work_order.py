@@ -97,6 +97,7 @@ def update_next_user(work_order, current_user_id, order_flow, pro_type):
 def apply(work_order, next_user_id):
     ap = BusinessApply(workorder=work_order,
                        title=work_order.title,
+                       t_title=work_order.t_title,
                        cretor=work_order.cretor,
                        structure=work_order.structure,
                        next_user_id=next_user_id,
@@ -423,6 +424,8 @@ class WorkOrderAppUpdateView(LoginRequiredMixin, View):
             for i in user_orders:
                 if len(i.title) >= 10:
                     i.title = i.title[:10] + "..."
+                if len(i.t_title) >= 10:
+                    i.t_title = i.t_title[:10] + "..."
             ret['user_orders'] = user_orders
 
             ret['is_apply_only'] = work_order.is_apply_only
@@ -1114,6 +1117,8 @@ class CostAppUpdateView(LoginRequiredMixin, View):
             for i in businessApplys:
                 if len(i.title) >= 10:
                     i.title = i.title[:10] + "..."
+                if len(i.t_title) >= 10:
+                    i.t_title = i.t_title[:10] + "..."
             ret['businessApplys'] = businessApplys
 
         ret.update({

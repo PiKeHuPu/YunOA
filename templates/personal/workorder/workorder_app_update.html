@@ -47,6 +47,11 @@
                                         <td>{{ work_order.number }}</td>
                                     </tr>
                                     <tr>
+                                        <td><strong> 申请标题</strong></td>
+                                        <td>{{ work_order.t_title }}</td>
+
+                                    </tr>
+                                    <tr>
                                         <td><strong> 申请类型</strong></td>
                                         <td>{{ work_order.get_type_display }}</td>
 
@@ -263,7 +268,7 @@
                                 </tr>
                                 {% for user_order in user_orders %}
                                     <tr>
-                                        <td><a onclick="showDetail({{ user_order.id }})">{{ user_order.title }}</a></td>
+                                        <td><a onclick="showDetail({{ user_order.id }})">{% if user_order.t_title %}{{ user_order.t_title }}{% else %}{{ user_order.title }}{% endif %}</a></td>
                                         <td>{{ user_order.cost }}</td>
                                         <td style="text-align: center">{{ user_order.create_time }}</td>
                                     </tr>

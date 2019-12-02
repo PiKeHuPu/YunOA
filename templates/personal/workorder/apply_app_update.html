@@ -252,7 +252,7 @@
                                 </tr>
                                 {% for businessApply in businessApplys %}
                                 <tr>
-                                    <td><a onclick="showApplyDetail({{ businessApply.id }})">{{ businessApply.title }}</a></td>
+                                    <td><a onclick="showApplyDetail({{ businessApply.id }})">{% if businessApply.t_title %}{{ businessApply.t_title }}{% else %}{{ businessApply.title }}{% endif %}</a></td>
                                     <td>{{ businessApply.all_fee }}</td>
                                     <td style="text-align: center">{{ businessApply.create_time }}</td>
                                 </tr>
