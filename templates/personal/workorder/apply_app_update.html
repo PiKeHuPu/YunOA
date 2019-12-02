@@ -48,6 +48,10 @@
                                             <a href="/update_detail?id={{ ap.workorder.id }}"> {{ ap.workorder.number }}</a>
                                         </td>
                                     </tr>
+                                     <tr>
+                                        <td><strong> 申请标题</strong></td>
+                                        <td>{{ ap.t_title }}</td>
+                                    </tr>
                                     <tr>
                                         <td><strong> 申请类型</strong></td>
                                         <td>报销：{{ ap.get_type_display }}</td>
@@ -215,21 +219,21 @@
                 <!-- /.col -->
                 <div class="col-md-4">
                     <div class="box box-primary">
-                        <div class="box-header with-border">
-                            <h3 class="box-title">报销明细</h3>
-
-                            <div class="box-tools">
-                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
-                                        class="fa fa-minus"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="box-body no-padding">
-
-                            <textarea class="form-control" name="cost" id="desc" type="textarea" readonly="readonly"
-                                      style="margin: 0px 3px 0px 0px; height: 250px;resize:vertical;">{{ ap.detail }}</textarea>
-                            <br>
-                        </div>
+{#                        <div class="box-header with-border">#}
+{#                            <h3 class="box-title">报销明细</h3>#}
+{##}
+{#                            <div class="box-tools">#}
+{#                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i#}
+{#                                        class="fa fa-minus"></i>#}
+{#                                </button>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                        <div class="box-body no-padding">#}
+{##}
+{#                            <textarea class="form-control" name="cost" id="desc" type="textarea" readonly="readonly"#}
+{#                                      style="margin: 0px 3px 0px 0px; height: 250px;resize:vertical;">{{ ap.detail }}</textarea>#}
+{#                            <br>#}
+{#                        </div>#}
                         <!-- /.box-body -->
                     </div>
 
