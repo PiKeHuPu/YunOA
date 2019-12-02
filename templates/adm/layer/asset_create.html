@@ -19,12 +19,12 @@
                         <input class="form-control" name="operator" type="hidden" value="{{ request.user.name }}"/>
                         <label class="col-sm-2 control-label">资产编号</label>
                         <div class="col-sm-3">
-                            <input class="form-control" name="number" id="number" type="text"/>
+                            <input class="form-control" name="number" id="number" type="text" value="{{ asset.number }}"/>
                         </div>
 
                         <label class="col-sm-2 control-label">资产名称</label>
                         <div class="col-sm-3">
-                            <input class="form-control" name="name" id="name" type="text"/>
+                            <input class="form-control" name="name" id="name" type="text" value="{{ asset.name }}"/>
                         </div>
                     </div>
                     <div class="form-group has-feedback">
@@ -33,41 +33,41 @@
                             <select class="form-control select2" style="width:100%;" name="department" id="department" onchange="a_ajax()">
                                 <option></option>
                                 {% for department in department_list %}
-                                    <option value="{{ department.id }}">{{ department.name }}</option>
+                                    <option value="{{ department.id }}" {% if department.id == asset.department_id %}selected{% endif %}>{{ department.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
                         <label class="col-sm-2 control-label">所属仓库</label>
                         <div class="col-sm-3">
-                            <select class="form-control select2" style="width:100%;" name="warehouse" id="warehouse" disabled>
-                                <option></option>
+                            <select class="form-control select2" style="width:100%;" name="warehouse" id="warehouse" disabled >
+                                <option value="{{ asset.warehouse_id }}">{{ asset.warehouse.name }}</option>
                             </select>
                         </div>
                     </div>
                     <div class="form-group has-feedback">
                         <label class="col-sm-2 control-label">数量</label>
                         <div class="col-sm-3">
-                            <input class="form-control" name="quantity" id="quantity" type="number" min="0" step="1"/>
+                            <input class="form-control" name="quantity" id="quantity" type="number" min="0" step="1" value="{{ asset.quantity }}"/>
                         </div>
                         <label class="col-sm-2 control-label">单位</label>
                         <div class="col-sm-3">
-                            <input class="form-control" name="unit" id="unit" type="text"/>
+                            <input class="form-control" name="unit" id="unit" type="text" value="{{ asset.unit }}"/>
                         </div>
                     </div>
                     <div class="form-group has-feedback">
                         <label class="col-sm-2 control-label">型号</label>
                         <div class="col-sm-3">
-                            <input class="form-control" name="type" id="type" type="text"/>
+                            <input class="form-control" name="type" id="type" type="text" value="{{ asset.type }}"/>
                         </div>
                         <label class="col-sm-2 control-label">到期时间(选填)</label>
                         <div class="col-sm-3">
-                        <input type="text" class="form-control pull-right form_datetime" name="due_time" id="due_time" value=""/>
+                        <input type="text" class="form-control pull-right form_datetime" name="due_time" id="due_time" value="{{ asset.due_time }}"/>
                         </div>
                     </div>
                     <div class="form-group has-feedback">
                         <label class="col-sm-2 control-label">备注信息(选填)</label>
                         <div class="col-sm-8">
-                            <textarea class="form-control" name="remark" id="remark" rows="5"></textarea>
+                            <textarea class="form-control" name="remark" id="remark" rows="5" >{{ asset.remark }}</textarea>
                         </div>
                     </div>
                 </fieldset>

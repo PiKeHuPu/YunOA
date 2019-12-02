@@ -222,11 +222,11 @@ function doDetail(id){
 function doUpdate(id){
 	var div=layer.open({
 		type : 2,
-		title : '修改设备信息',
+		title : '修改资产信息',
 		shadeClose : false,
     	maxmin : true,
 		area : [ '800px', '580px' ],
-		content : "{% url 'adm-asset:update' %}"+'?id='+id,
+		content : "{% url 'adm-n-create' %}"+'?id='+id,
 		end : function() {
 			//oDataTable.ajax.reload();
             window.location.reload();

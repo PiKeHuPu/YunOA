@@ -250,6 +250,10 @@ class AssetCreateView(LoginRequiredMixin, View):
     def get(self, request):
         ret = dict()
         user_id = request.session.get("_auth_user_id")
+        asset_id = request.GET.get("id")
+        if asset_id:
+            asset = AssetInfo.objects.get(id=asset_id)
+            ret['asset'] = asset
         department_list = department_admin(user_id)
         ret['department_list'] = department_list
         return render(request, "adm/layer/asset_create.html", ret)
