@@ -28,7 +28,7 @@
                         </div>
                     </div>
                     <div class="form-group has-feedback">
-                        <label class="col-sm-2 control-label">报销内容</label>
+                        <label class="col-sm-2 control-label">报销详情</label>
                         <div class="col-sm-8">
                             <textarea class="form-control" name="title" id="title" style="height:150px;resize:vertical"
                             >{{ ap.title }}</textarea>
@@ -92,15 +92,15 @@
                             </div>
                         </div>
                     </div>
-                {% if ap.type == '0' %}
-                    <div class="form-group has-feedback">
-                        <label class="col-sm-2 control-label">费用明细</label>
-                        <div class="col-sm-8">
-                                <textarea class="form-control" name="destination" id="detail" required
-                                          value="{{ ap.detail }}" style="height: 160px;">{{ ap.detail }}</textarea>
-                        </div>
-                    </div>
-                {% endif %}
+{#                {% if ap.type == '0' %}#}
+{#                    <div class="form-group has-feedback">#}
+{#                        <label class="col-sm-2 control-label">费用明细</label>#}
+{#                        <div class="col-sm-8">#}
+{#                                <textarea class="form-control" name="destination" id="detail" required#}
+{#                                          value="{{ ap.detail }}" style="height: 160px;">{{ ap.detail }}</textarea>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                {% endif %}#}
                 </fieldset>
 
                 {% if ap.type == '1' %}
