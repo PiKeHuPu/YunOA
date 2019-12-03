@@ -170,7 +170,7 @@ function verify() {
 
     if (isError(t_title, '请填写申请标题')) {
         return false
-    } else if (isError(title, '请填写报销详情')) {
+    } else if (isError(title, '请填写工作内容')) {
         return false
     } else if (isError(all_fee, '请填写总费用')) {
         return false
@@ -187,6 +187,8 @@ function verify() {
     } else if (isError(payee, '请输入收款方')) {
         return false
     } else if (isError(bank_info, '请输入开户行')) {
+        return false
+    } else if (isError(detail, '请输入费用明细')) {
         return false
     }
 
