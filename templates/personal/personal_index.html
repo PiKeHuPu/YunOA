@@ -17,79 +17,11 @@
     </section>
 
     <section class="content">
-        <!-- 审批模块 -->
-{#        <div class="row">#}
-{#            <div class="col-lg-3 col-xs-6">#}
-{#                <!-- small box -->#}
-{#                <div class="small-box bg-teal">#}
-{#                    <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px">需要我审批</p>#}
-{#                    <div class="inner">#}
-{#                        <a href="{% url 'personal-workorder-app' %}"#}
-{#                                                        class="small-box-footer"><p style="font-size:28px; color: white" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">申请：{{ work_order_x }}</p></a>#}
-{#                        <a href="{% url 'personal-workorder_ap_cost_app' %}"#}
-{#                                                        class="small-box-footer"><p style="font-size:28px; color: white" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">报销：{{ apply_x }}</p></a>#}
-{#                    </div>#}
-{#                    <div class="icon" style="margin-top: 40px">#}
-{#                        <i class="fa fa-pencil"></i>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-{#            <!-- ./col -->#}
-{#            <div class="col-lg-3 col-xs-6">#}
-{#                <!-- small box -->#}
-{#                <div class="small-box bg-yellow ">#}
-{#                    <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px">等待中...</p>#}
-{#                    <div class="inner">#}
-{#                        <a href="{% url 'personal-workorder_Icrt' %}"#}
-{#                                                        class="small-box-footer"><p style="font-size:28px; color: white" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">申请：{{ work_order_0 }}</p></a>#}
-{#                        <a href="{% url 'personal-workorder_ap_cost' %}"#}
-{#                                                        class="small-box-footer"><p style="font-size:28px; color: white" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">报销：{{ apply_0 }}</p></a>#}
-{#                    </div>#}
-{#                    <div class="icon" style="margin-top: 40px">#}
-{#                        <i class="fa fa-send-o"></i>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-{#            <!-- ./col -->#}
-{#            <div class="col-lg-3 col-xs-6">#}
-{#                <!-- small box -->#}
-{#                <div class="small-box bg-green">#}
-{#                    <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px">审批中...</p>#}
-{#                    <div class="inner">#}
-{#                        <a href="{% url 'personal-workorder_Icrt' %}"#}
-{#                                                        class="small-box-footer"><p style="font-size:28px; color: white" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">申请：{{ work_order_1 }}</p></a>#}
-{#                        <a href="{% url 'personal-workorder_ap_cost' %}"#}
-{#                                                        class="small-box-footer"><p style="font-size:28px; color: white" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">报销：{{ apply_1 }}</p></a>#}
-{#                    </div>#}
-{#                    <div class="icon" style="margin-top: 50px">#}
-{#                        <i class="glyphicon glyphicon-play"></i>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-{#            <!-- ./col -->#}
-{#            <div class="col-lg-3 col-xs-6">#}
-{#                <!-- small box -->#}
-{#                <div class="small-box bg-red">#}
-{#                    <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px">完成</p>#}
-{#                    <div class="inner">#}
-{#                        <a href="{% url 'personal-workorder_Icrt' %}"#}
-{#                                                        class="small-box-footer"><p style="font-size:28px; color: white" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">申请：{{ work_order_2 }}</p></a>#}
-{#                        <a href="{% url 'personal-workorder_ap_cost' %}"#}
-{#                                                        class="small-box-footer"><p style="font-size:28px; color: white" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">报销：{{ apply_2 }}</p></a>#}
-{#                    </div>#}
-{#                    <div class="icon" style="margin-top: 40px">#}
-{#                        <i class="fa fa-check"></i>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-{#            <!-- ./col -->#}
-{#        </div>#}
-        <!-- /.row -->
 
 {#        新我的工作台页面#}
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
-            <div class="small-box bg-teal" style="box-shadow: 0 0 10px gray">
+            <div class="small-box" style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #3ce6e9, #15c1cc)">
                 <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">查看我的申请</p>
                 <div class="inner" >
                     <a href="/personal/workorder_Icrt/?type=0"
@@ -105,7 +37,7 @@
 
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
-            <div class="small-box bg-yellow" style="box-shadow: 0 0 10px gray">
+            <div class="small-box" style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #ffa850, #ee7b1e)">
                 <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">查看我的报销</p>
                 <div class="inner">
                     <a href="/personal/workorder_ap_cost/?type=0"
@@ -121,7 +53,7 @@
 
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
-            <div class="small-box bg-purple" style="box-shadow: 0 0 10px gray">
+            <div class="small-box" style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #7d71ff, #6d22ff)">
                 <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">审批申请</p>
                 <div class="inner">
                     <a href="/personal/workorder_app/?type=0"
@@ -137,7 +69,7 @@
 
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
-            <div class="small-box bg-fuchsia-active" style="box-shadow: 0 0 10px gray">
+            <div class="small-box" style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #ff71a8, #ff3a72)">
                 <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">审批报销</p>
                 <div class="inner">
                     <a href="/personal/workorder_ap_cost_app/?type=0"
@@ -155,7 +87,7 @@
 
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
-            <div class="small-box bg-red" style="box-shadow: 0 0 10px gray">
+            <div class="small-box" style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #ff8a74, #ff1f1a)">
                 <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">公告</p>
                 <div class="inner">
                     <a href="#" data-toggle="control-sidebar" onclick="getBulletin()"
@@ -169,25 +101,25 @@
             </div>
         </div>
 
-{#        <div class="col-lg-3 col-xs-6">#}
-{#            <!-- small box -->#}
-{#            <div class="small-box bg-blue" style="box-shadow: 0 0 10px gray">#}
-{#                <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">物资续期提醒</p>#}
-{#                <div class="inner">#}
-{#                    <a href="{% url 'personal-workorder-app' %}"#}
-{#                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">0件物资</p></a>#}
-{#                    <a href="{% url 'personal-workorder_ap_cost_app' %}"#}
-{#                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">即将到期</p></a>#}
-{#                </div>#}
-{#                <div class="icon" style="margin-top: 40px">#}
-{#                    <i class="fa fa-bell-o"></i>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
+        {% if asset or gone_asset %}
+            <div class="col-lg-3 col-xs-6">
+                <!-- small box -->
+                <div class="small-box" style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #8187ff, #6b4cff)">
+                    <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">物资续期提醒</p>
+                    <div class="inner">
+                        <a href="#" class="small-box-footer" onclick="due_asset(0)"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">{{ asset_num }}件即将到期</p></a>
+                        <a href="#" class="small-box-footer" onclick="due_asset(1)"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">{{ gone_asset_num }}件已过期</p></a>
+                    </div>
+                    <div class="icon" style="margin-top: 40px">
+                        <i class="fa fa-bell-o"></i>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
 
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
-            <div class="small-box bg-orange-active" style="box-shadow: 0 0 10px gray">
+            <div class="small-box" style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #2cec25, #26b320)">
                 <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">油耗表</p>
                 <div class="inner">
                     <a href="/personal/oilWear/oil/order"
@@ -201,52 +133,7 @@
             </div>
         </div>
 
-{#        {% if asset %}#}
-{#            <div class="row">#}
-{#                <div class="col-md-12">#}
-{#                    <div class="box">#}
-{#                        <div class="box-header with-border">#}
-{#                            <h3 class="box-title">本部门物资续期提醒</h3>#}
-{#                            <div class="box-tools pull-right">#}
-{#                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i#}
-{#                                        class="fa fa-minus"></i>#}
-{#                                </button>#}
-{#                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i#}
-{#                                        class="fa fa-times"></i></button>#}
-{#                            </div>#}
-{#                        </div>#}
-{##}
-{#                        <!-- /.box-header -->#}
-{##}
-{#                        <div class="box-body">#}
-{#                            <div class="row">#}
-{#                                {% for aa in asset %}#}
-{#                                    <div class="col-md-3">#}
-{#                                        <div class="box box-primary">#}
-{#                                            <a href="/adm/asset/update?id={{ aa.id }}">#}
-{#                                                <div class="box-body box-profile">#}
-{#                                                    <h3 class="profile-username text-center" style="overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">{{ aa.brand }}</h3>#}
-                                                    {#                                                <h3 class="profile-username text-center">哇哈哈</h3>#}
-{#                                                    <p class="text-muted text-center">{{ aa.assetNum }}</p>#}
-                                                    {#                                                <p class="text-muted text-center">12345678</p>#}
-{#                                                    <ul class="list-group list-group-unbordered">#}
-{#                                                        <li class="list-group-item">#}
-{#                                                            <b>到期日期：</b> <a>{{ aa.dueDate }}</a>#}
-{#                                                        </li>#}
-{#                                                    </ul>#}
-{#                                                </div>#}
-{#                                                <!-- /.box-body -->#}
-{#                                            </a>#}
-{#                                        </div>#}
-{#                                    </div>#}
-{#                                {% endfor %}#}
-{#                            </div>#}
-{##}
-{#                        </div>#}
-{#                    </div>#}
-{#                </div>#}
-{#            </div>#}
-{#        {% endif %}#}
+
 
         <!--
     <div class="row">
@@ -345,61 +232,58 @@
                 {% endfor %}
             ]
         };
-        ;
 
         if (option && typeof option === "object") {
             myBarChart.setOption(option, true);
         }
 
 
-        //echarts bar
-        var pie_dom = document.getElementById("pie_container");
-        var myPieChart = echarts.init(pie_dom);
-        option = null;
-        option = {
-            title: {
-                text: '年度工单比例',
-                subtext: '',
-                x: 'center'
-            },
-            tooltip: {
-                trigger: 'item',
-                formatter: "{a} <br/>{b} : {c} ({d}%)"
-            },
-
-            toolbox: {
-                show: true,
-                feature: {
-                    saveAsImage: {show: true}
-                }
-            },
-            legend: {
-                orient: 'vertical',
-                left: 'left',
-                data: [{% for data in year_work_order_count %}'{{ data.name }}',{% endfor %}]
-            },
-            series: [
-                {
-                    name: '工单申请比例',
-                    type: 'pie',
-                    radius: '55%',
-                    center: ['50%', '60%'],
-                    data: [
-                        {% for data in year_work_order_count %}
-                            {value:{{ data.count }}, name: '{{ data.name }}'},
-                        {% endfor %}
-                    ],
-                    itemStyle: {
-                        emphasis: {
-                            shadowBlur: 10,
-                            shadowOffsetX: 0,
-                            shadowColor: 'rgba(0, 0, 0, 0.5)'
-                        }
-                    }
-                }
-            ]
-        };
-        ;
+        {#//echarts bar#}
+        {#var pie_dom = document.getElementById("pie_container");#}
+        {#var myPieChart = echarts.init(pie_dom);#}
+        {#option = null;#}
+        {#option = {#}
+        {#    title: {#}
+        {#        text: '年度工单比例',#}
+        {#        subtext: '',#}
+        {#        x: 'center'#}
+        {#    },#}
+        {#    tooltip: {#}
+        {#        trigger: 'item',#}
+        {#        formatter: "{a} <br/>{b} : {c} ({d}%)"#}
+        {#    },#}
+        {##}
+        {#    toolbox: {#}
+        {#        show: true,#}
+        {#        feature: {#}
+        {#            saveAsImage: {show: true}#}
+        {#        }#}
+        {#    },#}
+        {#    legend: {#}
+        {#        orient: 'vertical',#}
+        {#        left: 'left',#}
+        {#        data: [{% for data in year_work_order_count %}'{{ data.name }}',{% endfor %}]#}
+        {#    },#}
+        {#    series: [#}
+        {#        {#}
+        {#            name: '工单申请比例',#}
+        {#            type: 'pie',#}
+        {#            radius: '55%',#}
+        {#            center: ['50%', '60%'],#}
+        {#            data: [#}
+        {#                {% for data in year_work_order_count %}#}
+        {#                    {value:{{ data.count }}, name: '{{ data.name }}'},#}
+        {#                {% endfor %}#}
+        {#            ],#}
+        {#            itemStyle: {#}
+        {#                emphasis: {#}
+        {#                    shadowBlur: 10,#}
+        {#                    shadowOffsetX: 0,#}
+        {#                    shadowColor: 'rgba(0, 0, 0, 0.5)'#}
+        {#                }#}
+        {#            }#}
+        {#        }#}
+        {#    ]#}
         if (option && typeof option === "object") {
             myPieChart.setOption(option, true);
         }
@@ -409,5 +293,14 @@
             myBarChart.resize();
             myPieChart.resize();
         });
+
+        function due_asset(type) {
+            var index = layer.open({
+                type: 2,
+                title: "本部门物资续期提醒",
+                content: "{% url 'due_asset' %}" + '?type=' + type,
+            });
+            layer.full(index)
+        }
     </script>
 {% endblock %}
