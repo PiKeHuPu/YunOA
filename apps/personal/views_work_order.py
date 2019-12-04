@@ -1308,7 +1308,7 @@ class APPLogListView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        fields = ['id', 'order_id__id', 'order_id__number', 'order_id__title', 'order_id__type','start_time','end_time',
+        fields = ['id', 'order_id__id', 'order_id__number', 'order_id__title', 'order_id__type',
                   'type', 'order_id__structure__title',
                   'create_time',  'order_id__cretor__name', 'record_type', 'order_id__cost']
         filters = dict(creator = request.user)
@@ -1325,8 +1325,6 @@ class APPLogListView(LoginRequiredMixin, View):
         if request.GET.get("start_time") and request.GET.get("end_time"):
             start_time = request.GET.get("start_time")
             end_time = request.GET.get("end_time")
-            print(request.GET.get("start_time"))
-            print(request.GET.get("end_time"))
             filters['create_time__range'] = (start_time, end_time)
 
         # l = WorkOrderLog.objects.filter(**filters).values(*fields).order_by('-create_time')
