@@ -176,9 +176,14 @@ class WorkOrderListView(LoginRequiredMixin, View):
         if request.GET.get('cretor__name'):
             filters['cretor__name'] = request.GET.get('cretor__name')
 
+        if request.GET.get("start_time") and request.GET.get("end_time"):
+            start_time = request.GET.get("start_time")
+            end_time = request.GET.get("end_time")
+            filters['create_time__range'] = (start_time, end_time)
+
         if 'main_url' in request.GET and request.GET['main_url'] == '/personal/workorder_Icrt/':
             filters['cretor_id'] = request.user.id
-            ret = dict(data=list(WorkOrder.objects.filter(**filters).values(*fields).order_by('-create_time')))
+            ret = dict(data=list(WorkOrder.objects.filter(**filters ).values(*fields).order_by('-create_time')))
         if 'main_url' in request.GET and request.GET['main_url'] == '/personal/workorder_app/':
             request_user_id = request.user.id
             filters['next_user_id'] = request_user_id
@@ -874,6 +879,10 @@ class APListView(LoginRequiredMixin, View):
             filters['type'] = request.GET.get('customer')
         if request.GET.get('cretor'):
             filters['cretor__name'] = request.GET.get('cretor')
+        if request.GET.get('start_time') and request.GET.get('end_time'):
+            start_time = request.GET.get("start_time")
+            end_time = request.GET.get("end_time")
+            filters['create_time__range'] = (start_time,end_time)
         if 'main_url' in request.GET and request.GET['main_url'] == '/personal/workorder_ap_cost/':  # 我的
             filters['cretor_id'] = request.user.id
             ret = dict(data=list(BusinessApply.objects.filter(**filters).values(*fields).order_by('-create_time')))
@@ -991,6 +1000,7 @@ class ApplyCostAppView(LoginRequiredMixin, View):
         filters = dict()
         type_list = to_list(BusinessApply.type_choices)
         type0 = request.GET.get('type')
+
         ret['type'] = type0
         ret['type_list'] = type_list
         ret['status_list'] = status_list
@@ -1286,6 +1296,7 @@ class WorkOrderAppLogView(LoginRequiredMixin, View):
         type_list = to_list(WorkOrderLog.type_choices)
         item_type_list = to_list(WorkOrderLog.item_type_choices)
         record_list = to_list(WorkOrderLog.record_type_choices)
+
         ret['type_list'] = type_list
         ret['item_type_list'] = item_type_list
         ret['record_list'] = record_list
@@ -1297,7 +1308,7 @@ class APPLogListView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        fields = ['id', 'order_id__id', 'order_id__number', 'order_id__title', 'order_id__type',
+        fields = ['id', 'order_id__id', 'order_id__number', 'order_id__title', 'order_id__type','start_time','end_time',
                   'type', 'order_id__structure__title',
                   'create_time',  'order_id__cretor__name', 'record_type', 'order_id__cost']
         filters = dict(creator = request.user)
@@ -1311,6 +1322,13 @@ class APPLogListView(LoginRequiredMixin, View):
             filters['type'] = request.GET.get('app_type')
         if request.GET.get('cretor'):
             filters['order_id__cretor__name'] = request.GET.get('cretor')
+        if request.GET.get("start_time") and request.GET.get("end_time"):
+            start_time = request.GET.get("start_time")
+            end_time = request.GET.get("end_time")
+            print(request.GET.get("start_time"))
+            print(request.GET.get("end_time"))
+            filters['create_time__range'] = (start_time, end_time)
+
         # l = WorkOrderLog.objects.filter(**filters).values(*fields).order_by('-create_time')
         # ret = ""
         ret = dict(data=list(WorkOrderLog.objects.filter(**filters).values(*fields).order_by('-create_time')))

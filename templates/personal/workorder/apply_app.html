@@ -71,6 +71,16 @@
                                 {% endfor %}
                             </select>
                         </div>
+                    <div class="form-group searchArea margin-r-5 margin-top-5">
+                            <label style="font-weight: bolder; margin-left: 15px">开始日期：</label>
+                            <input class="form-control timepick" name="start_time" id="start_time" type="text" autocomplete="off"/>
+                        </div>
+
+                        <div class="form-group searchArea margin-r-5 margin-top-5">
+                            <label style="font-weight: bolder; margin-left: 15px">结束日期：</label>
+                            <input class="form-control timepick" name="end_time" id="end_time" type="text" autocomplete="off"/>
+                        </div>
+
                         <button type="button" id="btnWorkorderSearch" class="btn btn-default">
                             <i class="glyphicon glyphicon-search"></i>查询
                         </button>
@@ -115,6 +125,7 @@
     <script src="{% static 'plugins/datatables/moment.min.js' %}"></script>
     <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
     <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
     <!-- iCheck 1.0.1 -->
     <script type="text/javascript">
         $(function () {
@@ -125,6 +136,13 @@
     </script>
 
     <script type="text/javascript">
+     $(".timepick").datetimepicker({
+            format: 'yyyy-mm-dd',
+            language: 'zh',
+            autoclose: 1,
+            forceParse: 0,
+            minView: 2,
+        });
         var oDataTable = null;
 
         $(function () {
@@ -142,6 +160,8 @@
                                 d.workorder_status = $("#workorder_status").val();
                                 d.customer = $("#customer").val();
                                 d.cretor = $("#cretor").val()
+                                d.start_time = $("#start_time").val();
+                                d.end_time = $("#end_time").val();
                             }
                         },
                         columns: [
@@ -257,7 +277,11 @@
             }
 
             $("#btnWorkorderSearch").click(function () {
-                oDataTable.ajax.reload();
+                if($("#start_time").val()>$("#end_time").val()){
+                    alert('起始时间不能晚于结束时间')
+                }else{
+                    oDataTable.ajax.reload()
+                }
             });
 
             //checkbox全选
