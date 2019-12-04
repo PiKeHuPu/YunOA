@@ -169,21 +169,21 @@
             </div>
         </div>
 
-        <div class="col-lg-3 col-xs-6">
-            <!-- small box -->
-            <div class="small-box bg-blue" style="box-shadow: 0 0 10px gray">
-                <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">物资续期提醒</p>
-                <div class="inner">
-                    <a href="{% url 'personal-workorder-app' %}"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 华文行楷" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">0件物资</p></a>
-                    <a href="{% url 'personal-workorder_ap_cost_app' %}"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 华文行楷" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">即将到期</p></a>
-                </div>
-                <div class="icon" style="margin-top: 40px">
-                    <i class="fa fa-bell-o"></i>
-                </div>
-            </div>
-        </div>
+{#        <div class="col-lg-3 col-xs-6">#}
+{#            <!-- small box -->#}
+{#            <div class="small-box bg-blue" style="box-shadow: 0 0 10px gray">#}
+{#                <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">物资续期提醒</p>#}
+{#                <div class="inner">#}
+{#                    <a href="{% url 'personal-workorder-app' %}"#}
+{#                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 华文行楷" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">0件物资</p></a>#}
+{#                    <a href="{% url 'personal-workorder_ap_cost_app' %}"#}
+{#                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 华文行楷" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">即将到期</p></a>#}
+{#                </div>#}
+{#                <div class="icon" style="margin-top: 40px">#}
+{#                    <i class="fa fa-bell-o"></i>#}
+{#                </div>#}
+{#            </div>#}
+{#        </div>#}
 
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
@@ -201,52 +201,52 @@
             </div>
         </div>
 
-        {% if asset %}
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="box">
-                        <div class="box-header with-border">
-                            <h3 class="box-title">本部门物资续期提醒</h3>
-                            <div class="box-tools pull-right">
-                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
-                                        class="fa fa-minus"></i>
-                                </button>
-                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i
-                                        class="fa fa-times"></i></button>
-                            </div>
-                        </div>
-
-                        <!-- /.box-header -->
-
-                        <div class="box-body">
-                            <div class="row">
-                                {% for aa in asset %}
-                                    <div class="col-md-3">
-                                        <div class="box box-primary">
-                                            <a href="/adm/asset/update?id={{ aa.id }}">
-                                                <div class="box-body box-profile">
-                                                    <h3 class="profile-username text-center" style="overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">{{ aa.brand }}</h3>
+{#        {% if asset %}#}
+{#            <div class="row">#}
+{#                <div class="col-md-12">#}
+{#                    <div class="box">#}
+{#                        <div class="box-header with-border">#}
+{#                            <h3 class="box-title">本部门物资续期提醒</h3>#}
+{#                            <div class="box-tools pull-right">#}
+{#                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i#}
+{#                                        class="fa fa-minus"></i>#}
+{#                                </button>#}
+{#                                <button type="button" class="btn btn-box-tool" data-widget="remove"><i#}
+{#                                        class="fa fa-times"></i></button>#}
+{#                            </div>#}
+{#                        </div>#}
+{##}
+{#                        <!-- /.box-header -->#}
+{##}
+{#                        <div class="box-body">#}
+{#                            <div class="row">#}
+{#                                {% for aa in asset %}#}
+{#                                    <div class="col-md-3">#}
+{#                                        <div class="box box-primary">#}
+{#                                            <a href="/adm/asset/update?id={{ aa.id }}">#}
+{#                                                <div class="box-body box-profile">#}
+{#                                                    <h3 class="profile-username text-center" style="overflow:hidden; white-space:nowrap; text-overflow:ellipsis;">{{ aa.brand }}</h3>#}
                                                     {#                                                <h3 class="profile-username text-center">哇哈哈</h3>#}
-                                                    <p class="text-muted text-center">{{ aa.assetNum }}</p>
+{#                                                    <p class="text-muted text-center">{{ aa.assetNum }}</p>#}
                                                     {#                                                <p class="text-muted text-center">12345678</p>#}
-                                                    <ul class="list-group list-group-unbordered">
-                                                        <li class="list-group-item">
-                                                            <b>到期日期：</b> <a>{{ aa.dueDate }}</a>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                                <!-- /.box-body -->
-                                            </a>
-                                        </div>
-                                    </div>
-                                {% endfor %}
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-        {% endif %}
+{#                                                    <ul class="list-group list-group-unbordered">#}
+{#                                                        <li class="list-group-item">#}
+{#                                                            <b>到期日期：</b> <a>{{ aa.dueDate }}</a>#}
+{#                                                        </li>#}
+{#                                                    </ul>#}
+{#                                                </div>#}
+{#                                                <!-- /.box-body -->#}
+{#                                            </a>#}
+{#                                        </div>#}
+{#                                    </div>#}
+{#                                {% endfor %}#}
+{#                            </div>#}
+{##}
+{#                        </div>#}
+{#                    </div>#}
+{#                </div>#}
+{#            </div>#}
+{#        {% endif %}#}
 
         <!--
     <div class="row">
