@@ -63,6 +63,9 @@
                             <label>申请类型：</label>
                             <select class="form-control inputText select2" name="customer" id="customer">
                                 <option></option>
+                                {% if type %}
+                                    <option value="{{ type }}" selected></option>
+                                {% endif %}
                                 {% for type in type_list %}
                                     <option value= {{ type.item }}>{{ type.value }}</option>
                                 {% endfor %}

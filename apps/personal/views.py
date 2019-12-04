@@ -10,6 +10,7 @@ from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
+from bulletin.models import Bulletin
 from utils.mixin_utils import LoginRequiredMixin
 from rbac.models import Menu
 from system.models import SystemSetup
@@ -44,19 +45,15 @@ class PersonalView(LoginRequiredMixin, View):
                                               Q(cretor_id=request.user.id) |
                                               Q(next_user_id=request.user.id)
                                               )
-        ret['work_order_0'] = work_order.filter(cretor=request.user, status__in=['0','3']).count()   # 等待中
-        ret['work_order_1'] = work_order.filter(cretor=request.user, status__in=["1","5"]).count()   # 审批中
-        ret['work_order_2'] = work_order.filter(cretor=request.user, status__in=["2","4"]).count()   # 完成
-        ret['work_order_x'] = work_order.filter(next_user_id=request.user.id, status__in = ['1', '0']).count()  # 等待我审批的
+        ret['work_order_lx'] = work_order.filter(next_user_id=request.user.id, status__in = ['1', '0'], type='0').count()  # 等待我审批的
+        ret['work_order_cc'] = work_order.filter(next_user_id=request.user.id, status__in = ['1', '0'], type='1').count()  # 等待我审批的
         ret['start_date'] = start_date
         # 当月个人报销统计
         busin_apply = BusinessApply.objects.filter(
                                                    Q(cretor_id=request.user.id) |
                                                    Q(next_user_id=request.user.id))
-        ret['apply_0'] = busin_apply.filter(cretor=request.user, status__in=['0','3', '-1']).count()
-        ret['apply_1'] = busin_apply.filter(cretor=request.user, status__in=["1","5"]).count()
-        ret['apply_2'] = busin_apply.filter(cretor=request.user, status__in=["2","4"]).count()
-        ret['apply_x'] = busin_apply.filter(next_user_id=request.user.id, status__in = ['1', '0']).count()
+        ret['apply_lx'] = busin_apply.filter(next_user_id=request.user.id, status__in = ['1', '0'], type='0').count()
+        ret['apply_cc'] = busin_apply.filter(next_user_id=request.user.id, status__in = ['1', '0'], type='1').count()
         current_user_id = request.user.id
         cashier = SpecialRole.objects.filter(title='0').first()
         if cashier:
@@ -68,6 +65,13 @@ class PersonalView(LoginRequiredMixin, View):
         structure = request.user.department    # 用户所在部门
         asset = Asset.objects.filter(Q(dueremind = '1'), Q(assetType__structure=structure), Q(dueDate__range=(today, three_months)))
         ret['asset'] = asset
+
+        # 公告相关
+        bulletin = Bulletin.objects.filter(status='1')
+        bulletin_amount = len(bulletin)
+        ret['bulletin_amount'] = bulletin_amount
+        unread_bulletin_num = request.session.get('unread_bulletin_num')
+        ret['unread_bulletin_num'] = unread_bulletin_num
         return render(request, 'personal/personal_index.html', ret)
 
 

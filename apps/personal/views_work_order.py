@@ -151,6 +151,8 @@ class WorkOrderView(LoginRequiredMixin, View):
         status_list = to_list(WorkOrder.status_choices)
         filters = dict()
         type_list = to_list(WorkOrder.type_choices)
+        type0 = request.GET.get('type')
+        ret['type'] = type0
         ret['type_list'] = type_list
         ret['status_list'] = status_list
         return render(request, 'personal/workorder/workorder.html', ret)
@@ -382,6 +384,8 @@ class WorkOrderAppView(LoginRequiredMixin, View):
         ret = Menu.getMenuByRequestUrl(url=request.path_info)
         status_list = to_list(WorkOrder.status_choices)
         type_list = to_list(WorkOrder.type_choices)
+        type0 = request.GET.get('type')
+        ret['type'] = type0
         ret['type_list'] = type_list
         ret['status_list'] = status_list
         return render(request, 'personal/workorder/workorder_app.html', ret)
@@ -845,6 +849,8 @@ class ApplyCostView(LoginRequiredMixin, View):
         status_list = to_list(BusinessApply.status_choices)
         filters = dict()
         type_list = to_list(BusinessApply.type_choices)
+        type0 = request.GET.get('type')
+        ret['type'] = type0
         ret['type_list'] = type_list
         ret['status_list'] = status_list
         return render(request, 'personal/workorder/apply.html', ret)
@@ -983,6 +989,8 @@ class ApplyCostAppView(LoginRequiredMixin, View):
         status_list = to_list(BusinessApply.status_choices)
         filters = dict()
         type_list = to_list(BusinessApply.type_choices)
+        type0 = request.GET.get('type')
+        ret['type'] = type0
         ret['type_list'] = type_list
         ret['status_list'] = status_list
 
