@@ -951,7 +951,6 @@ class ApplyCostUpdateView(LoginRequiredMixin, View):
         ap.bank_account = ret_data.get('bank_account')
         ap.bank_info = ret_data.get('bank_info')
         ap.advance = ret_data.get('advance')
-        ap.detail = ret_data.get('detail')
         if ret_data.get('type') == '1':  # 出差审批
             ap.start_time = ret_data.get('start_time')
             ap.end_time = ret_data.get('end_time')
@@ -966,6 +965,7 @@ class ApplyCostUpdateView(LoginRequiredMixin, View):
             ap.tran_fee = ret_data.get('tran_fee')
             ap.acco_fee = ret_data.get('acco_fee')
             ap.other_fee = ret_data.get('other_fee')
+            ap.detail = ret_data.get('detail')
             end_t = datetime.strptime(ap.end_time, '%Y-%m-%d %H:%M')
             start_t = datetime.strptime(ap.start_time, '%Y-%m-%d %H:%M')
             d_time_value = end_t - start_t

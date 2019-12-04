@@ -142,7 +142,6 @@ function verify() {
         bank_account = $("#bank-account").val(),
         payee = $("#payee").val(),
         bank_info = $("#bank-info").val(),
-        detail = $("#detail").val(),  // 费用明细
         t_title = $("#t_title").val();
 
     var tem_invoice = temData(invoice_type);
@@ -154,6 +153,7 @@ function verify() {
             food_fee = $("#food_fee").val(),
             rece_fee = $("#rece_fee").val(),
             other_fee = $("#other_fee").val(),
+            detail = $("#detail").val(),
             people = $("#people").val(),
             transport = $("#transport").val(),
             becity = $("#becity").val(),
@@ -187,8 +187,6 @@ function verify() {
     } else if (isError(payee, '请输入收款方')) {
         return false
     } else if (isError(bank_info, '请输入开户行')) {
-        return false
-    } else if (isError(detail, '请输入费用明细')) {
         return false
     }
 
@@ -226,7 +224,6 @@ function verify() {
         bank_account: bank_account,
         payee: payee,
         bank_info: bank_info,
-        detail: detail,
         t_title: t_title
     };
     if (ap_type == '1') {
@@ -243,6 +240,7 @@ function verify() {
         retData['other_fee'] = other_fee;
         retData['start_time'] = start_time;
         retData['end_time'] = end_time;
+        retData['detail'] = detail;
     }
 
     return retData
