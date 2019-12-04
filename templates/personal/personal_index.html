@@ -6,7 +6,7 @@
 {% block content %}
 
     <section class="content-header">
-        <h1 style="font-family: 华文行楷; font-size: 30px; margin-left: 15px">
+        <h1 style="font-family: 楷体; font-size: 30px; margin-left: 15px">
             我的工作台 &nbsp;<button type="button" class="btn btn-success" onclick="window.open('{% url "direction" %}')" style="font-size: 18px">操作说明</button>
         </h1>
 
@@ -91,11 +91,11 @@
             <!-- small box -->
             <div class="small-box bg-teal" style="box-shadow: 0 0 10px gray">
                 <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">查看我的申请</p>
-                <div class="inner" style="margin-left: 40px">
+                <div class="inner" >
                     <a href="/personal/workorder_Icrt/?type=0"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 华文行楷" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">立项申请</p></a>
+                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">立项申请</p></a>
                     <a href="/personal/workorder_Icrt/?type=1"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 华文行楷" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">出差申请</p></a>
+                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">出差申请</p></a>
                 </div>
                 <div class="icon" style="margin-top: 40px">
                     <i class="fa fa-pencil"></i>
@@ -107,11 +107,11 @@
             <!-- small box -->
             <div class="small-box bg-yellow" style="box-shadow: 0 0 10px gray">
                 <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">查看我的报销</p>
-                <div class="inner" style="margin-left: 40px">
+                <div class="inner">
                     <a href="/personal/workorder_ap_cost/?type=0"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 华文行楷" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">立项报销</p></a>
+                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">立项报销</p></a>
                     <a href="/personal/workorder_ap_cost/?type=1"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 华文行楷" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">出差报销</p></a>
+                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">出差报销</p></a>
                 </div>
                 <div class="icon" style="margin-top: 40px">
                     <i class="fa fa-pencil"></i>
@@ -125,9 +125,9 @@
                 <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">审批申请</p>
                 <div class="inner">
                     <a href="/personal/workorder_app/?type=0"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 华文行楷" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">立项申请：{{ work_order_lx }}</p></a>
+                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">立项申请：{{ work_order_lx }}</p></a>
                     <a href="/personal/workorder_app/?type=1"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 华文行楷" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">出差申请：{{ work_order_cc }}</p></a>
+                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">出差申请：{{ work_order_cc }}</p></a>
                 </div>
                 <div class="icon" style="margin-top: 40px">
                     <i class="fa fa-check"></i>
@@ -141,9 +141,9 @@
                 <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">审批报销</p>
                 <div class="inner">
                     <a href="/personal/workorder_ap_cost_app/?type=0"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 华文行楷" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">立项报销：{{ apply_lx }}</p></a>
+                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">立项报销：{{ apply_lx }}</p></a>
                     <a href="/personal/workorder_ap_cost_app/?type=1"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 华文行楷" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">出差报销：{{ apply_cc }}</p></a>
+                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">出差报销：{{ apply_cc }}</p></a>
                 </div>
                 <div class="icon" style="margin-top: 40px">
                     <i class="fa fa-check"></i>
@@ -151,7 +151,7 @@
             </div>
         </div>
 
-        <h1 style="font-family: 华文行楷; font-size: 30px; margin-left: 15px">其他</h1>
+        <h1 style="font-family: 楷体; font-size: 30px; margin-left: 15px">其他</h1>
 
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
@@ -159,9 +159,9 @@
                 <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">公告</p>
                 <div class="inner">
                     <a href="#" data-toggle="control-sidebar" onclick="getBulletin()"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 华文行楷" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">公告数量：{{ bulletin_amount }}</p></a>
+                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">公告数量：{{ bulletin_amount }}</p></a>
                     <a href="#" data-toggle="control-sidebar" onclick="getBulletin()"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 华文行楷" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">未读数量：{{ unread_bulletin_num }}</p></a>
+                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">未读数量：{{ unread_bulletin_num }}</p></a>
                 </div>
                 <div class="icon" style="margin-top: 40px">
                     <i class="fa fa-envelope-o"></i>
@@ -175,9 +175,9 @@
 {#                <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">物资续期提醒</p>#}
 {#                <div class="inner">#}
 {#                    <a href="{% url 'personal-workorder-app' %}"#}
-{#                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 华文行楷" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">0件物资</p></a>#}
+{#                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">0件物资</p></a>#}
 {#                    <a href="{% url 'personal-workorder_ap_cost_app' %}"#}
-{#                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 华文行楷" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">即将到期</p></a>#}
+{#                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">即将到期</p></a>#}
 {#                </div>#}
 {#                <div class="icon" style="margin-top: 40px">#}
 {#                    <i class="fa fa-bell-o"></i>#}
@@ -189,11 +189,11 @@
             <!-- small box -->
             <div class="small-box bg-orange-active" style="box-shadow: 0 0 10px gray">
                 <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">油耗表</p>
-                <div class="inner" style="margin-left: 30px">
+                <div class="inner">
                     <a href="/personal/oilWear/oil/order"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 华文行楷" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">油耗记录</p></a>
+                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">油耗记录</p></a>
                     <a href="/personal/oilWear/oil/order/statistic"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 华文行楷" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">油耗统计</p></a>
+                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">油耗统计</p></a>
                 </div>
                 <div class="icon" style="margin-top: 40px">
                     <i class="fa fa-car"></i>
