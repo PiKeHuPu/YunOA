@@ -65,6 +65,10 @@ class PersonalView(LoginRequiredMixin, View):
         structure = request.user.department    # 用户所在部门
         asset = Asset.objects.filter(Q(dueremind = '1'), Q(assetType__structure=structure), Q(dueDate__range=(today, three_months)))
         ret['asset'] = asset
+        ret['asset_num'] = len(asset)
+        gone_asset = Asset.objects.filter(Q(dueremind='1'), Q(assetType__structure=structure), Q(dueDate__lt=today))
+        ret['gone_asset'] = gone_asset
+        ret['gone_asset_num'] = len(gone_asset)
 
         # 公告相关
         bulletin = Bulletin.objects.filter(status='1')
@@ -159,3 +163,38 @@ class PhoneBookView(LoginRequiredMixin, View):
 class Direction(View):
     def get(self, request):
         return render(request, 'direction.html')
+
+
+class DueAssetView(LoginRequiredMixin, View):
+    """
+    物资续期提醒页面
+    """
+    def get(self, request):
+        ret = dict()
+        # 物资到期提醒
+        today = date.today()
+        three_months = today + timedelta(days=100)
+        structure = request.user.department  # 用户所在部门
+
+        type0 = request.GET.get("type")
+
+        if type0 == '0':
+            asset = Asset.objects.filter(Q(dueremind='1'), Q(assetType__structure=structure),
+                                         Q(dueDate__range=(today, three_months)))
+            for a in asset:
+                if len(a.brand) > 10:
+                    a.brand = a.brand[:10] + "..."
+                if len(a.desc) > 20:
+                    a.desc = a.desc[:20] + "..."
+            ret['asset'] = asset
+            ret['asset_num'] = len(asset)
+        elif type0 == '1':
+            asset = Asset.objects.filter(Q(dueremind='1'), Q(assetType__structure=structure), Q(dueDate__lt=today))
+            for a in asset:
+                if len(a.brand) > 10:
+                    a.brand = a.brand[:10] + "..."
+                if len(a.desc) > 20:
+                    a.desc = a.desc[:20] + "..."
+            ret['asset'] = asset
+            ret['asset_num'] = len(asset)
+        return render(request, "adm/asset/due_asset.html", ret)
