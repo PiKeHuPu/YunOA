@@ -58,8 +58,10 @@ class PersonalView(LoginRequiredMixin, View):
         cashier = SpecialRole.objects.filter(title='0').first()
         if cashier:
             if current_user_id == cashier.user.id:
-                ret['work_order_x'] += WorkOrder.objects.filter(status='5').count()
-                ret['apply_x'] += BusinessApply.objects.filter(status='5').count()
+                ret['work_order_lx'] += WorkOrder.objects.filter(status='5', type="0").count()
+                ret['work_order_cc'] += WorkOrder.objects.filter(status='5', type="1").count()
+                ret['apply_lx'] += BusinessApply.objects.filter(status='5', type='0').count()
+                ret['apply_cc'] += BusinessApply.objects.filter(status='5', type='1').count()
         # 物资到期提醒
         three_months = today + timedelta(days=100)
         structure = request.user.department    # 用户所在部门

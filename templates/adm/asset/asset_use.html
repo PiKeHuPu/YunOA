@@ -34,10 +34,10 @@
                         </div>
                         <div class="form-group searchArea margin-r-5 margin-top-5">
                             <label>所在仓库：</label>
-                            <select class="form-control inputText select2" name="assetType" , id="assetType">
+                            <select class="form-control inputText select2" name="warehouse"  id="warehouse">
                                 <option></option>
-                                {% for type in asset_types %}
-                                    <option value={{ type.id }}>{{ type.name }}</option>
+                                {% for warehouse in warehouses %}
+                                    <option value={{ warehouse.id }}>{{ warehouse.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -71,8 +71,8 @@
                         <tr valign="middle">
                             <th><input type="checkbox" id="checkAll"></th>
                             <th>资产编号</th>
-                            <th>仓库</th>
                             <th>名称</th>
+                            <th>仓库</th>
                             <th>型号</th>
                             <th>状态</th>
                             <th>数量</th>
@@ -120,7 +120,7 @@
                             "url": "{% url 'adm-asset:use-list' %}",
                             "data": function (d) {
                                 d.assetNum = $("#assetNum").val();
-                                d.assetType = $("#assetType").val();
+                                d.warehouse = $("#warehouse").val();
                                 d.brand = $("#brand").val();
                                 d.model = $("#model").val();
                                 d.status = $("#status").val();
@@ -130,16 +130,16 @@
                         columns: [
                             DATATABLES_CONSTANT.DATA_TABLES.COLUMN.CHECKBOX,
                             {
-                                data: "assetNum",
+                                data: "number",
                             },
                             {
-                                data: "assetType__name",
+                                data: "name",
                             },
                             {
-                                data: "brand",
+                                data: "warehouse__name",
                             },
                             {
-                                data: "model",
+                                data: "type",
                             },
                             {
                                 data: "status",
@@ -169,10 +169,10 @@
                                 }
                             },
                             {
-                                data: "assetCount",
+                                data: "quantity",
                             },
                             {
-                                data: "assetUnit",
+                                data: "unit",
                             },
                             {
                                 data: "id",

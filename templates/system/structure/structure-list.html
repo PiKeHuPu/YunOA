@@ -50,7 +50,9 @@
                         <th>名称</th>
                         <th>类别</th>
                         <th>所属</th>
-                        <th>管理员</th>
+                        <th>工单管理员</th>
+                        <th>物资管理员</th>
+                        <th>物资审批人</th>
                         <th>操作</th>
                     </tr>
                     </thead>
@@ -121,6 +123,12 @@ $(function() {
                                 {
                                     data : "adm_list",
                                 },
+                                {
+                                    data : "administrator__name"
+                                },
+                                {
+                                    data : "approver__name"
+                                },
 								{
 									data : "id",
 									width : "12%",
@@ -129,7 +137,8 @@ $(function() {
 										var ret="";
 										var ret="<button title='详情-编辑' onclick='doUpdate("+ data + ")'><i class='glyphicon glyphicon-pencil'></i></button>";
 										ret=ret+"<button title='关联用户' onclick='doAddUser("+ data + ")'><i class='glyphicon glyphicon-user'></i></button>";
-										 ret=ret+"<button title='修改管理员' onclick='doAddAdm("+ data + ")'><i class='fa fa-user-plus'></i></button>";
+										 ret=ret+"<button title='修改工单管理员' onclick='doAddAdm("+ data + ")'><i class='fa fa-user-plus'></i></button>";
+										 ret=ret+"<button title='修改物资管理员与审批人' onclick='doSetAdm("+ data + ")'><i class='fa fa-user-plus'></i></button>";
 										 ret=ret+"<button title='删除' onclick='doDelete("+ data + ")'><i class='glyphicon glyphicon-trash'></i></button>";
 										return ret;
 									}
@@ -277,14 +286,28 @@ function doAddUser(id){
 	});
 }
 
-// 修改管理员
+// 修改工单管理员
 function doAddAdm(id){
     layer.open({
         type: 2,
-        title: '修改管理员',
+        title: '修改工单管理员',
         maxmin: 'true',
         area: [ '800px', '600px' ],
         content: ['{% url "system-basic:structure-add_adm" %}' + '?id=' + id, 'no'],
+        end: function () {
+            window.location.reload();
+        }
+    })
+}
+
+// 修改物资管理员
+function doSetAdm(id){
+    layer.open({
+        type: 2,
+        title: '修改物资管理员与审批人',
+        maxmin: 'true',
+        area: [ '800px', '400px' ],
+        content: ['{% url "adm-department" %}' + '?id=' + id, 'no'],
         end: function () {
             window.location.reload();
         }

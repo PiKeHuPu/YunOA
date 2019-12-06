@@ -11,7 +11,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from utils.mixin_utils import LoginRequiredMixin
 from rbac.models import Menu
 from system.models import SystemSetup
-from .models import Asset, AssetType, AssetLog, AssetUseLog, AssetFile, AssetUseAddress
+from .models import Asset, AssetType, AssetLog, AssetUseLog, AssetFile, AssetUseAddress, AssetInfo, AssetWarehouse
 from .forms import AssetCreateForm, AssetUpdateForm, AssetUploadForm
 from rbac.models import Role
 from datetime import datetime
@@ -37,27 +37,39 @@ class AssetView(LoginRequiredMixin, View):
         return render(request, 'adm/asset/asset.html', ret)
 
 
+##
 class AssetListView(LoginRequiredMixin, View):
     """
     资产获取list
     """
 
     def get(self, request):
-        fields = ['assetNum', 'assetType__name', 'brand', 'model', 'status', 'assetCount', 'assetUnit', 'operator',
-                  'add_time', 'id', 'dueDate', 'dueremind']
-        filters = dict()
+        user_id = request.session.get("_auth_user_id")
+        user = User.objects.get(id=user_id)
+        department = user.department
+        warehouses = department.assetwarehouse_set.filter(is_delete=False)
+        warehouse_id_list = []
+        for w in warehouses:
+            warehouse_id_list.append(w.id)
+        all_view_warehouse = AssetWarehouse.objects.filter(is_all_view=True)
+        for w in all_view_warehouse:
+            warehouse_id_list.append(w.id)
 
+        fields = ['id', 'warehouse__name', 'number', 'name', 'quantity', 'status', 'unit', 'type', 'remark']
+        filters = dict()
+        filters['is_delete'] = False
+        filters['warehouse_id__in'] = warehouse_id_list
         if 'assetNum' in request.GET and request.GET['assetNum']:
-            filters['assetNum__icontains'] = request.GET['assetNum']
-        if 'assetType' in request.GET and request.GET['assetType']:
-            filters['assetType'] = request.GET['assetType']
+            filters['number__icontains'] = request.GET['assetNum']
+        if 'warehouse' in request.GET and request.GET['warehouse']:
+            filters['warehouse_id'] = request.GET['warehouse']
         if 'model' in request.GET and request.GET['model']:
-            filters['model__icontains'] = request.GET['model']
+            filters['type__icontains'] = request.GET['model']
         if 'status' in request.GET and request.GET['status']:
             filters['status'] = request.GET['status']
         if 'brand' in request.GET and request.GET['brand']:
-            filters['brand'] = request.GET['brand']
-        ret = dict(data=list(Asset.objects.filter(**filters).values(*fields).order_by("-add_time")))
+            filters['name'] = request.GET['brand']
+        ret = dict(data=list(AssetInfo.objects.filter(**filters).values(*fields).order_by("-create_time")))
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
 
 
@@ -359,21 +371,32 @@ class AssetUseView(View):
         return HttpResponse(json.dumps(res), content_type='application/json')
 
 
+##
 class AssetUseHtmlView(LoginRequiredMixin, View):
     """
     物资领用页面
     """
 
     def get(self, request):
-        ret = Menu.getMenuByRequestUrl(url=request.path_info)
-        ret.update(SystemSetup.getSystemSetupLastData())
+        # ret = Menu.getMenuByRequestUrl(url=request.path_info)
+        # ret.update(SystemSetup.getSystemSetupLastData())
+        # asset_types = AssetType.objects.all()
+        # ret['status_list'] = status_list
+        # ret['asset_types'] = asset_types
+
+        ret = dict()
+        user_id = request.session.get('_auth_user_id')
+        user = User.objects.get(id=user_id)
+        department = user.department
+        warehouses = department.assetwarehouse_set.filter(is_delete=False)
+        all_view_warehouses = AssetWarehouse.objects.filter(is_all_view=True)
+        warehouses = warehouses | all_view_warehouses
         status_list = []
         for status in Asset.asset_status:
             status_dict = dict(item=status[0], value=status[1])
             status_list.append(status_dict)
-        asset_types = AssetType.objects.all()
+        ret['warehouses'] = warehouses
         ret['status_list'] = status_list
-        ret['asset_types'] = asset_types
         return render(request, 'adm/asset/asset_use.html', ret)
 
 class AssetUseInfoView(LoginRequiredMixin, View):
@@ -382,10 +405,10 @@ class AssetUseInfoView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        ret = Menu.getMenuByRequestUrl(url=request.path_info)
-        if 'id' in request.GET and request.GET['id']:
-            asset = get_object_or_404(Asset, pk=request.GET.get('id'))
-            ret['asset'] = asset
+        ret = dict()
+        id = request.GET.get("id")
+        asset = AssetInfo.objects.get(id=id)
+        ret['asset'] = asset
         return render(request, 'adm/asset/asset_detail_use.html', ret)
 
     def post(self, request):

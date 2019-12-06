@@ -80,7 +80,7 @@ $(function() {
             {
                 "id": "{{ warehouse.id }}",
                 "name": "{{ warehouse.name }}",
-                "department": "{{ warehouse.department.name }}",
+                "department": "{{ warehouse.department.title }}",
                 "is_all_view": "{{ warehouse.is_all_view }}",
                 "remark": "{{ warehouse.remark }}"
             },
@@ -136,7 +136,7 @@ $(function() {
 			title : '新增',
 			shadeClose : false,
 			maxmin : true,
-			area : [ '800px', '350px' ],
+			area : [ '800px', '500px' ],
 			content : "{% url 'adm-warehouse-create' %}",
 			end : function() {
 				//关闭时做的事情

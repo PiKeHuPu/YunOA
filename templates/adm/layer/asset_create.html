@@ -16,7 +16,7 @@
                     <legend>
                     </legend>
                     <div class="form-group has-feedback">
-                        <input class="form-control" name="operator" type="hidden" value="{{ request.user.name }}"/>
+                        <input class="form-control" name="id0" id="id0" type="hidden" value="{{ asset.id }}"/>
                         <label class="col-sm-2 control-label">资产编号</label>
                         <div class="col-sm-3">
                             <input class="form-control" name="number" id="number" type="text" value="{{ asset.number }}"/>
@@ -33,14 +33,13 @@
                             <select class="form-control select2" style="width:100%;" name="department" id="department" onchange="a_ajax()">
                                 <option></option>
                                 {% for department in department_list %}
-                                    <option value="{{ department.id }}" {% if department.id == asset.department_id %}selected{% endif %}>{{ department.name }}</option>
+                                    <option value="{{ department.id }}">{{ department.title }}</option>
                                 {% endfor %}
                             </select>
                         </div>
                         <label class="col-sm-2 control-label">所属仓库</label>
                         <div class="col-sm-3">
                             <select class="form-control select2" style="width:100%;" name="warehouse" id="warehouse" disabled >
-                                <option value="{{ asset.warehouse_id }}">{{ asset.warehouse.name }}</option>
                             </select>
                         </div>
                     </div>

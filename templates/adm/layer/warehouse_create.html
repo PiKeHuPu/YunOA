@@ -24,9 +24,9 @@
                 <label class="col-sm-2 control-label">所属部门</label>
                   <div class="col-sm-3">
                     <select class="form-control select2" name="department_id" id="department_id">
-                        <option value="{{ warehouse.department_id }}">{{ warehouse.department.name }}</option>
+                        <option value="{{ warehouse.department_id }}">{{ warehouse.department.title }}</option>
                         {% for department in department_list %}
-                        <option value={{ department.id }} > {{ department.name }} </option>
+                        <option value={{ department.id }} > {{ department.title }} </option>
                         {% endfor %}
                   </select>
                 </div>

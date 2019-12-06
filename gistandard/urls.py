@@ -22,15 +22,15 @@ import xadmin
 from apps.users.views_user import LoginView, IndexView, LogoutView
 from personal.views import Direction
 from system.views import SystemView
-from adm.views import AdmView, DepartmentManageView, DepartmentCreateView, DepartmentDeleteView, WarehouseView, \
-    WarehouseCreateView, WarehouseDeleteView, AssetView, AssetCreateView, AssetAjaxView
+from adm.views import AdmView, WarehouseView, \
+    WarehouseCreateView, WarehouseDeleteView, AssetView, AssetCreateView, AssetAjaxView, AssetUseFlowView
 from oilWear.views import OilOrderCreateView
 from personal import views as personal_views
 from personal import views_work_order as order
 from adm.views_asset import AssetUseHtmlView, AssetUseInfoView, AssetBackView
 from bulletin import views as bulletin_views
 from oilWear import views as oilWear_views
-
+from users.views_structure import StructureAssetAdmView
 
 urlpatterns = [
     url(r'^xadmin/', xadmin.site.urls),
@@ -53,15 +53,16 @@ urlpatterns = [
     url(r'^adm/bsm/', include('adm.urls', namespace='adm-bsm')),
     url(r'^adm/equipment/', include('adm.urls_equipment', namespace='adm-equipment')),
     url(r'^adm/asset/', include('adm.urls_asset', namespace='adm-asset')),
-    url(r'^adm/department', DepartmentManageView.as_view(), name='adm-department'),
-    url(r'^adm/create', DepartmentCreateView.as_view(), name='adm-department-create'),
-    url(r'^adm/delete', DepartmentDeleteView.as_view(), name='adm-department-delete'),
+    url(r'^adm/department', StructureAssetAdmView.as_view(), name='adm-department'),
+    # url(r'^adm/create', DepartmentCreateView.as_view(), name='adm-department-create'),
+    # url(r'^adm/delete', DepartmentDeleteView.as_view(), name='adm-department-delete'),
     url(r'^adm/warehouse', WarehouseView.as_view(), name='adm-warehouse'),
     url(r'^adm/whCreate', WarehouseCreateView.as_view(), name='adm-warehouse-create'),
     url(r'^adm/whDelete', WarehouseDeleteView.as_view(), name='adm-warehouse-delete'),
     url(r'^adm/n_asset', AssetView.as_view(), name='adm-n-asset'),
     url(r'^adm/n_create', AssetCreateView.as_view(), name='adm-n-create'),
     url(r'^adm/ajax', AssetAjaxView.as_view(), name='adm-ajax'),
+    url(r'^adm/use_flow', AssetUseFlowView.as_view(), name='adm-useflow'),
     # 工作台模块
     ## 审批报销
     url(r'^personal/$', personal_views.PersonalView.as_view(), name="personal"),

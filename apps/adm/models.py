@@ -213,14 +213,14 @@ class Equipment(models.Model):
 
 
 
-class AssetDepartment(models.Model):
-    """
-    资产部门
-    """
-    name = models.CharField(max_length=20, verbose_name="名称")
-    administrator = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, verbose_name="资产管理员")
-    super_adm = models.BooleanField(default=False, verbose_name="是否有全部部门管理权限")
-    is_delete = models.BooleanField(default=False, verbose_name="是否删除")
+# class AssetDepartment(models.Model):
+#     """
+#     资产部门
+#     """
+#     name = models.CharField(max_length=20, verbose_name="名称")
+#     administrator = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, verbose_name="资产管理员")
+#     super_adm = models.BooleanField(default=False, verbose_name="是否有全部部门管理权限")
+#     is_delete = models.BooleanField(default=False, verbose_name="是否删除")
 
 
 class AssetWarehouse(models.Model):
@@ -228,7 +228,7 @@ class AssetWarehouse(models.Model):
     资产仓库
     """
     name = models.CharField(max_length=20, verbose_name="名称")
-    department = models.ForeignKey(AssetDepartment, on_delete=models.CASCADE, verbose_name="所属资产部门")
+    department = models.ForeignKey(Structure, on_delete=models.CASCADE, verbose_name="所属资产部门")
     remark = models.TextField(blank=True, null=True, verbose_name="备注")
     is_delete = models.BooleanField(default=False, verbose_name="是否删除")
     is_all_view = models.BooleanField(default=False, verbose_name="是否所有人可见")
@@ -247,7 +247,7 @@ class AssetInfo(models.Model):
     )
     number = models.CharField(max_length=20, unique=True, verbose_name="资产编号")
     name = models.CharField(max_length=50, verbose_name="资产名称")
-    department = models.ForeignKey(AssetDepartment, on_delete=models.CASCADE, verbose_name="所属部门")
+    department = models.ForeignKey(Structure, on_delete=models.CASCADE, verbose_name="所属部门")
     warehouse = models.ForeignKey(AssetWarehouse, on_delete=models.CASCADE, verbose_name="所属仓库")
     quantity = models.IntegerField(verbose_name="数量")
     status = models.CharField(choices=asset_status, max_length=5, default="0", verbose_name="资产状态")

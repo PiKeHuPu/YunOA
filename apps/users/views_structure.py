@@ -13,7 +13,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from .forms import StructureUpdateForm
 from utils.mixin_utils import LoginRequiredMixin
 from users.models import Structure, UserProfile
-from rbac.models import Menu
+from rbac.models import Menu, Role
 from system.models import SystemSetup
 
 
@@ -35,7 +35,7 @@ class StructureListView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        fields = ['id', 'title', 'type', 'parent__title', 'adm_list']
+        fields = ['id', 'title', 'type', 'parent__title', 'adm_list', 'administrator__name', 'approver__name']
         ret = dict(data=list(Structure.objects.values(*fields)))
         # print(ret)
         for data in ret["data"]:
@@ -123,7 +123,7 @@ class Structure2UserView(LoginRequiredMixin, View):
 
 class StructureAdmView(LoginRequiredMixin, View):
     """
-    组织架构添加部门管理员
+    组织架构添加工单管理员
     """
     def get(self, request):
         if 'id' in request.GET and request.GET['id']:
@@ -156,3 +156,40 @@ class StructureAdmView(LoginRequiredMixin, View):
         structure.save()
         res['result'] = True
         return HttpResponse(json.dumps(res), content_type='application/json')
+
+
+class StructureAssetAdmView(LoginRequiredMixin, View):
+    """
+    设置物资管理员与审批人
+    """
+    def get(self, request):
+        ret = dict()
+        id0 = request.GET.get("id")
+        department = Structure.objects.get(id=id0)
+        users = department.userprofile_set.all()
+        approver = User.objects.filter(is_active='1')
+        ret['department'] = department
+        ret['users'] = users
+        ret['approver'] = approver
+        return render(request, "adm/layer/department.html", ret)
+
+    def post(self, request):
+        ret = dict()
+        id0 = request.POST.get("id0")
+        administrator = request.POST.get('operator')
+        approver_id = request.POST.get('approver')
+        department = Structure.objects.get(id=id0)
+        department.administrator_id = administrator
+        department.approver_id = approver_id
+        if request.POST.get('admin') == 'on':
+            department.super_adm = True
+        else:
+            department.super_adm = False
+        department.save()
+
+        if administrator:
+            role = Role.objects.get(title="仓库管理")
+            user = User.objects.get(id=administrator)
+            role.userprofile_set.add(user)
+        ret['result'] = True
+        return HttpResponse(json.dumps(ret), content_type='application/json')
