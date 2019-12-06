@@ -92,6 +92,15 @@ class WorkOrder(models.Model):
         return self.title
 
 
+class WorkOrderCard(models.Model):
+    createman = models.ForeignKey(User, related_name='cm'
+                                  ,on_delete=models.CASCADE,verbose_name='银行卡信息人')
+    payee = models.CharField(max_length=300, blank=True, null=True, verbose_name='收款方')
+    bank_account = models.CharField(max_length=30, blank=True, null=True, verbose_name='银行账户')
+    bank_info = models.CharField(max_length=300, blank=True, null=True, verbose_name='开户行')
+    time = models.IntegerField(max_length=10, blank=False,null=True , verbose_name='使用次数')
+
+
 class WorkOrderRecord(models.Model):
     """
     TODO 将要被取消的模型

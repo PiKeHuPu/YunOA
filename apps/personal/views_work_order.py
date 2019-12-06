@@ -11,7 +11,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 from utils.mixin_utils import LoginRequiredMixin
 from rbac.models import Menu
-from .models import WorkOrder, WorkOrderRecord, WorkOrderFlow, WorkOrderLog, BusinessApply
+from .models import WorkOrder, WorkOrderRecord, WorkOrderFlow, WorkOrderLog, BusinessApply, WorkOrderCard
 from .forms import WorkOrderCreateForm, WorkOrderUpdateForm, WorkOrderRecordForm, WorkOrderRecordUploadForm, \
     WorkOrderProjectUploadForm, APProjectUploadForm
 from adm.models import Customer
@@ -203,7 +203,6 @@ class WorkOrderCreateView(LoginRequiredMixin, View):
     """
     （用户自己操作自己的申请）创建/更新审批
     """
-
     def get(self, request):
         ret = dict()
         type_list = to_list(WorkOrder.type_choices)  # 审批类型
@@ -211,6 +210,24 @@ class WorkOrderCreateView(LoginRequiredMixin, View):
         advance_list = to_list(WorkOrder.advance_choices)  # 是否预支
         users = User.objects.values('name', 'department__title', 'id')
         transport = to_list(WorkOrder.transport_choices)
+        #获取个人银行卡
+        createm = request.user
+        cm = WorkOrderCard.objects.filter(createman = createm).order_by('-time')[:5]
+
+        bank_account = []
+        bank_info = []
+        payee = []
+
+        if cm:
+            for x in cm:
+                bank_account.append(x.bank_account)
+                bank_info.append(x.bank_info)
+                payee.append(x.payee)
+        else:
+            bank_account = ''
+            bank_info = ''
+            payee = ''
+
         if request.GET.get('id'):
             work_order = get_object_or_404(WorkOrder, pk=request.GET['id'])
             ret['work_order'] = work_order
@@ -232,6 +249,9 @@ class WorkOrderCreateView(LoginRequiredMixin, View):
             'users_dict': users,
             'transport': transport,
             'advance_list': advance_list,
+            'bank_account': bank_account,
+            'bank_info': bank_info,
+            'payee': payee
         })
         return render(request, 'personal/workorder/workorder_create.html', ret)
 
@@ -243,7 +263,9 @@ class WorkOrderCreateView(LoginRequiredMixin, View):
             work_order = get_object_or_404(WorkOrder, pk=work_order_id)
         else:
             work_order = WorkOrder()
+            card = WorkOrderCard()
             work_order.number = auto_timestamp('WO')
+
         work_order.title = ret_data.get('title')
         work_order.type = ret_data.get('type')
         work_order.t_title = ret_data.get('t_title')
@@ -261,6 +283,21 @@ class WorkOrderCreateView(LoginRequiredMixin, View):
                 work_order.payee = ret_data.get('payee')
                 work_order.bank_account = ret_data.get('bank_account')
                 work_order.bank_info = ret_data.get('bank_info')
+                card.payee = work_order.payee
+                card.bank_account = work_order.bank_account
+                card.bank_info = work_order.bank_info
+
+        #判断这个人之前是否有银行卡信息以及后续保存流程
+        card.createman = request.user
+        cm = WorkOrderCard.objects.filter(createman= card.createman)
+        if cm :
+            bank_acc = WorkOrderCard.objects.filter(createman=card.createman, bank_account=card.bank_account)[0]
+            bank_acc.time += 1
+            bank_acc.save()
+        else:
+            card.time = 1
+            card.save()
+
 
         if ret_data.get('type') == '1':  # 出差审批
             work_order.people = ret_data.get('people')
@@ -276,8 +313,7 @@ class WorkOrderCreateView(LoginRequiredMixin, View):
             pro_type = '0'
         elif advance == '1':
             pro_type = '1'
-        order_flow = WorkOrderFlow.objects.filter(order_type=ret_data.get('type'), pro_type=pro_type,
-                                                  structure=request.user.department).first()
+        order_flow = WorkOrderFlow.objects.filter(order_type=ret_data.get('type'), pro_type=pro_type,structure=request.user.department).first()
         bool_info = update_next_user(work_order, str(current_user_id), order_flow, '0')  # 更新审批人信息
         if bool_info:
             work_order.save()
@@ -286,7 +322,10 @@ class WorkOrderCreateView(LoginRequiredMixin, View):
         else:
             res['status'] = 'fail'
             res['errors_info'] = '还没有建立审批人，请联系人事部门'
+
+
         return HttpResponse(json.dumps(res), content_type='application/json')
+
 
     # def post(self, request):
     #     res = dict()
