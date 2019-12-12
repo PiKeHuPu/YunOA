@@ -263,7 +263,7 @@ class WorkOrderCreateView(LoginRequiredMixin, View):
             work_order = get_object_or_404(WorkOrder, pk=work_order_id)
         else:
             work_order = WorkOrder()
-            card = WorkOrderCard()
+
             work_order.number = auto_timestamp('WO')
 
         work_order.title = ret_data.get('title')
@@ -283,6 +283,7 @@ class WorkOrderCreateView(LoginRequiredMixin, View):
                 work_order.payee = ret_data.get('payee')
                 work_order.bank_account = ret_data.get('bank_account')
                 work_order.bank_info = ret_data.get('bank_info')
+                card = WorkOrderCard()
                 card.bank_info = work_order.bank_info
                 card.createman = request.user
                 card.payee = work_order.payee
