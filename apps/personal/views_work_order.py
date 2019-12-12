@@ -259,12 +259,12 @@ class WorkOrderCreateView(LoginRequiredMixin, View):
         res = dict(result=False)
         ret_data = json.loads(request.body.decode())
         work_order_id = ret_data.get('id')
+        card = WorkOrderCard()
         if work_order_id:
             work_order = get_object_or_404(WorkOrder, pk=work_order_id)
         else:
             work_order = WorkOrder()
             card = WorkOrderCard()
-
             work_order.number = auto_timestamp('WO')
 
         work_order.title = ret_data.get('title')
