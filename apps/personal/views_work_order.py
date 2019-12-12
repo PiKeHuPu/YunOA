@@ -263,6 +263,7 @@ class WorkOrderCreateView(LoginRequiredMixin, View):
             work_order = get_object_or_404(WorkOrder, pk=work_order_id)
         else:
             work_order = WorkOrder()
+            card = WorkOrderCard()
 
             work_order.number = auto_timestamp('WO')
 
@@ -283,21 +284,19 @@ class WorkOrderCreateView(LoginRequiredMixin, View):
                 work_order.payee = ret_data.get('payee')
                 work_order.bank_account = ret_data.get('bank_account')
                 work_order.bank_info = ret_data.get('bank_info')
-                card = WorkOrderCard()
                 card.bank_info = work_order.bank_info
                 card.createman = request.user
                 card.payee = work_order.payee
                 card.bank_account = work_order.bank_account
-        #判断这个人之前是否有银行卡信息以及后续保存流程
-        bank_acc = WorkOrderCard.objects.filter(createman=card.createman, bank_account=card.bank_account)
-        if bank_acc:
-            bank_acc = WorkOrderCard.objects.filter(createman=card.createman, bank_account=card.bank_account)[0]
-            bank_acc.time += 1
-            bank_acc.save()
-        else:
-            card.time = 1
-            card.save()
-
+                # 判断这个人之前是否有银行卡信息以及后续保存流程
+                bank_acc = WorkOrderCard.objects.filter(createman=card.createman, bank_account=card.bank_account)
+                if bank_acc:
+                    bank_acc = WorkOrderCard.objects.filter(createman=card.createman, bank_account=card.bank_account)[0]
+                    bank_acc.time += 1
+                    bank_acc.save()
+                else:
+                    card.time = 1
+                    card.save()
 
         if ret_data.get('type') == '1':  # 出差审批
             work_order.people = ret_data.get('people')
@@ -487,7 +486,7 @@ class WorkOrderAppUpdateView(LoginRequiredMixin, View):
         work_order = get_object_or_404(WorkOrder, pk=str(ret_data.get('id')))
         advance = work_order.advance
         current_user_id = request.user.id
-        if current_user_id == work_order.next_user_id:  # TODO
+        if current_user_id == work_order.next_user_id:  #TODO
             if ret_data.get('opinion') == 'agree':
                 # 完成审批， 并写入下一个审批人
                 work_order.status = '1'
