@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <title>YunOA操作说明</title>
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap-multiselect/bootstrap-multiselect.css' %}">
     <style>
         li {
             list-style: none;
@@ -123,6 +126,11 @@
             </a>
         </li>
 
+        <li style="">
+            <a href="#btnSave">
+                意见反馈
+            </a>
+        </li>
     </ul>
 </div>
 <div class="xbox" style="width:80%;top: 20px;right:200px">
@@ -207,11 +215,63 @@
     </div>
 </div>
 
+ <div class="box box-danger">
+        <form class="form-horizontal" id="addForm" method="post">
+            <input type="hidden" name='order' value="{{ work_order.id }}" id="orderId"/>
+            <label class="col-sm-2 control-label">意见/建议</label>
+            <div class="col-sm-8">
+                <textarea class="form-control" name="title" id="advise" style="height:150px;width: 600px"></textarea>
+            </div>
+            <div class="box-footer ">
+                <div class="row span7 text-center">
+                    <button type="button" id="btnSave" class="btn btn-info margin-right " onclick="Save()">保存</button>
+                </div>
+            </div>
+        </form>
+    </div>
+<script>
+    function Save() {
+        var advise = $("#advise").val();
+        if (advise == '') {
+            alert('请输入反馈内容！');
+        } else if (advise.length>300) {
+            alert('建议内容过长，请删减内容')
+        }
+        else {
+            retData = {
+                advise: advise,
+            }
+            var data = retData;
+            if (data === false) {
+                return
+            }
+            var url = "/direction/";
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=UTF-8",
+                success: function (data) {
+                    alert('提交成功');
+                }
+            });
+        }
+
+    }
+</script>
 </body>
 
 </html>
 <!-- jQuery 2.2.3 -->
 <script src="/static/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-multiselect/bootstrap-multiselect.js' %}"></script>
+    <script src="{% static 'plugins/fileinput/fileinput.js' %}"></script>
+    <script src="{% static 'plugins/fileinput/zh.js' %}"></script>
+    <script src="{% static 'js/vue-2.6.10.js' %}"></script>
+
+
 <script>
     var imgsObj = $('.amplifyImg img');//需要放大的图像
     if (imgsObj) {

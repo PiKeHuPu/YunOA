@@ -100,6 +100,8 @@ class WorkOrderCard(models.Model):
     bank_info = models.CharField(max_length=300, blank=True, null=True, verbose_name='开户行')
     time = models.IntegerField(max_length=10, blank=False,null=True , verbose_name='使用次数')
 
+class WorkOrderType(models.Model):
+    type = models.CharField(max_length=10,blank=True,verbose_name='花销类型', )
 
 class WorkOrderRecord(models.Model):
     """
@@ -223,3 +225,8 @@ class BusinessApply(models.Model):
 
 
 
+class Advise(models.Model):
+    creator = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE,verbose_name='建议人')
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name='提交时间')
+    back = models.TextField(max_length=1000, verbose_name="意见反馈")
+    is_done = models.BooleanField(default=False, verbose_name='是否已解决')

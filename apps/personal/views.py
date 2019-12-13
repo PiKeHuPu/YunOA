@@ -1,7 +1,7 @@
 import json
 import re
 import calendar
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
 from django.shortcuts import render
 from django.views.generic.base import View
@@ -16,7 +16,7 @@ from rbac.models import Menu
 from system.models import SystemSetup
 from .forms import ImageUploadForm, UserUpdateForm
 from users.forms import AdminPasswdChangeForm
-from .models import WorkOrder, BusinessApply
+from .models import WorkOrder, BusinessApply, Advise
 from adm.models import Asset, AssetType
 from rbac.models import Role, SpecialRole
 
@@ -161,9 +161,21 @@ class PhoneBookView(LoginRequiredMixin, View):
 
 
 class Direction(View):
+
     def get(self, request):
+
         return render(request, 'direction.html')
 
+    def post(self, request):
+        ret = dict()
+        advise = Advise()
+        advise.creator = request.user
+        ret_data = json.loads(request.body.decode())
+        advise.back = ret_data["advise"]
+
+        advise.create_time = datetime.now().year
+        advise.save()
+        return HttpResponse(json.dumps(ret), content_type='application/json')
 
 class DueAssetView(LoginRequiredMixin, View):
     """
