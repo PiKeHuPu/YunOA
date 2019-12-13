@@ -42,18 +42,20 @@ class PersonalView(LoginRequiredMixin, View):
         #  (('0', '审批提交'), ('1', '审批中'), ('2', '审批完成'), ('3', '审批被退回'))
         # 当月个人立项统计
         work_order = WorkOrder.objects.filter(
-                                              Q(cretor_id=request.user.id) |
-                                              Q(next_user_id=request.user.id)
-                                              )
-        ret['work_order_lx'] = work_order.filter(next_user_id=request.user.id, status__in = ['1', '0'], type='0').count()  # 等待我审批的
-        ret['work_order_cc'] = work_order.filter(next_user_id=request.user.id, status__in = ['1', '0'], type='1').count()  # 等待我审批的
+            Q(cretor_id=request.user.id) |
+            Q(next_user_id=request.user.id)
+        )
+        ret['work_order_lx'] = work_order.filter(next_user_id=request.user.id, status__in=['1', '0'],
+                                                 type='0').count()  # 等待我审批的
+        ret['work_order_cc'] = work_order.filter(next_user_id=request.user.id, status__in=['1', '0'],
+                                                 type='1').count()  # 等待我审批的
         ret['start_date'] = start_date
         # 当月个人报销统计
         busin_apply = BusinessApply.objects.filter(
-                                                   Q(cretor_id=request.user.id) |
-                                                   Q(next_user_id=request.user.id))
-        ret['apply_lx'] = busin_apply.filter(next_user_id=request.user.id, status__in = ['1', '0'], type='0').count()
-        ret['apply_cc'] = busin_apply.filter(next_user_id=request.user.id, status__in = ['1', '0'], type='1').count()
+            Q(cretor_id=request.user.id) |
+            Q(next_user_id=request.user.id))
+        ret['apply_lx'] = busin_apply.filter(next_user_id=request.user.id, status__in=['1', '0'], type='0').count()
+        ret['apply_cc'] = busin_apply.filter(next_user_id=request.user.id, status__in=['1', '0'], type='1').count()
         current_user_id = request.user.id
         cashier = SpecialRole.objects.filter(title='0').first()
         if cashier:
@@ -62,8 +64,9 @@ class PersonalView(LoginRequiredMixin, View):
                 ret['apply_lx'] += BusinessApply.objects.filter(status='5').count()
         # 物资到期提醒
         three_months = today + timedelta(days=100)
-        structure = request.user.department    # 用户所在部门
-        asset = Asset.objects.filter(Q(dueremind = '1'), Q(assetType__structure=structure), Q(dueDate__range=(today, three_months)))
+        structure = request.user.department  # 用户所在部门
+        asset = Asset.objects.filter(Q(dueremind='1'), Q(assetType__structure=structure),
+                                     Q(dueDate__range=(today, three_months)))
         ret['asset'] = asset
         ret['asset_num'] = len(asset)
         gone_asset = Asset.objects.filter(Q(dueremind='1'), Q(assetType__structure=structure), Q(dueDate__lt=today))
@@ -163,7 +166,6 @@ class PhoneBookView(LoginRequiredMixin, View):
 class Direction(View):
 
     def get(self, request):
-
         return render(request, 'direction.html')
 
     def post(self, request):
@@ -177,10 +179,43 @@ class Direction(View):
         advise.save()
         return HttpResponse(json.dumps(ret), content_type='application/json')
 
+
+class Check(View):
+
+    def get(self, request):
+        ret = dict()
+        advise = Advise.objects.all()
+        ret["advice"] = advise
+
+        # creator = []
+        # create_time = []
+        # back = []
+        # is_done = []
+        # if advise:
+        #     for x in advise:
+        #         creator.append(x.creator)
+        #         create_time.append(x.create_time)
+        #         back.append(x.back)
+        #         is_done.append(x.is_done)
+        # else:
+        #     creator = ''
+        #     create_time = ''
+        #     back = ''
+        #     is_done = ''
+        # ret.update({
+        #     'create_time': create_time,
+        #     'creator': creator,
+        #     'back': back,
+        #     'is_done': is_done,
+        # })
+        return render(request, 'checkAdvise.html', ret)
+
+
 class DueAssetView(LoginRequiredMixin, View):
     """
     物资续期提醒页面
     """
+
     def get(self, request):
         ret = dict()
         # 物资到期提醒
