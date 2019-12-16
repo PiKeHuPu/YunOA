@@ -1,0 +1,145 @@
+{% extends "base-left.html" %}
+{% load staticfiles %}
+
+{% block css %}
+
+    <link rel="stylesheet" href="{% static 'plugins/datatables/jquery.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+
+    <!-- iCheck for checkboxes and radio inputs -->
+{% endblock %}
+
+{% block content %}
+
+    <!-- Content Header (Page header) -->
+
+    <section class="content-header margin-bottom">
+        <ol class="breadcrumb">
+            <li><a href=""><i class="fa fa-dashboard"></i>办公平台</a></li>
+            <li class="active"><a href="{% url 'personal' %}">我的工作台</a></li>
+            <li class="active"><a href="#">物资审批</a></li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div id="devlist">
+            <div class="box box-primary" id="liebiao">
+                <div class="box-body">
+                    <table id="dtbList" class="display" cellspacing="0" width="100%" style="overflow-x: auto;width: 100%">
+                        <thead style="width: 100%">
+                        <tr valign="middle">
+                            <th>ID</th>
+                            <th>仓库</th>
+                            <th>资产名称</th>
+                            <th>数量</th>
+                            <th>申请人</th>
+                            <th>预计归还时间</th>
+                            <th>发起时间</th>
+                            <th>用途</th>
+                            <th>审批意见</th>
+                        </tr>
+                        </thead>
+                        <tbody style="width: 100px">
+                        </tbody>
+                    </table>
+                    <br> <br>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- /.content -->
+
+{% endblock %}
+
+{% block javascripts %}
+   
+    <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables/dataTables.const.js' %}"></script>
+    <script src="{% static 'plugins/datatables/moment.min.js' %}"></script>
+    <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+    <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+    <!-- iCheck 1.0.1 -->
+    <script type="text/javascript">
+        $(function () {
+            $('#ASSET-WTF-VIEW').addClass('active');
+            $('#ASSET-APPROVE-HISTORY-VIEW').addClass('active');
+        });
+    </script>
+
+    <script type="text/javascript">
+        var oDataTable = null;
+        var data = [
+            {% for approve in asset_approve_history_list %}
+                {
+                    'id': {{ approve.id }},
+                    'warehouse': '{{ approve.asset_order.asset.warehouse.name }}',
+                    'name': '{{ approve.asset_order.asset.name }}',
+                    'quantity': '{{ approve.asset_order.quantity }}',
+                    'proposer': '{{ approve.asset_order.proposer.name }}',
+                    'return_date': '{{ approve.asset_order.return_date }}',
+                    'create_time': '{{ approve.create_time }}',
+                    'purpose': '{{ approve.asset_order.purpose }}',
+                    'is_pass': '{{ approve.is_pass }}'
+                },
+            {% endfor %}
+        ];
+
+        $(function () {
+            oDataTable = initTable();
+            function initTable() {
+                return $('#dtbList').DataTable(
+                    $.extend(true, {"scrollX": true},
+                    DATATABLES_CONSTANT.DATA_TABLES.DEFAULT_OPTION,
+                    {
+                        data: data,
+                        columns: [
+                            {
+                                data: "id"
+                            },
+                            {
+                                data: "warehouse"
+                            },
+                            {
+                                data: "name"
+                            },
+                            {
+                                data: "quantity"
+                            },
+                            {
+                                data: "proposer"
+                            },
+                            {
+                                data: "return_date"
+                            },
+                            {
+                                data: "create_time"
+                            },
+                            {
+                                data: "purpose"
+                            },
+                            {
+                                data: "is_pass",
+                                render: function (data) {
+                                    var ret;
+                                    if (data == "1") {
+                                        ret = "同意"
+                                    } else if (data == "0") {
+                                        ret = "不同意"
+                                    }
+                                    return ret;
+                                }
+                            },
+                        ],
+                    }));
+            }
+        });
+    </script>
+    <script>
+        $(function () {
+            //Initialize Select2 Elements
+            $(".select2").select2();
+        });
+    </script>
+{% endblock %}

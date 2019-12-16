@@ -245,7 +245,7 @@ class AssetInfo(models.Model):
         ("3", "报废"),
         ("4", "售出")
     )
-    number = models.CharField(max_length=20, unique=True, verbose_name="资产编号")
+    number = models.CharField(max_length=20, verbose_name="资产编号")
     name = models.CharField(max_length=50, verbose_name="资产名称")
     department = models.ForeignKey(Structure, on_delete=models.CASCADE, verbose_name="所属部门")
     warehouse = models.ForeignKey(AssetWarehouse, on_delete=models.CASCADE, verbose_name="所属仓库")
@@ -259,4 +259,47 @@ class AssetInfo(models.Model):
     unit = models.CharField(max_length=20, verbose_name="单位")
     type = models.CharField(max_length=20, verbose_name="型号")
     remark = models.TextField(max_length=500, verbose_name="备注信息")
+    is_no_return = models.BooleanField(default=False, verbose_name="无需归还")
+    is_no_approve = models.BooleanField(default=False, verbose_name="无需审批")
+
+
+class AssetEditFlow(models.Model):
+    """
+    资产变更记录
+    """
+    asset = models.ForeignKey(AssetInfo, on_delete=models.DO_NOTHING, verbose_name='相关资产')
+    operator = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name='操作人')
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name="添加时间")
+    content = models.CharField(max_length=20, verbose_name='内容')
+
+
+class AssetApprove(models.Model):
+    """
+    物资审批
+    """
+    proposer = models.ForeignKey(User, related_name='asset_proposer', on_delete=models.DO_NOTHING, verbose_name="申请人")
+    asset = models.ForeignKey(AssetInfo, on_delete=models.DO_NOTHING, verbose_name="物资")
+    quantity = models.IntegerField(verbose_name="数量")
+    purpose = models.CharField(max_length=30, blank=True, null=True, verbose_name="用途")
+    return_date = models.DateField(null=True, blank=True, verbose_name="预计归还时间")
+    status = models.CharField(max_length=10, verbose_name="状态")  # '0': 未审批  '1': 审批中  '2': 审批通过  '3': 审批未通过
+    use_status = models.CharField(max_length=10, verbose_name="使用状态")
+    # '0': 未领用  '1': 已领用  '2': 未归还  '3': 已归还  '4': 无需归还
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+
+
+class AssetApproveDetail(models.Model):
+    """
+    物资
+    """
+    approver = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="审批人")
+    asset_order = models.ForeignKey(AssetApprove, on_delete=models.DO_NOTHING, verbose_name="物资申请")
+    is_pass = models.CharField(max_length=10, blank=True, null=True, verbose_name="是否通过")  # "0": 不通过  "1": 通过
+    remark = models.CharField(max_length=50, blank=True, null=True, verbose_name="审批意见")
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+
+
+
+
+
 

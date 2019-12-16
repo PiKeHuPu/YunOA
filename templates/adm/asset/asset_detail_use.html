@@ -23,7 +23,7 @@
                     </legend>
                     <div class="form-group has-feedback">
                         <input class="form-control" name="operator" type="hidden" value="{{ asset.operator }}"/>
-                        <input class="form-control" name="id" type="hidden" value="{{ asset.id }}"/>
+                        <input class="form-control" name="id0" id="id0" type="hidden" value="{{ asset.id }}"/>
                         <div class="form-group has-feedback">
                             <label class="col-sm-2 control-label">领用用途</label>
                             <div class="col-sm-3">
@@ -32,7 +32,7 @@
 
                             <label class="col-sm-2 control-label">预计归还日期</label>
                             <div class="col-sm-3">
-                                 <input class="form-control pull-right form_datetime" name="use_time" type="text" id="use_time"/>
+                                 <input class="form-control pull-right form_datetime" name="use_time" type="text" id="use_time" autocomplete="off"/>
                             </div>
                         </div>
                         <label class="col-sm-2 control-label">资产编号</label>
@@ -65,9 +65,7 @@
                         <label class="col-sm-2 control-label">领用数量</label>
                         <div class="col-sm-3">
                             <div class="input-group">
-                                <input class="form-control" name="assetCount" type="Number" min="1"
-                                       max="{{ asset.quantity }}"
-                                       placeholder="还有{{ asset.quantity }} {{ asset.unit }}" id="use_count" />
+                                <input class="form-control" name="assetCount" type="Number" min="1" max="{{ asset.quantity }}" placeholder="还有{{ asset.quantity }} {{ asset.unit }}" id="use_count" />
                                 <span class="input-group-addon">{{ asset.unit }}</span>
 
                             </div>
@@ -96,6 +94,7 @@
             var useCount = $("#use_count").val();
             var title = $("#asset_title").val();
             var use_time = $("#use_time").val();
+            var id0 = $("#id0").val();
             if (useCount == "") {
                 layer.alert("领用数量不能为空", {icon: 5});
                 return
@@ -105,11 +104,11 @@
                 return
             }
             if (Number(useCount) > Number({{ asset.quantity }})) {
-                layer.alert("领用数量超出库存数量({{ asset.assetCount }})", {icon: 5});
+                layer.alert("领用数量超出库存数量({{ asset.quantity }})", {icon: 5});
                 return
             }
             var data = {
-                id: {{ asset.id }},
+                id0: id0,
                 useCount: useCount,
                 title: title,
                 use_time: use_time,
@@ -117,11 +116,11 @@
             $.ajax({
                 type: "POST",
                 url: "{% url 'personal-asset-use' %}",
-                data: JSON.stringify(data),
+                data: data,
                 cache: false,
                 success: function (msg) {
                     if (msg.status == 'success') {
-                        layer.alert('登记成功，请及时领取物品！', {icon: 1}, function (index) {
+                        layer.alert('已提交申请', {icon: 1}, function (index) {
                             parent.layer.closeAll(); //关闭所有弹窗
                         });
                     } else if (msg.status == 'fail') {

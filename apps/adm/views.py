@@ -9,7 +9,7 @@ from django.shortcuts import render
 from django.views.generic.base import View
 
 from adm import migrate_asset
-from adm.models import AssetWarehouse, AssetInfo
+from adm.models import AssetWarehouse, AssetInfo, AssetEditFlow, AssetApprove, AssetApproveDetail
 from users.models import Structure
 from utils.mixin_utils import LoginRequiredMixin
 from rbac.models import Menu, Role
@@ -279,6 +279,11 @@ class AssetCreateView(LoginRequiredMixin, View):
                 if AssetInfo.objects.filter(Q(number=number) & ~Q(id=id0) & Q(is_delete=False)):
                     ret['asset_form_errors'] = "资产编号已存在"
                     raise AttributeError
+                asset_edit_flow = AssetEditFlow()
+                asset_edit_flow.asset_id = asset.id
+                asset_edit_flow.operator_id = user_id
+                asset_edit_flow.content = '修改'
+                asset_edit_flow.save()
             else:
                 asset = AssetInfo()
                 if AssetInfo.objects.filter(Q(number=number) & Q(is_delete=False)):
@@ -298,6 +303,12 @@ class AssetCreateView(LoginRequiredMixin, View):
             asset.type = request.POST.get("type")
             asset.remark = request.POST.get("remark")
             asset.save()
+            if id0 == "":
+                asset_edit_flow = AssetEditFlow()
+                asset_edit_flow.asset_id = asset.id
+                asset_edit_flow.operator_id = user_id
+                asset_edit_flow.content = '创建'
+                asset_edit_flow.save()
             ret['status'] = "success"
         except:
             ret['status'] = "fail"
@@ -357,3 +368,106 @@ class AssetUseFlowView(LoginRequiredMixin, View):
     def get(self, request):
         ret = dict()
         return render(request, "adm/layer/asset_useflow.html", ret)
+
+
+class AssetApplyView(LoginRequiredMixin, View):
+    '''
+    物资申请页面
+    '''
+    def get(self, request):
+        ret = dict()
+        user_id = request.session.get('_auth_user_id')
+        asset_order_list = AssetApprove.objects.filter(proposer_id=user_id).order_by('-create_time')
+        ret['asset_order_list'] = asset_order_list
+
+        return render(request, 'adm/layer/asset_order.html', ret)
+
+
+class AssetApproveresultView(LoginRequiredMixin, View):
+    def get(self, request):
+        """
+        审批意见
+        :param request:
+        :return:
+        """
+        ret = dict()
+        id = request.GET.get("id")
+        ps = request.GET.get("ps")
+        ret["id"] = id
+        ret["ps"] = ps
+        return render(request, "adm/layer/approval_opinion.html", ret)
+    def post(self, request):
+        '''
+        物资审批ajax
+        '''
+        ret = dict()
+        id = request.POST.get("id")
+        ps = request.POST.get("ps")
+        content = request.POST.get("content")
+
+        asset_approve = AssetApproveDetail.objects.get(id=id)
+        asset_approve.is_pass = ps
+        asset_approve.remark = content
+        asset_approve.save()
+
+        asset_order = asset_approve.asset_order
+        if ps == "0":
+            asset_order.status = "3"
+            asset_order.save()
+        else:
+            asset_order = asset_approve.asset_order
+            asset_approve_list = AssetApproveDetail.objects.filter(asset_order=asset_order)
+            asset_order_1 = len(asset_approve_list)
+            asset_order_2 = len(AssetApproveDetail.objects.filter(Q(asset_order=asset_order) & ~Q(is_pass=None)))
+            if asset_order_2 > 0:
+                asset_order.status = "1"
+            if asset_order_2 == asset_order_1:
+                for i in asset_approve_list:
+                    if i.is_pass == "0":
+                        asset_order.status = "3"
+                        break
+                else:
+                    asset_order.status = "2"
+            asset_order.save()
+        ret["success"] = True
+
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
+
+
+class AssetApproveView(LoginRequiredMixin, View):
+    """
+    物资审批页面
+    """
+    def get(self, request):
+        ret = dict()
+        user_id = request.session.get("_auth_user_id")
+        approve_list = AssetApproveDetail.objects.filter(approver_id=user_id, is_pass=None)
+        ret['approve_list'] = approve_list
+        return render(request, "adm/layer/asset_approve.html", ret)
+
+
+class AssetApproveHistoryView(LoginRequiredMixin, View):
+    """
+    审批历史页面
+    """
+    def get(self, request):
+        ret = dict()
+        user_id = request.session.get("_auth_user_id")
+        asset_approve_history_list = AssetApproveDetail.objects.filter(~Q(is_pass=None) & Q(approver_id=user_id))
+        ret['asset_approve_history_list'] = asset_approve_history_list
+        return render(request, "adm/layer/asset_approve_history.html", ret)
+
+
+class AssetOrderDetailView(LoginRequiredMixin, View):
+    """
+    物资申请详情页面
+    """
+    def get(self, request):
+        ret = dict()
+        user_id = request.session.get("_auth_user_id")
+        id = request.GET.get("id")
+        asset_order = AssetApprove.objects.get(id=id)
+        ret["asset_order"] = asset_order
+        asset_approve_list = asset_order.assetapprovedetail_set.filter(asset_order__proposer_id=user_id)
+        ret['asset_approve_list'] = asset_approve_list
+        return render(request, "adm/layer/asset_order_detail.html", ret)
