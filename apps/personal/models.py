@@ -177,7 +177,7 @@ class BusinessApply(models.Model):
     workorder = models.ForeignKey(WorkOrder, related_name='business', blank=True, null=True, on_delete=models.SET_NULL,
                                verbose_name='审批单')
     # 报销内容
-    t_title = models.CharField(max_length=30, verbose_name="申请标题")
+    t_title = models.CharField(max_length=100, verbose_name="申请标题")
     title = models.TextField(verbose_name='工作内容')
     detail = models.TextField(blank=True, null=True, verbose_name='报销明细')
     invoice_type = models.CharField(max_length=10, choices=invoice_choices, default='0', blank=True, null=True,
