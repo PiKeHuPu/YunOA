@@ -436,6 +436,14 @@ class AssetApproveresultView(LoginRequiredMixin, View):
         if ps == "0":
             asset_order.status = "3"
             asset_order.save()
+            asset_approve = AssetApproveDetail.objects.filter(asset_order=asset_order, is_pass=None)
+            for approve in asset_approve:
+                approve.delete()
+            use_asset = AssetInfo.objects.filter(name=asset_order.asset.name, user_id=asset_order.proposer_id,quantity__lte=asset_order.quantity,warehouse=asset_order.asset.warehouse)[0]
+            asset = asset_order.asset
+            asset.quantity += int(use_asset.quantity)
+            asset.save()
+            use_asset.delete()
         else:
             asset_order = asset_approve.asset_order
             asset_approve_list = AssetApproveDetail.objects.filter(asset_order=asset_order)
