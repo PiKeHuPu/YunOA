@@ -9,6 +9,7 @@ from django.shortcuts import render
 from django.views.generic.base import View
 
 from adm import migrate_asset
+from adm.migrate_asset import migrate_asset_flow, create_no_back
 from adm.models import AssetWarehouse, AssetInfo, AssetEditFlow, AssetApprove, AssetApproveDetail
 from users.models import Structure
 from utils.mixin_utils import LoginRequiredMixin
@@ -17,11 +18,13 @@ from system.models import SystemSetup
 
 User = get_user_model()
 
+
 def switch_date_str(str0):
     str0 = str0.replace("年", "-")
     str0 = str0.replace("月", "-")
     str0 = str0.replace("日", "")
     return str0
+
 
 def department_admin(user_id):
     """
@@ -360,20 +363,38 @@ class AssetAjaxView(LoginRequiredMixin, View):
             ret['data'] += assets
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
 
-# class AssetDeleteView(LoginRequiredMixin, View):
-#     def get(self):
-
 
 class AssetUseFlowView(LoginRequiredMixin, View):
+    """
+    领用记录页面
+    """
+
     def get(self, request):
         ret = dict()
+        user_id = request.session.get("_auth_user_id")
+        department_list = department_admin(user_id)
+        warehouse_list = warehouse_admin(department_list)
+        ret['warehouse_list'] = warehouse_list
         return render(request, "adm/layer/asset_useflow.html", ret)
+
+    def post(self, request):
+        ret = dict()
+        try:
+            id = request.POST.get("id")
+            asset_order = AssetApprove.objects.filter(id=id)[0]
+            asset_order.use_status = "1"
+            asset_order.save()
+            ret["success"] = True
+        except:
+            ret["success"] = False
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
 
 
 class AssetApplyView(LoginRequiredMixin, View):
     '''
     物资申请页面
     '''
+
     def get(self, request):
         ret = dict()
         user_id = request.session.get('_auth_user_id')
@@ -396,6 +417,7 @@ class AssetApproveresultView(LoginRequiredMixin, View):
         ret["id"] = id
         ret["ps"] = ps
         return render(request, "adm/layer/approval_opinion.html", ret)
+
     def post(self, request):
         '''
         物资审批ajax
@@ -438,6 +460,7 @@ class AssetApproveView(LoginRequiredMixin, View):
     """
     物资审批页面
     """
+
     def get(self, request):
         ret = dict()
         user_id = request.session.get("_auth_user_id")
@@ -450,6 +473,7 @@ class AssetApproveHistoryView(LoginRequiredMixin, View):
     """
     审批历史页面
     """
+
     def get(self, request):
         ret = dict()
         user_id = request.session.get("_auth_user_id")
@@ -462,12 +486,13 @@ class AssetOrderDetailView(LoginRequiredMixin, View):
     """
     物资申请详情页面
     """
+
     def get(self, request):
         ret = dict()
-        user_id = request.session.get("_auth_user_id")
+        # user_id = request.session.get("_auth_user_id")
         id = request.GET.get("id")
         asset_order = AssetApprove.objects.get(id=id)
         ret["asset_order"] = asset_order
-        asset_approve_list = asset_order.assetapprovedetail_set.filter(asset_order__proposer_id=user_id)
+        asset_approve_list = asset_order.assetapprovedetail_set.all()
         ret['asset_approve_list'] = asset_approve_list
         return render(request, "adm/layer/asset_order_detail.html", ret)

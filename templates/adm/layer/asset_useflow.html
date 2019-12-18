@@ -29,42 +29,22 @@
 
                         <div class="form-group searchArea margin-r-5 margin-top-5">
                             <label>资产编号：</label>
-                            <input type="text" name="model" class="form-control inputText" id="assetNum">
+                            <input type="text" name="asset_number" class="form-control inputText" id="asset_number">
                         </div>
 
                         <div class="form-group searchArea margin-r-5 margin-top-5">
                             <label>所在仓库：</label>
-                            <select class="form-control inputText select2" name="assetType"  id="assetType">
+                            <select class="form-control inputText select2" name="asset_warehouse"  id="asset_warehouse">
                                 <option></option>
-                                {% for type in asset_types %}
-                                    <option value={{ type.id }}>{{ type.name }}</option>
+                                {% for warehouse in warehouse_list %}
+                                    <option value={{ warehouse.id }}>{{ warehouse.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
 
                         <div class="form-group searchArea margin-r-5 margin-top-5">
                             <label>资产名称：</label>
-                            <input type="text" name="asset__brand" class="form-control inputText" id="asset__brand">
-                        </div>
-
-{#                        <div class="form-group searchArea margin-r-5 margin-top-5">#}
-{#                            <label>领取方：</label>#}
-{#                            <select class="form-control inputText select2" name="status" id="party">#}
-{#                                <option></option>#}
-{#                                {% for status in status_list %}#}
-{#                                    <option value={{ status.item }}>{{ status.value }}</option>#}
-{#                                {% endfor %}#}
-{#                            </select>#}
-{#                        </div>#}
-
-                        <div class="form-group searchArea margin-r-5 margin-top-5">
-                            <label>资产状态：</label>
-                            <select class="form-control inputText select2" name="status" id="status">
-                                <option></option>
-                                {% for status in asset_status %}
-                                    <option value={{ status.item }}>{{ status.value }}</option>
-                                {% endfor %}
-                            </select>
+                            <input type="text" name="asset_name" class="form-control inputText" id="asset_name">
                         </div>
                         <button type="button" id="btnAssetSearch" class="btn btn-default">
                             <i class="glyphicon glyphicon-search"></i>查询
@@ -75,18 +55,17 @@
                     <table id="dtbList" class="display" cellspacing="0" width="100%">
                         <thead>
                         <tr valign="middle">
-                            <th><input type="checkbox" id="checkAll"></th>
                             <th>资产编号</th>
                             <th>仓库</th>
                             <th>名称</th>
                             <th>型号</th>
                             <th>数量</th>
                             <th>领取人</th>
-{#                            <th>领取方</th>#}
                             <th>领取时间</th>
                             <th>预计归还日期</th>
                             <th>用途</th>
-                            <th>归还操作</th>
+                            <th>状态</th>
+                            <th>操作</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -128,91 +107,41 @@
                         ajax: {
                             "url": "{% url 'adm-asset:asset-use-flow-list' %}",
                             "data": function (d) {
-                                d.assetNum = $("#assetNum").val();
-                                d.assetType = $("#assetType").val();
-                                d.asset__brand = $("#asset__brand").val();
-                                d.party = $("#party").val();
-                                d.status = $("#status").val();
+                                d.asset_number = $("#asset_number").val();
+                                d.asset_warehouse = $("#asset_warehouse").val();
+                                d.asset_name = $("#asset_name").val();
                             }
                         },
 
                         columns: [
-                            DATATABLES_CONSTANT.DATA_TABLES.COLUMN.CHECKBOX,
                             {
-                                data: "asset__assetNum"
+                                data: "asset__number"
                             },
                             {
-                                data: "asset__assetType__name",
-                                width: "10%"
+                                data: "asset__warehouse__name",
                             },
                             {
-                                data: "asset__brand",
-                                width: "8%"
+                                data: "asset__name",
                             },
                             {
-                                data: "asset__model"
-                            },
-                            {#{#}
-                            {#    data: "asset__status",#}
-                            {#    render: function (data, type, row, meta) {#}
-                            {#        if (data == 0) {#}
-                            {#            var ret = "<button class='btn btn-primary btn-xs'>闲置</button>";#}
-                            {#            return ret;#}
-                            {#        }#}
-                            {#        if (data == 1) {#}
-                            {#            var ret = "<button class='btn  btn-success btn-xs'>在用</button>";#}
-                            {#            return ret;#}
-                            {##}
-                            {#        }#}
-                            {#        if (data == 2) {#}
-                            {#            var ret = "<button class='btn btn-warning btn-xs'>维修</button>";#}
-                            {#            return ret;#}
-                            {##}
-                            {#        }#}
-                            {#        if (data == 3) {#}
-                            {#            var ret = "<button class='btn btn-danger btn-xs'>报废</button>";#}
-                            {#            return ret;#}
-                            {#        }#}
-                            {#        if (data == 4) {#}
-                            {#            var ret = "<button class='btn btn-info btn-xs'>售出</button>";#}
-                            {#            return ret;#}
-                            {#        }#}
-                            {#    }#}
-                            {#},#}
-                            {
-                                data: "asset__assetUnit",
-                                render: function (data, type, row, meta) {
-                                    return row.useCount + data
-                                }
+                                data: "asset__type"
                             },
                             {
-                                data: "operator",
+                                data: "quantity",
+                            },
+                            {
+                                data: "proposer__name",
                                 width: "6%"
                             },
-                            {#{#}
-                            {#    data: "party",#}
-                            {#    render: function (data, type, row, meta) {#}
-                            {#        if (data == '0') {#}
-                            {#            var ret = "<button class='btn btn-primary btn-xs'>自用</button>";#}
-                            {#            return ret;#}
-                            {#        }#}
-                            {#        if (data == '1') {#}
-                            {#            var ret = "<button class='btn  btn-success btn-xs'>外包使用</button>";#}
-                            {#            return ret;#}
-                            {##}
-                            {#        }#}
-                            {#    }#}
-                            {#},#}
-
                             {
-                                data: "add_time",
+                                data: "create_time",
                                 width: "9%",
                                 render: function (data, type, full, meta) {
                                     return moment(data).format("YYYY-MM-DD HH:mm");
                                 }
                             },
                             {
-                                data: "use_time",
+                                data: "return_date",
                                 width: "10%",
                                 render: function (data, type, row, meta) {
                                     if (data){
@@ -223,20 +152,43 @@
                                 }
                             },
                             {
-                                data: "title"
+                                data: "purpose"
+                            },
+                            {
+                                data: "status",
+                                width: "5%",
+                                render: function (data, type, row, meta) {
+                                    var ret;
+                                    if (row.use_status == "0") {
+                                        if (data == "0" || data == "1") {
+                                            ret = "审批中"
+                                        } else if (data == "2") {
+                                            ret = "未领用"
+                                        } else if (data == "3") {
+                                            ret = "审批未通过"
+                                        }
+                                    } else if (row.use_status == "1") {
+                                        ret = "未归还"
+                                    } else if (row.use_status == "2") {
+                                        ret = "已归还"
+                                    } else if (row.use_status == "3") {
+                                        ret = "无需归还"
+                                    }
+                                    return ret;
+                                }
                             },
                             {
                                 data: "id",
-                                width: "10%",
-                                bSortable: "false",
+                                width: "7%",
                                 render: function (data, type, row, meta) {
-                                    var ret = "<button title='归还' onclick='doUpdate("
-                                        + data + ")'><i class='glyphicon glyphicon-check'></i></button>";
-                                    if(row.give_back == "1") {
-                                        r_time = moment(row.back_date).format("YYYY-MM-DD");
-                                        ret = r_time + '<br/>'+'归还';
+                                    var ret = "<button title='查看详情' onclick='detail(" + data + ")'><i class='glyphicon glyphicon-list-alt'></i></button>";
+                                    if (row.status == "2" && row.use_status == "0") {
+                                        ret = ret + "<button title='领用' onclick='receive(" + data + ")'><i class='glyphicon glyphicon-open'></i></button>";
                                     }
-                                    return ret;
+                                    if (row.status == "2" && row.use_status == "1") {
+                                        ret = ret + "<button title='归还' onclick='give_back(" + data + ")'><i class='glyphicon glyphicon-save'></i></button>";
+                                    }
+                                    return ret
                                 }
                             }
                         ],
@@ -254,40 +206,9 @@
                 //alert($("#select").val())
                 oDataTable.ajax.reload();
             });
-            //checkbox全选
-            $("#checkAll").on("click", function () {
-                if ($(this).prop("checked") === true) {
-                    $("input[name='checkList']").prop("checked", $(this).prop("checked"));
-                    $('#example tbody tr').addClass('selected');
-                } else {
-                    $("input[name='checkList']").prop("checked", false);
-                    $('#example tbody tr').removeClass('selected');
-                }
-            });
-
-
-            $("#btnCreate").click(function () {
-                var div = layer.open({
-                    type: 2,
-                    title: '设备入库',
-                    shadeClose: false,
-                    maxmin: true,
-                    area: ['800px', '580px'],
-                    content: "{% url 'adm-asset:create' %}",
-                    end: function () {
-                        //关闭时做的事情
-                        window.location.reload();
-                    }
-                });
-                layer.full(div)
-            });
-
-
-
-
         });
 
-        function doUpdate(id) {
+        function give_back(id) {
            layer.open({
                 type: 2,
                 title: '归还',
@@ -302,35 +223,31 @@
                 }
             })
         }
-
-        //删除单个数据
-        function doDelete(id) {
-            layer.alert('确定删除吗？', {
-                title: '提示'
-                , icon: 3 //0:感叹号 1：对号 2：差号 3：问号 4：小锁 5：哭脸 6：笑脸
-                , time: 0 //不自动关闭
-                , btn: ['YES', 'NO']
-                , yes: function (index) {
-                    layer.close(index);
-                    $.ajax({
-                        type: "POST",
-                        url: "{% url 'adm-asset:delete' %}",
-                        data: {"id": id, csrfmiddlewaretoken: '{{ csrf_token }}'},  //防止post数据时报 csrf_token 403
-                        cache: false,
-                        success: function (msg) {
-                            if (msg.result) {
-                                layer.alert('删除成功', {icon: 1});
-                                oDataTable.ajax.reload();
-                            } else {
-                                //alert(msg.message);
-                                layer.alert('删除失败', {icon: 2});
-                            }
-                            return;
+        function detail(id) {
+            layer.open({
+                type: 2,
+                title: "申请详情",
+                content: "{% url 'personal-apply-detail' %}?id=" + id,
+                area: ["1000px", "480px"]
+            })
+        }
+        function receive(id) {
+            var con = confirm("确定领用吗？");
+            if (con) {
+                $.ajax({
+                    url: "{% url 'adm-useflow' %}",
+                    type: "post",
+                    data: {"id": id},
+                    success: function (ret) {
+                        if (ret.success) {
+                            alert("领用成功");
+                            window.location.reload();
+                        } else {
+                            alert("领用失败，请稍后再试")
                         }
-                    });
-                }
-            });
-
+                    }
+                })
+            }
         }
     </script>
     <script>

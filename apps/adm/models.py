@@ -275,17 +275,20 @@ class AssetEditFlow(models.Model):
 
 class AssetApprove(models.Model):
     """
-    物资审批
+    物资记录
     """
     proposer = models.ForeignKey(User, related_name='asset_proposer', on_delete=models.DO_NOTHING, verbose_name="申请人")
     asset = models.ForeignKey(AssetInfo, on_delete=models.DO_NOTHING, verbose_name="物资")
     quantity = models.IntegerField(verbose_name="数量")
-    purpose = models.CharField(max_length=30, blank=True, null=True, verbose_name="用途")
+    purpose = models.CharField(max_length=100, blank=True, null=True, verbose_name="用途")
     return_date = models.DateField(null=True, blank=True, verbose_name="预计归还时间")
     status = models.CharField(max_length=10, verbose_name="状态")  # '0': 未审批  '1': 审批中  '2': 审批通过  '3': 审批未通过
     use_status = models.CharField(max_length=10, verbose_name="使用状态")
-    # '0': 未领用  '1': 已领用  '2': 未归还  '3': 已归还  '4': 无需归还
+    # '0': 未领用  '1': 未归还  '2': 已归还  '3': 无需归还
     create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+    t_return_date = models.DateField(null=True, blank=True, verbose_name="归还日期")
+    return_quantity = models.IntegerField(default=0, verbose_name="归还数量")
+    return_operator = models.ForeignKey(User, related_name="return_operator", blank=True, null=True, verbose_name="归还操作人")
 
 
 class AssetApproveDetail(models.Model):
