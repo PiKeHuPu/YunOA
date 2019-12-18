@@ -38,6 +38,7 @@
                             <th>发起时间</th>
                             <th>用途</th>
                             <th>审批意见</th>
+                            <th>操作</th>
                         </tr>
                         </thead>
                         <tbody style="width: 100px">
@@ -73,7 +74,7 @@
         var data = [
             {% for approve in asset_approve_history_list %}
                 {
-                    'id': {{ approve.id }},
+                    'id': '{{ approve.asset_order.id }}',
                     'warehouse': '{{ approve.asset_order.asset.warehouse.name }}',
                     'name': '{{ approve.asset_order.asset.name }}',
                     'quantity': '{{ approve.asset_order.quantity }}',
@@ -131,10 +132,24 @@
                                     return ret;
                                 }
                             },
+                            {
+                                data: "id",
+                                render: function (data) {
+                                    return "<button title='查看详情' onclick='detail(" + data + ")'><i class='glyphicon glyphicon-list-alt'></i></button>"
+                                }
+                            }
                         ],
                     }));
             }
         });
+        function detail(id) {
+            layer.open({
+                type: 2,
+                title: "申请详情",
+                content: "{% url 'personal-apply-detail' %}?id=" + id,
+                area: ["1000px", "550px"]
+            })
+        }
     </script>
     <script>
         $(function () {

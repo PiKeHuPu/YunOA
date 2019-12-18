@@ -58,17 +58,17 @@
                                 <td>{{ asset_order.quantity }}</td>
                             </tr>
 
-                            <tr>
+                            <tr class="info">
                                 <td><strong> 已归还数量: </strong></td>
                                 <td>{{ asset_order.return_quantity }}</td>
                             </tr>
 
-                            <tr class="info">
+                            <tr>
                                 <td><strong> 预计归还时间: </strong></td>
                                 <td>{{ asset_order.return_date }}</td>
                             </tr>
 
-                            <tr>
+                            <tr class="info">
                                 <td><strong> 状态: </strong></td>
                                 <td>
                                 {% if asset_order.use_status == "0" %}
@@ -83,18 +83,18 @@
                                     未归还
                                 {% elif asset_order.use_status == "2" %}
                                     已归还
-                                {% elif asset_order.use_status == "2" %}
+                                {% elif asset_order.use_status == "3" %}
                                     无需归还
                                 {% endif %}
                                 </td>
                             </tr>
 
-                            <tr class="info">
+                            <tr>
                                 <td><strong> 发起时间: </strong></td>
                                 <td>{{ asset_order.create_time }}</td>
                             </tr>
 
-                            <tr>
+                            <tr class="info">
                                 <td><strong> 用途: </strong></td>
                                 <td>{{ asset_order.purpose }}</td>
                             </tr>

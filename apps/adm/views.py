@@ -305,6 +305,10 @@ class AssetCreateView(LoginRequiredMixin, View):
             asset.unit = request.POST.get("unit")
             asset.type = request.POST.get("type")
             asset.remark = request.POST.get("remark")
+            if request.POST.get("no_approve") == "on":
+                asset.is_no_approve = True
+            if request.POST.get("no_return") == "on":
+                asset.is_no_return = True
             asset.save()
             if id0 == "":
                 asset_edit_flow = AssetEditFlow()
@@ -382,7 +386,10 @@ class AssetUseFlowView(LoginRequiredMixin, View):
         try:
             id = request.POST.get("id")
             asset_order = AssetApprove.objects.filter(id=id)[0]
-            asset_order.use_status = "1"
+            if asset_order.asset.is_no_return:
+                asset_order.use_status = "3"
+            else:
+                asset_order.use_status = "1"
             asset_order.save()
             ret["success"] = True
         except:

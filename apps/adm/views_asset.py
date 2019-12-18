@@ -417,17 +417,19 @@ class AssetUseInfoView(LoginRequiredMixin, View):
         asset_id = request.POST.get('id0')
         use_quantity = request.POST.get('useCount')
         asset = AssetInfo.objects.get(id=asset_id)
-        use_asset = asset
-        use_asset.id = None
-        use_asset.save()
-        asset = AssetInfo.objects.get(id=asset_id)
         asset.quantity = int(asset.quantity) - int(use_quantity)
         asset.save()
-        use_asset.quantity = int(use_quantity)
-        use_asset.create_time = asset.create_time
-        use_asset.status = '1'
-        use_asset.user_id = request.session.get('_auth_user_id')
-        use_asset.save()
+        if asset.is_no_return:
+            pass
+        else:
+            use_asset = asset
+            use_asset.id = None
+            use_asset.save()
+            use_asset.quantity = int(use_quantity)
+            use_asset.create_time = asset.create_time
+            use_asset.status = '1'
+            use_asset.user_id = request.session.get('_auth_user_id')
+            use_asset.save()
 
         user_id = request.session.get('_auth_user_id')
         asset_order = AssetApprove()
@@ -440,19 +442,23 @@ class AssetUseInfoView(LoginRequiredMixin, View):
         asset_order.use_status = '0'
         asset_order.save()
 
-        if asset.department.administrator_id:
-            if int(user_id) != int(asset.department.administrator_id):
-                approve = AssetApproveDetail()
-                approve.approver_id = asset.department.administrator_id
-                approve.asset_order_id = asset_order.id
-                approve.save()
+        if asset.is_no_approve:
+            pass
+            print(111111111111111112222222222222)
+        else:
+            if asset.department.administrator_id:
+                if int(user_id) != int(asset.department.administrator_id):
+                    approve = AssetApproveDetail()
+                    approve.approver_id = asset.department.administrator_id
+                    approve.asset_order_id = asset_order.id
+                    approve.save()
 
-        if asset.department.approver_id:
-            if int(user_id) != int(asset.department.approver_id):
-                approve = AssetApproveDetail()
-                approve.approver_id = asset.department.approver_id
-                approve.asset_order_id = asset_order.id
-                approve.save()
+            if asset.department.approver_id:
+                if int(user_id) != int(asset.department.approver_id):
+                    approve = AssetApproveDetail()
+                    approve.approver_id = asset.department.approver_id
+                    approve.asset_order_id = asset_order.id
+                    approve.save()
 
         if AssetApproveDetail.objects.filter(asset_order=asset_order):
             pass

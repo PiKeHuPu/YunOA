@@ -25,8 +25,8 @@
                         <label class="col-sm-2 control-label">资产名称</label>
                         <div class="col-sm-3">
                             <input class="form-control" name="name" id="name" type="text" value="{{ asset.name }}"/>
-                            <input type="checkbox" name="no_return" id="no_return">无需归还
-                            <input type="checkbox" name="no_approve" id="no_approve">无需审批
+                            <input type="checkbox" name="no_return" id="no_return" {% if asset.is_no_return %}checked{% endif %}>无需归还
+                            <input type="checkbox" name="no_approve" id="no_approve" {% if asset.is_no_approve %}checked{% endif %}>无需审批
                         </div>
                     </div>
                     <div class="form-group has-feedback">
@@ -62,7 +62,7 @@
                         </div>
                         <label class="col-sm-2 control-label">到期时间(选填)</label>
                         <div class="col-sm-3">
-                        <input type="text" class="form-control pull-right form_datetime" name="due_time" id="due_time" value="{{ asset.due_time }}"/>
+                        <input type="text" class="form-control pull-right form_datetime" name="due_time" id="due_time" value="{% if asset.due_time %}{{ asset.due_time }}{% else %}{% endif %}" autocomplete="off"/>
                         </div>
                     </div>
                     <div class="form-group has-feedback">
@@ -107,6 +107,8 @@
                 alert("请输入型号")
             } else {
                 var data = $("#addForm").serialize();
+                {#data.add({"no_approve": $("#no_approve").is(":checked"),#}
+                {#          "no_return": $("#no_return").is(":checked")});#}
                 $.ajax({
                     type: $("#addForm").attr('method'),
                     url: "{% url 'adm-n-create' %}",
