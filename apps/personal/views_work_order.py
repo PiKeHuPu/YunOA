@@ -11,7 +11,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 
 from utils.mixin_utils import LoginRequiredMixin
 from rbac.models import Menu
-from .models import WorkOrder, WorkOrderRecord, WorkOrderFlow, WorkOrderLog, BusinessApply, WorkOrderCard
+from .models import WorkOrder, WorkOrderRecord, WorkOrderFlow, WorkOrderLog, BusinessApply, WorkOrderCard, FeeType
 from .forms import WorkOrderCreateForm, WorkOrderUpdateForm, WorkOrderRecordForm, WorkOrderRecordUploadForm, \
     WorkOrderProjectUploadForm, APProjectUploadForm
 from adm.models import Customer
@@ -164,8 +164,9 @@ class WorkOrderListView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        fields = ['id', 'number', 'title', 'type', 'status', 'start_time', 'end_time', 'structure__title', "t_title",
+        fields = ['id', 'number', 'title', 'type', 'status', 'start_time', 'end_time', 'structure__title', 'feeid__fee_type',
                   'create_time', 'advance', 'adv_payment', 'cretor__name', 'cost']
+
         filters = dict()
         if request.GET.get('number'):
             filters['number__contains'] = request.GET.get('number')
@@ -210,6 +211,7 @@ class WorkOrderCreateView(LoginRequiredMixin, View):
         advance_list = to_list(WorkOrder.advance_choices)  # 是否预支
         users = User.objects.values('name', 'department__title', 'id')
         transport = to_list(WorkOrder.transport_choices)
+        feetype = FeeType.objects.all()
         #获取个人银行卡
         createm = request.user
         cm = WorkOrderCard.objects.filter(createman = createm).order_by('-time')[:5]
@@ -251,7 +253,9 @@ class WorkOrderCreateView(LoginRequiredMixin, View):
             'advance_list': advance_list,
             'bank_account': bank_account,
             'bank_info': bank_info,
-            'payee': payee
+            'payee': payee,
+            'feetype': feetype
+
         })
         return render(request, 'personal/workorder/workorder_create.html', ret)
 
@@ -269,7 +273,10 @@ class WorkOrderCreateView(LoginRequiredMixin, View):
 
         work_order.title = ret_data.get('title')
         work_order.type = ret_data.get('type')
-        work_order.t_title = ret_data.get('t_title')
+        feetype = ret_data.get('feetype')
+        feeid = FeeType.objects.filter(fee_type=feetype)[0].fee_id
+        work_order.feeid_id = feeid
+
         work_order.status = '0'  # 等待审批
         work_order.cost = ret_data.get('cost')
         work_order.cretor = request.user
@@ -403,6 +410,9 @@ class WorkOrderDetailView(LoginRequiredMixin, View):
                 ret['work_order_log'] = work_order_log
             else:
                 ret['ban'] = 'ban'
+
+        #print(work_order.feeid.fee_type)
+
         return render(request, 'personal/workorder/workorder_detail.html', ret)
 
 
@@ -472,8 +482,8 @@ class WorkOrderAppUpdateView(LoginRequiredMixin, View):
             for i in user_orders:
                 if len(i.title) >= 10:
                     i.title = i.title[:10] + "..."
-                if len(i.t_title) >= 10:
-                    i.t_title = i.t_title[:10] + "..."
+                # if len(i.t_title) >= 10:
+                #     i.t_title = i.t_title[:10] + "..."
             ret['user_orders'] = user_orders
 
             ret['is_apply_only'] = work_order.is_apply_only
@@ -544,6 +554,8 @@ class WorkOrderAppUpdateView(LoginRequiredMixin, View):
                     res['status'] = 'success'
         else:
             res['error'] = '当前项目还没到你审批，请等待'
+
+
         return HttpResponse(json.dumps(res), content_type='application/json')
 
 
@@ -576,6 +588,7 @@ class WorkOrderUpdateView(LoginRequiredMixin, View):
             'users_dict': users,
             'transport': transport
         })
+
         return render(request, 'personal/workorder/workorder.html', ret)
 
     def post(self, request):
@@ -603,6 +616,7 @@ class WorkOrderUpdateView(LoginRequiredMixin, View):
                 }
         else:
             res['status'] = 'ban'
+        # print(res)
         return HttpResponse(json.dumps(res), content_type='application/json')
 
 
@@ -906,8 +920,9 @@ class APListView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        fields = ['id', 'workorder__number', 'workorder__id', 'title', 'type', 'status', 'structure__title', 't_title',
+        fields = ['id', 'workorder__number', 'workorder__id', 'title', 'type', 'status', 'structure__title', 'feeid__fee_type',
                   'create_time', 'workorder__advance', 'cretor__name', 'all_fee']
+
         filters = dict()
         if request.GET.get('number'):
             filters['workorder__number'] = request.GET.get('number')
@@ -976,6 +991,10 @@ class ApplyCostUpdateView(LoginRequiredMixin, View):
                         tem = transport.split('|')
                         ret['transport'] = tem
 
+            feetype = FeeType.objects.all()
+            ret.update({
+                'feetype':feetype
+            })
             return render(request, 'personal/workorder/apply_update.html', ret)
         else:
             return redirect('/personal/workorder_ap_cost/detail?id={}'.format(request.GET['id']))
@@ -989,7 +1008,11 @@ class ApplyCostUpdateView(LoginRequiredMixin, View):
         else:
             ap = BusinessApply()
         ap.title = ret_data.get('title')
-        ap.t_title = ret_data.get('t_title')
+
+        feetype = ret_data.get('feetype')
+        feeid = FeeType.objects.filter(fee_type=feetype)[0].fee_id
+        print(feeid, feetype)
+        ap.feeid_id = feeid
         ap.type = ret_data.get('type')
         ap.status = '0'  # 等待审批
         ap.all_fee = ret_data.get('all_fee')
@@ -1138,6 +1161,7 @@ class CostAppUpdateView(LoginRequiredMixin, View):
             ap = get_object_or_404(BusinessApply, workorder_id=request.GET['id'])
             work_order_log = ap.workorder.workorderlog_set.filter(type='1').order_by('create_time')
             ret['ap'] = ap
+
             people = ap.people
             if people:
                 if '|' in people:
@@ -1174,8 +1198,7 @@ class CostAppUpdateView(LoginRequiredMixin, View):
             for i in businessApplys:
                 if len(i.title) >= 10:
                     i.title = i.title[:10] + "..."
-                if len(i.t_title) >= 10:
-                    i.t_title = i.t_title[:10] + "..."
+
             ret['businessApplys'] = businessApplys
 
         ret.update({
@@ -1186,6 +1209,7 @@ class CostAppUpdateView(LoginRequiredMixin, View):
         cashier = SpecialRole.objects.filter(title='0').first()
         if request_user_id == cashier.user.id:
             ret['cashier'] = '1'
+
         return render(request, 'personal/workorder/apply_app_update.html', ret)
 
     def post(self, request):
@@ -1346,7 +1370,7 @@ class APPLogListView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        fields = ['id', 'order_id__id', 'order_id__number', 'order_id__title', 'order_id__type',
+        fields = ['id', 'order_id__id', 'order_id__number','order_id__title', 'order_id__feeid__fee_type', 'order_id__type',
                   'type', 'order_id__structure__title',
                   'create_time',  'order_id__cretor__name', 'record_type', 'order_id__cost']
         filters = dict(creator = request.user)
@@ -1523,7 +1547,7 @@ class APPLogListContentView(LoginRequiredMixin, View):
 
         if len(structure_id) != 0:
             # print(structure_id)
-            fields = ['number', 'id', 'title', 'status', 'type', 'structure__title', 'create_time', 'cretor__name', 'type', 'cost']
+            fields = ['number', 'id', 'feeid__fee_type', 'title', 'status', 'type', 'structure__title', 'create_time', 'cretor__name', 'type', 'cost']
             filters = dict(structure_id__in=structure_id)
             if request.GET.get('number'):
                 filters['number'] = request.GET.get('number')

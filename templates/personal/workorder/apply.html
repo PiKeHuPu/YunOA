@@ -71,7 +71,7 @@
                         <tr valign="middle">
                             <th><input type="checkbox" id="checkAll"></th>
                             <th>申请单号</th>
-                            <th>事项</th>
+                            <th>费用类型</th>
                             <th>审批类型</th>
                             <th>审批状态</th>
                             <th>申请部门</th>
@@ -133,14 +133,19 @@
                                 data: "workorder__number",
                             },
                             {
-                                data: "t_title",
-                                render:function (data, type, row, meta) {
-                                    if (data=="") {
-                                        var ret = row.title
+                                data: "feeid__fee_type",
+                                render: function (data, type, row, meta) {
+                                    var ret;
+                                    if (data) {
+                                        ret = data
                                     } else {
-                                        var ret = row.t_title
+                                        if (row.title.length > 10) {
+                                            ret = row.title.slice(0, 10) + "..."
+                                        } else {
+                                            ret = row.title
+                                        }
                                     }
-                                    return ret.slice(0,10)
+                                    return ret;
                                 }
                             },
                             {

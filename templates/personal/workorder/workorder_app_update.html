@@ -47,8 +47,8 @@
                                         <td>{{ work_order.number }}</td>
                                     </tr>
                                     <tr>
-                                        <td><strong> 申请标题</strong></td>
-                                        <td>{{ work_order.t_title }}</td>
+                                        <td><strong> 费用类型</strong></td>
+                                        <td>{{ work_order.feeid.fee_type }}</td>
 
                                     </tr>
                                     <tr>
@@ -262,13 +262,13 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td style="text-align: center; font-weight: bolder">申请名称</td>
+                                    <td style="text-align: center; font-weight: bolder">费用类型</td>
                                     <td style="text-align: center; font-weight: bolder">金额</td>
                                     <td style="text-align: center; font-weight: bolder">申请时间</td>
                                 </tr>
                                 {% for user_order in user_orders %}
                                     <tr>
-                                        <td><a onclick="showDetail({{ user_order.id }})">{% if user_order.t_title %}{{ user_order.t_title }}{% else %}{{ user_order.title }}{% endif %}</a></td>
+                                        <td><a onclick="showDetail({{ user_order.id }})">{% if user_order.feeid.fee_type %}{{ user_order.feeid.fee_type }}{% else %}{{ user_order.title }}{% endif %}</a></td>
                                         <td>{{ user_order.cost }}</td>
                                         <td style="text-align: center">{{ user_order.create_time }}</td>
                                     </tr>

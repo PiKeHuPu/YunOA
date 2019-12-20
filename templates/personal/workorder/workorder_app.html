@@ -179,14 +179,19 @@
                                 }
                             },
                             {
-                                data: "t_title",
-                                render:function (data, type, row, meta) {
-                                    if (data=="") {
-                                        var ret = row.title
+                                data: "feeid__fee_type",
+                                render: function (data, type, row, meta) {
+                                    var ret;
+                                    if (data) {
+                                        ret = data
                                     } else {
-                                        var ret = row.t_title
+                                        if (row.title.length > 10) {
+                                            ret = row.title.slice(0, 10) + "..."
+                                        } else {
+                                            ret = row.title
+                                        }
                                     }
-                                    return ret.slice(0,10)
+                                    return ret;
                                 }
                             },
                             {

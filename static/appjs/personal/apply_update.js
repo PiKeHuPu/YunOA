@@ -107,7 +107,7 @@ function allFee() {
 // 数据验证
 function isError(data, info) {
     if (data == null || data == "") {
-        layer.alert('请' + info, {icon: 5});
+        layer.alert( info, {icon: 5});
         return true
     }
 }
@@ -142,7 +142,8 @@ function verify() {
         bank_account = $("#bank-account").val(),
         payee = $("#payee").val(),
         bank_info = $("#bank-info").val(),
-        t_title = $("#t_title").val();
+        feetype = $("#feetype").val();
+
 
     var tem_invoice = temData(invoice_type);
 
@@ -168,9 +169,7 @@ function verify() {
 
     var r_num = /^\d*$/; //全数字
 
-    if (isError(t_title, '请填写申请标题')) {
-        return false
-    } else if (isError(title, '请填写工作内容')) {
+    if (isError(title, '请填写工作内容')) {
         return false
     } else if (isError(all_fee, '请填写总费用')) {
         return false
@@ -224,7 +223,7 @@ function verify() {
         bank_account: bank_account,
         payee: payee,
         bank_info: bank_info,
-        t_title: t_title
+        feetype: feetype
     };
     if (ap_type == '1') {
         retData['people'] = tem_people;

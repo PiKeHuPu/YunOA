@@ -8,6 +8,7 @@ from django.contrib.auth import get_user_model
 from adm.models import Customer
 
 
+
 from utils.type_constant import CHOICES
 
 User = get_user_model()
@@ -40,6 +41,11 @@ User = get_user_model()
 #         return self.title
 
 
+class FeeType(models.Model):
+    fee_id = models.IntegerField(blank=True)
+    fee_type = models.CharField(max_length=10, blank=True)
+
+
 class WorkOrder(models.Model):
     """
     审批申请
@@ -52,7 +58,7 @@ class WorkOrder(models.Model):
     advance_choices = CHOICES['advance_choices']
     payment_choices = CHOICES['payment_choices']
     number = models.CharField(max_length=20, verbose_name='审批单号')   # 自动生成
-    t_title = models.CharField(max_length=30, verbose_name="申请标题")
+    feeid = models.ForeignKey(FeeType, blank=True, null=True, on_delete=models.CASCADE, verbose_name='费用id')
     title = models.TextField(verbose_name='工作内容')
     type = models.CharField(max_length=10, choices=type_choices, default='0', verbose_name='审批类型')
     status = models.CharField(max_length=10, choices=status_choices, default='0', verbose_name='审批状态')  # TODO 这个逻辑，被退回3，申请是重建
@@ -100,8 +106,7 @@ class WorkOrderCard(models.Model):
     bank_info = models.CharField(max_length=300, blank=True, null=True, verbose_name='开户行')
     time = models.IntegerField(max_length=10, blank=False,null=True , verbose_name='使用次数')
 
-class WorkOrderType(models.Model):
-    type = models.CharField(max_length=10,blank=True,verbose_name='花销类型', )
+
 
 class WorkOrderRecord(models.Model):
     """
@@ -188,7 +193,8 @@ class BusinessApply(models.Model):
     workorder = models.ForeignKey(WorkOrder, related_name='business', blank=True, null=True, on_delete=models.SET_NULL,
                                verbose_name='审批单')
     # 报销内容
-    t_title = models.CharField(max_length=30, verbose_name="申请标题")
+
+    feeid = models.ForeignKey(FeeType,null=True,blank=True,verbose_name='费用id')
     title = models.TextField(verbose_name='工作内容')
     detail = models.TextField(blank=True, null=True, verbose_name='报销明细')
     invoice_type = models.CharField(max_length=10, choices=invoice_choices, default='0', blank=True, null=True,

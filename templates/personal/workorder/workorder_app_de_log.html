@@ -64,7 +64,7 @@
                         <tr valign="middle">
                             <th><input type="checkbox" id="checkAll"></th>
                             <th>申请单号</th>
-                            <th>事项</th>
+                            <th>费用类型</th>
                             <th>审批类型</th>
                             <th>审批进程</th>
                             <th>申请部门</th>
@@ -134,14 +134,19 @@
 
                             },
                             {
-                                data: "title",
-                                render:function (data, type, row, meta) {
-                                    if (data.length <= 10) {
-                                        return data;
+                                data: "feeid__fee_type",
+                                render: function (data, type, row, meta) {
+                                    var ret;
+                                    if (data) {
+                                        ret = data
                                     } else {
-                                        return data.slice(0,10) + "..."
+                                        if (row.title.length > 10) {
+                                            ret = row.title.slice(0, 10) + "..."
+                                        } else {
+                                            ret = row.title
+                                        }
                                     }
-
+                                    return ret;
                                 }
                             },
                             {
