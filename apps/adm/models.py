@@ -284,11 +284,14 @@ class AssetApprove(models.Model):
     return_date = models.DateField(null=True, blank=True, verbose_name="预计归还时间")
     status = models.CharField(max_length=10, verbose_name="状态")  # '0': 未审批  '1': 审批中  '2': 审批通过  '3': 审批未通过
     use_status = models.CharField(max_length=10, verbose_name="使用状态")
-    # '0': 未领用  '1': 未归还  '2': 已归还  '3': 无需归还
+    # '0': 未领用  '1': 未归还  '2': 已归还  '3': 无需归还  '4': 已转移
+    type = models.CharField(max_length=10, verbose_name="类型")  # '0': 物资领用  '1': 资产转移
     create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
     t_return_date = models.DateField(null=True, blank=True, verbose_name="归还日期")
     return_quantity = models.IntegerField(default=0, verbose_name="归还数量")
     return_operator = models.ForeignKey(User, related_name="return_operator", blank=True, null=True, verbose_name="归还操作人")
+    transfer_department = models.ForeignKey(Structure, blank=True, null=True, verbose_name="转移部门")
+    transfer_warehouse = models.ForeignKey(AssetWarehouse, blank=True, null=True, verbose_name="转移仓库")
 
 
 class AssetApproveDetail(models.Model):

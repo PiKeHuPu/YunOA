@@ -24,7 +24,8 @@ from personal.views import Direction
 from system.views import SystemView
 from adm.views import AdmView, WarehouseView, \
     WarehouseCreateView, WarehouseDeleteView, AssetView, AssetCreateView, AssetAjaxView, AssetUseFlowView, \
-    AssetApplyView, AssetApproveView, AssetApproveresultView, AssetApproveHistoryView, AssetOrderDetailView
+    AssetApplyView, AssetApproveView, AssetApproveresultView, AssetApproveHistoryView, AssetOrderDetailView, \
+    AssetTransferView
 from oilWear.views import OilOrderCreateView
 from personal import views as personal_views
 from personal import views_work_order as order
@@ -67,6 +68,7 @@ urlpatterns = [
     url(r'^personal/apply', AssetApplyView.as_view(), name='personal-apply'),
     url(r'^personal/approve/result', AssetApproveresultView.as_view(), name='personal-approve-result'),
     url(r'^personal/approve', AssetApproveView.as_view(), name='personal-approve'),
+    url(r'^personal/transfer', AssetTransferView.as_view(), name='personal-transfer'),
     # 工作台模块
     # 审批报销
     url(r'^personal/$', personal_views.PersonalView.as_view(), name="personal"),

@@ -167,7 +167,6 @@ $(function() {
                                 },
 								{
 									data : "id",
-									{#width : "10%",#}
 									bSortable : "false",
 									render : function(data, type, row, meta) {
 										var ret="<button title='详情' onclick='doDetail("
@@ -177,6 +176,11 @@ $(function() {
 										    + data + ")'><i class='glyphicon glyphicon-pencil'></i></button>";
 										    ret=ret+"<button title='删除' onclick='doDelete("
                                             + data + ")'><i class='glyphicon glyphicon-trash'></i></button>";
+                                        } else if (row.status == "0") {
+                                            ret=ret+"<button title='资产转移' onclick='transfer("
+										    + data + ")'><i class='glyphicon glyphicon-transfer'></i></button>";
+                                        } else {
+
                                         }
 
 										return ret;
@@ -234,6 +238,19 @@ function doUpdate(id){
 		}
 	});
 	layer.full(div)
+}
+
+// 资产转移
+function transfer(id) {
+    layer.open({
+        type: 2,
+        area: ["800px", "350px"],
+        content: "{% url 'personal-transfer' %}?id=" + id,
+        title: "资产转移",
+        end: function () {
+            window.location.reload()
+        }
+    })
 }
 
 //删除单个数据

@@ -162,7 +162,9 @@
                                     if (row.use_status == "0") {
                                         if (data == "0" || data == "1") {
                                             ret = "审批中"
-                                        } else if (data == "2") {
+                                        } else if (data == "2" && row.type == "1") {
+                                            ret = "未转移"
+                                        } else if (data == "2" && row.type == "0") {
                                             ret = "未领用"
                                         } else if (data == "3") {
                                             ret = "审批未通过"
@@ -173,6 +175,8 @@
                                         ret = "已归还"
                                     } else if (row.use_status == "3") {
                                         ret = "无需归还"
+                                    } else if (row.use_status == "4") {
+                                        ret = "已转移"
                                     }
                                     return ret;
                                 }
@@ -182,7 +186,10 @@
                                 width: "7%",
                                 render: function (data, type, row, meta) {
                                     var ret = "<button title='查看详情' onclick='detail(" + data + ")'><i class='glyphicon glyphicon-list-alt'></i></button>";
-                                    if (row.status == "2" && row.use_status == "0") {
+                                    if (row.status == "2" && row.use_status == "0" && row.type == "1") {
+                                        ret = ret + "<button title='转移' onclick='receive(" + data + ")'><i class='glyphicon glyphicon-transfer'></i></button>";
+                                    }
+                                    else if (row.status == "2" && row.use_status == "0") {
                                         ret = ret + "<button title='领用' onclick='receive(" + data + ")'><i class='glyphicon glyphicon-open'></i></button>";
                                     }
                                     if (row.status == "2" && row.use_status == "1") {
@@ -228,11 +235,11 @@
                 type: 2,
                 title: "申请详情",
                 content: "{% url 'personal-apply-detail' %}?id=" + id,
-                area: ["1000px", "480px"]
+                area: ["1000px", "550px"]
             })
         }
         function receive(id) {
-            var con = confirm("确定领用吗？");
+            var con = confirm("确定进行此操作吗？");
             if (con) {
                 $.ajax({
                     url: "{% url 'adm-useflow' %}",
@@ -240,10 +247,10 @@
                     data: {"id": id},
                     success: function (ret) {
                         if (ret.success) {
-                            alert("领用成功");
+                            alert("操作成功");
                             window.location.reload();
                         } else {
-                            alert("领用失败，请稍后再试")
+                            alert("操作失败，请稍后再试")
                         }
                     }
                 })

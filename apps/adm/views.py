@@ -1,3 +1,4 @@
+import copy
 import json
 
 from django.contrib.auth import get_user_model
@@ -389,7 +390,23 @@ class AssetUseFlowView(LoginRequiredMixin, View):
             if asset_order.asset.is_no_return:
                 asset_order.use_status = "3"
             else:
-                asset_order.use_status = "1"
+                if asset_order.type == "1":
+                    asset_order.use_status = "4"
+                    asset = copy.deepcopy(asset_order.asset)
+                    asset.id = None
+                    asset.save()
+                    asset.quantity = asset_order.quantity
+                    asset.status = "0"
+                    asset.is_delete = False
+                    asset.operator_id = asset_order.proposer_id
+                    asset.department_id = asset_order.transfer_department_id
+                    asset.warehouse_id = asset_order.transfer_warehouse_id
+                    asset.save()
+
+                    use_asset = AssetInfo.objects.filter(name=asset_order.asset.name, user_id=asset_order.proposer_id, quantity__lte=asset_order.quantity, warehouse=asset_order.asset.warehouse)[0]
+                    use_asset.delete()
+                else:
+                    asset_order.use_status = "1"
             asset_order.save()
             ret["success"] = True
         except:
@@ -446,9 +463,11 @@ class AssetApproveresultView(LoginRequiredMixin, View):
             asset_approve = AssetApproveDetail.objects.filter(asset_order=asset_order, is_pass=None)
             for approve in asset_approve:
                 approve.delete()
-            use_asset = AssetInfo.objects.filter(name=asset_order.asset.name, user_id=asset_order.proposer_id,quantity__lte=asset_order.quantity,warehouse=asset_order.asset.warehouse)[0]
+            use_asset = AssetInfo.objects.filter(name=asset_order.asset.name, user_id=asset_order.proposer_id, quantity__lte=asset_order.quantity,warehouse=asset_order.asset.warehouse)[0]
             asset = asset_order.asset
             asset.quantity += int(use_asset.quantity)
+            if asset.is_delete:
+                asset.is_delete = False
             asset.save()
             use_asset.delete()
         else:
@@ -511,3 +530,92 @@ class AssetOrderDetailView(LoginRequiredMixin, View):
         asset_approve_list = asset_order.assetapprovedetail_set.all()
         ret['asset_approve_list'] = asset_approve_list
         return render(request, "adm/layer/asset_order_detail.html", ret)
+
+
+class AssetTransferView(LoginRequiredMixin, View):
+    """
+    资产转移
+    """
+    def get(self, request):
+        ret = dict()
+        asset_id = request.GET.get("id")
+        asset = AssetInfo.objects.get(id=asset_id)
+        ret["asset"] = asset
+        user_id = request.session.get("_auth_user_id")
+        department_list = department_admin(user_id)
+        ret["department_list"] = department_list
+        return render(request, "adm/layer/asset_transfer.html", ret)
+
+    def post(self, request):
+        ret = dict()
+        asset_id = request.POST.get("id0")
+        asset = AssetInfo.objects.get(id=asset_id)
+        depatment0 = asset.department
+        depatment1 = Structure.objects.get(id=int(request.POST.get("department1")))
+        warehouse1 = AssetWarehouse.objects.get(id=int(request.POST.get("warehouse1")))
+        administrator0 = depatment0.administrator
+        approver0 = depatment0.approver
+        administrator1 = depatment1.administrator
+        approver1 = depatment1.approver
+
+        # 创建相应的在用物资
+        use_quantity = request.POST.get('quantity')
+        asset.quantity = int(asset.quantity) - int(use_quantity)
+        if int(asset.quantity) == 0:
+            asset.is_delete = True
+        asset.save()
+        use_asset = asset
+        use_asset.id = None
+        use_asset.save()
+        use_asset.create_time = asset.create_time
+        use_asset.quantity = int(use_quantity)
+        use_asset.status = '1'
+        use_asset.user_id = request.session.get('_auth_user_id')
+        use_asset.is_delete = False
+        use_asset.save()
+        user_id = request.session.get('_auth_user_id')
+
+        # 创建记录单
+        asset_order = AssetApprove()
+        asset_order.proposer_id = user_id
+        asset_order.asset_id = asset_id
+        asset_order.quantity = use_quantity
+        asset_order.purpose = "将" + use_quantity + asset.unit + " '" + asset.name + "' 由 '" + asset.department.title + " - " + asset.warehouse.name + "' 仓库转移至 '" + depatment1.title + " - " + warehouse1.name + "' 仓库"
+        asset_order.return_date = request.POST.get('use_time')
+        asset_order.status = '0'
+        asset_order.use_status = '0'
+        asset_order.type = "1"
+        asset_order.transfer_department = depatment1
+        asset_order.transfer_warehouse = warehouse1
+        asset_order.save()
+
+        # 添加审批
+        if administrator0.id:
+            if int(user_id) != int(administrator0.id):
+                approve = AssetApproveDetail()
+                approve.approver_id = administrator0.id
+                approve.asset_order_id = asset_order.id
+                approve.save()
+
+        if approver0.id:
+            if int(user_id) != int(approver0.id):
+                approve = AssetApproveDetail()
+                approve.approver_id = approver0.id
+                approve.asset_order_id = asset_order.id
+                approve.save()
+
+        if administrator1.id:
+            if int(user_id) != int(administrator1.id):
+                approve = AssetApproveDetail()
+                approve.approver_id = administrator1.id
+                approve.asset_order_id = asset_order.id
+                approve.save()
+
+        if approver1.id:
+            if int(user_id) != int(approver1.id):
+                approve = AssetApproveDetail()
+                approve.approver_id = approver1.id
+                approve.asset_order_id = asset_order.id
+                approve.save()
+        ret['status'] = "success"
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")

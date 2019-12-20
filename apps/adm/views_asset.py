@@ -215,7 +215,7 @@ class AssetUseFlowListView(LoginRequiredMixin, View):
         user_id = request.session.get("_auth_user_id")
         department_list = department_admin(user_id)
         warehouse_list = warehouse_admin(department_list)
-        fields = ['id', 'asset__number', "asset__warehouse__id", 'asset__warehouse__name', 'asset__name', 'asset__type', 'quantity', 'proposer__name', 'create_time', 'return_date', 'purpose', 'use_status', 'status']
+        fields = ['id', 'asset__number', "asset__warehouse__id", 'asset__warehouse__name', 'asset__name', 'asset__type', 'quantity', 'proposer__name', 'create_time', 'return_date', 'purpose', 'use_status', 'status', 'type']
         filters = dict()
         if request.GET.get('asset_number'):
             filters['asset__number'] = request.GET['asset_number']
@@ -344,7 +344,6 @@ class AssetUseView(View):
             use_count = ret_info.get('useCount')
             if use_count:
                 if int(use_count) <= int(asset.assetCount):
-                    # status = asset.get_status_display()  # TODO 状态是否修改
                     asset_use = AssetUseLog()
                     asset_use.asset_id = asset.id
                     asset_use.operator = ret_info.get('operator')
@@ -376,12 +375,6 @@ class AssetUseHtmlView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        # ret = Menu.getMenuByRequestUrl(url=request.path_info)
-        # ret.update(SystemSetup.getSystemSetupLastData())
-        # asset_types = AssetType.objects.all()
-        # ret['status_list'] = status_list
-        # ret['asset_types'] = asset_types
-
         ret = dict()
         user_id = request.session.get('_auth_user_id')
         user = User.objects.get(id=user_id)
@@ -440,11 +433,11 @@ class AssetUseInfoView(LoginRequiredMixin, View):
         asset_order.return_date = request.POST.get('use_time')
         asset_order.status = '0'
         asset_order.use_status = '0'
+        asset_order.type = "0"
         asset_order.save()
 
         if asset.is_no_approve:
             pass
-            print(111111111111111112222222222222)
         else:
             if asset.department.administrator_id:
                 if int(user_id) != int(asset.department.administrator_id):
