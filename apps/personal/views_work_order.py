@@ -97,7 +97,6 @@ def update_next_user(work_order, current_user_id, order_flow, pro_type):
 def apply(work_order, next_user_id):
     ap = BusinessApply(workorder=work_order,
                        title=work_order.title,
-                       t_title=work_order.t_title,
                        cretor=work_order.cretor,
                        structure=work_order.structure,
                        next_user_id=next_user_id,
