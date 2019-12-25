@@ -34,8 +34,8 @@
                             <th>资产名称</th>
                             <th>数量</th>
                             <th>申请人</th>
-                            <th>预计归还时间</th>
                             <th>发起时间</th>
+                            <th>预计归还时间</th>
                             <th>用途</th>
                             <th>审批意见</th>
                             <th>操作</th>
@@ -112,10 +112,19 @@
                                 data: "proposer"
                             },
                             {
-                                data: "return_date"
+                                data: "create_time"
                             },
                             {
-                                data: "create_time"
+                                data: "return_date",
+                                render: function (data) {
+                                    var ret;
+                                    if (data != "None") {
+                                        ret = data
+                                    } else {
+                                        ret = "未设置"
+                                    }
+                                    return ret
+                                }
                             },
                             {
                                 data: "purpose"

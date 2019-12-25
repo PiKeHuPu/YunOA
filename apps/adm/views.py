@@ -511,7 +511,7 @@ class AssetApproveHistoryView(LoginRequiredMixin, View):
     def get(self, request):
         ret = dict()
         user_id = request.session.get("_auth_user_id")
-        asset_approve_history_list = AssetApproveDetail.objects.filter(~Q(is_pass=None) & Q(approver_id=user_id))
+        asset_approve_history_list = AssetApproveDetail.objects.filter(~Q(is_pass=None) & Q(approver_id=user_id)).order_by("-create_time")
         ret['asset_approve_history_list'] = asset_approve_history_list
         return render(request, "adm/layer/asset_approve_history.html", ret)
 

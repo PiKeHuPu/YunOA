@@ -17,7 +17,7 @@ from system.models import SystemSetup
 from .forms import ImageUploadForm, UserUpdateForm
 from users.forms import AdminPasswdChangeForm
 from .models import WorkOrder, BusinessApply
-from adm.models import Asset, AssetType
+from adm.models import Asset, AssetType, AssetApproveDetail, AssetInfo
 from rbac.models import Role, SpecialRole
 
 from utils.toolkit import get_month_work_order_count, get_year_work_order_count
@@ -45,8 +45,8 @@ class PersonalView(LoginRequiredMixin, View):
                                               Q(cretor_id=request.user.id) |
                                               Q(next_user_id=request.user.id)
                                               )
-        ret['work_order_lx'] = work_order.filter(next_user_id=request.user.id, status__in = ['1', '0'], type='0').count()  # 等待我审批的
-        ret['work_order_cc'] = work_order.filter(next_user_id=request.user.id, status__in = ['1', '0'], type='1').count()  # 等待我审批的
+        ret['work_order_lx'] = work_order.filter(next_user_id=request.user.id, status__in=['1', '0'], type='0').count()  # 等待我审批的
+        ret['work_order_cc'] = work_order.filter(next_user_id=request.user.id, status__in=['1', '0'], type='1').count()  # 等待我审批的
         ret['start_date'] = start_date
         # 当月个人报销统计
         busin_apply = BusinessApply.objects.filter(
@@ -65,12 +65,13 @@ class PersonalView(LoginRequiredMixin, View):
         # 物资到期提醒
         three_months = today + timedelta(days=100)
         structure = request.user.department    # 用户所在部门
-        asset = Asset.objects.filter(Q(dueremind = '1'), Q(assetType__structure=structure), Q(dueDate__range=(today, three_months)))
-        ret['asset'] = asset
-        ret['asset_num'] = len(asset)
-        gone_asset = Asset.objects.filter(Q(dueremind='1'), Q(assetType__structure=structure), Q(dueDate__lt=today))
-        ret['gone_asset'] = gone_asset
-        ret['gone_asset_num'] = len(gone_asset)
+        if structure.administrator_id == current_user_id:
+            asset = AssetInfo.objects.filter(Q(department=structure), Q(due_time__range=(today, three_months)))
+            ret['asset'] = asset
+            ret['asset_num'] = len(asset)
+            gone_asset = AssetInfo.objects.filter(Q(department=structure), Q(due_time__lt=today))
+            ret['gone_asset'] = gone_asset
+            ret['gone_asset_num'] = len(gone_asset)
 
         # 公告相关
         bulletin = Bulletin.objects.filter(status='1')
@@ -78,6 +79,11 @@ class PersonalView(LoginRequiredMixin, View):
         ret['bulletin_amount'] = bulletin_amount
         unread_bulletin_num = request.session.get('unread_bulletin_num')
         ret['unread_bulletin_num'] = unread_bulletin_num
+
+        # 物资相关
+        user_id = request.session.get("_auth_user_id")
+        asset_approve_num = len(AssetApproveDetail.objects.filter(approver_id=user_id, is_pass=None))
+        ret['asset_approve_num'] = asset_approve_num
         return render(request, 'personal/personal_index.html', ret)
 
 
@@ -181,22 +187,21 @@ class DueAssetView(LoginRequiredMixin, View):
         type0 = request.GET.get("type")
 
         if type0 == '0':
-            asset = Asset.objects.filter(Q(dueremind='1'), Q(assetType__structure=structure),
-                                         Q(dueDate__range=(today, three_months)))
+            asset = AssetInfo.objects.filter(Q(department=structure), Q(due_time__range=(today, three_months)))
             for a in asset:
-                if len(a.brand) > 10:
-                    a.brand = a.brand[:10] + "..."
-                if len(a.desc) > 20:
-                    a.desc = a.desc[:20] + "..."
+                if len(a.name) > 10:
+                    a.name = a.name[:10] + "..."
+                if len(a.remark) > 20:
+                    a.remark = a.remark[:20] + "..."
             ret['asset'] = asset
             ret['asset_num'] = len(asset)
         elif type0 == '1':
-            asset = Asset.objects.filter(Q(dueremind='1'), Q(assetType__structure=structure), Q(dueDate__lt=today))
+            asset = AssetInfo.objects.filter(Q(department=structure), Q(due_time__lt=today))
             for a in asset:
-                if len(a.brand) > 10:
-                    a.brand = a.brand[:10] + "..."
-                if len(a.desc) > 20:
-                    a.desc = a.desc[:20] + "..."
+                if len(a.name) > 10:
+                    a.name = a.name[:10] + "..."
+                if len(a.remark) > 20:
+                    a.remark = a.remark[:20] + "..."
             ret['asset'] = asset
             ret['asset_num'] = len(asset)
         return render(request, "adm/asset/due_asset.html", ret)

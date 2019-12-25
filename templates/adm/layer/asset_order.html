@@ -104,6 +104,15 @@
                             },
                             {
                                 data: "return_date",
+                                render: function (data) {
+                                    var ret;
+                                    if (data != "None") {
+                                        ret = data
+                                    } else {
+                                        ret = "未设置"
+                                    }
+                                    return ret
+                                }
                             },
                             {
                                 data: "status",
