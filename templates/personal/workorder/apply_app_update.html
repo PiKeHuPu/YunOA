@@ -49,8 +49,8 @@
                                         </td>
                                     </tr>
                                      <tr>
-                                        <td><strong> 申请标题</strong></td>
-                                        <td>{{ ap.t_title }}</td>
+                                        <td><strong> 费用类型</strong></td>
+                                        <td>{{ ap.feeid.fee_type }}</td>
                                     </tr>
                                     <tr>
                                         <td><strong> 申请类型</strong></td>
@@ -252,7 +252,7 @@
                                 </tr>
                                 {% for businessApply in businessApplys %}
                                 <tr>
-                                    <td><a onclick="showApplyDetail({{ businessApply.id }})">{% if businessApply.t_title %}{{ businessApply.t_title }}{% else %}{{ businessApply.title }}{% endif %}</a></td>
+                                    <td><a onclick="showApplyDetail({{ businessApply.id }})">{% if businessApply.feeid.fee_type %}{{ businessApply.feeid.fee_type }}{% else %}{{ businessApply.title }}{% endif %}</a></td>
                                     <td>{{ businessApply.all_fee }}</td>
                                     <td style="text-align: center">{{ businessApply.create_time }}</td>
                                 </tr>

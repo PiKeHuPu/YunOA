@@ -23,23 +23,26 @@
                         </div>
                     </legend>
                     <div class="form-group has-feedback">
-                        <label class="col-sm-2 control-label">申请标题</label>
+                        <label class="col-sm-2 control-label">费用类型</label>
                         <div class="col-sm-3">
-                            <input type="text" class="form-control" name="t_title" id="t_title" maxlength="30" placeholder="请尽量控制在十个字以内， 如： 招待费、燃油费" value="{{ work_order.t_title }}">
+                            <select name="feetype" id="feetype">
+                                {% for foo in feetype %}
+                                    <option  id="feetype" {% if work_order.feeid.fee_type == foo.fee_type %} selected {% endif %}>{{ foo.fee_type }}</option>
+                                {% endfor %}
+
+                            </select>
                         </div>
                     </div>
                     <div class="form-group has-feedback">
                         <label class="col-sm-2 control-label">申请内容</label>
                         <div class="col-sm-8">
-                            <textarea class="form-control" name="title" id="title" style="height:150px;resize:vertical"
-                            >{{ work_order.title }}</textarea>
+                            <textarea class="form-control" name="title" id="title" style="height:150px;resize:vertical">{{ work_order.title }}</textarea>
                         </div>
                     </div>
                     <div class="form-group has-feedback">
                         <label class="col-sm-2 control-label">申请类型</label>
                         <div class="col-sm-3">
-                            <select class="form-control select2" style="width:100%;" name="type" id="order-type"
-                                    v-model="selected">
+                            <select class="form-control select2" style="width:100%;" name="type" id="order-type" v-model="selected">
                                 {% for type in type_list %}
                                     <option value="{{ type.item }}">{{ type.value }}</option>
                                 {% endfor %}
@@ -48,11 +51,8 @@
                         <label class="col-sm-2 control-label">申请金额(元)</label>
 
                         <div class="col-sm-3">
-                            <input class="form-control" name="cost" value="{{ work_order.cost }}" id="cost"
-                                   type="number" name="points" min="0"/>
+                            <input class="form-control" name="cost" value="{{ work_order.cost }}" id="cost" type="number" name="points" min="0" />
                         </div>
-
-
                     </div>
                     <div class="form-group has-feedback">
                         <label class="col-sm-2 control-label">是否预支</label>
@@ -108,24 +108,32 @@
 
                         <label class="col-sm-2 control-label">银行账号</label>
                         <div class="col-sm-3">
-                            <input class="form-control" name="bank_account" type="text" id="bank-account"
-                                   value=
-                                           "{% if work_order.bank_account %}{{ work_order.bank_account }}{% else %}{{ request.user.bank_card }}{% endif %}"/>
+                            <input class="form-control" name="bank_account" type="text" id="bank-account" value="{% if work_order.bank_account %}{{ work_order.bank_account }}{% else %}{{ request.user.bank_card }}{% endif %}" list="itemlist" autocomplete="off"/>
+                        <datalist id="itemlist">
+                            {% for acc in bank_account %}
+                                <option value="{{acc}}"></option>
+                            {% endfor %}
+                        </datalist>
                         </div>
                     </div>
                     <div class="form-group has-feedback">
                         <label class="col-sm-2 control-label">收款方</label>
                         <div class="col-sm-3">
-                            <input class="form-control" name="payee" type="text"
-                                   value=
-                                           "{% if work_order.payee %}{{ work_order.payee }}{% else %}{{ request.user.bank_user_name }}{% endif %}"
-                                   placeholder="1万元以上必须对公支付" id="payee"/>
+                            <input class="form-control" name="payee" type="text"                                   value="{% if work_order.payee %}{{ work_order.payee }}{% else %}{{ request.user.bank_user_name }}{% endif %}" placeholder="1万元以上必须对公支付" id="payee" list="itemlist1" autocomplete="off"/>
+                        <datalist id="itemlist1">
+                            {% for acc in payee %}
+                                <option value="{{acc}}"></option>
+                            {% endfor %}
+                        </datalist>
                         </div>
                         <label class="col-sm-2 control-label">开户银行</label>
                         <div class="col-sm-3">
-                            <input class="form-control" name="bank_info" type="text" id="bank-info"
-                                   value=
-                                           "{% if work_order.bank_info %}{{ work_order.bank_info }}{% else %}{{ request.user.bank_name }}{% endif %}"/>
+                            <input class="form-control" name="bank_info" type="text" id="bank-info" value="{% if work_order.bank_info %}{{ work_order.bank_info }}{% else %}{{ request.user.bank_name }}{% endif %}" list="itemlist2" autocomplete="off"/>
+                        <datalist id="itemlist2">
+                            {% for acc in bank_info %}
+                                <option value="{{acc}}"></option>
+                            {% endfor %}
+                        </datalist>
                         </div>
                     </div>
 
@@ -216,6 +224,7 @@
 
     <script src="{% static 'js/vue-2.6.10.js' %}"></script>
     <script type="text/javascript">
+
         var work_order_type = '{{ work_order.type }}';
         {% if people %}
             {% if people != '[None]' %}

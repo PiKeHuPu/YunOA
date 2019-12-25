@@ -165,7 +165,7 @@ function fileRe() {
 // 数据验证
 function isError(data, info) {
     if (data == null || data == "") {
-        layer.alert('请' + info, {icon: 5});
+        layer.alert( info, {icon: 5});
         return true
     }
 }
@@ -185,7 +185,7 @@ function verify() {
         payee = $("#payee").val(),
         bank_info = $("#bank-info").val(),
         apply_only = $("#ao").is(":checked"),
-        t_title = $("#t_title").val(),
+        feetype = $("#feetype").val(),
 
 
         people = $("#people").val(),
@@ -198,9 +198,9 @@ function verify() {
 
     var r_num = /^\d*$/; //全数字
 
-    if (isError(t_title, '请输入申请标题')) {
+    if (isError(title, '请费用类型')) {
         return false
-    } else if (isError(title, '请填写工作内容')) {
+    }else if (isError(title, '请填写工作内容')) {
         return false
     } else if (isError(type, '请选择审批类型')) {
         return false
@@ -286,7 +286,7 @@ function verify() {
         bank_info: bank_info,
         advance: advance,
         apply_only: apply_only,
-        t_title: t_title,
+        feetype:feetype,
 
         people: tem_people,
         transport: transport,

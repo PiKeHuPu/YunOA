@@ -20,7 +20,7 @@ from gistandard.settings import MEDIA_ROOT
 import xadmin
 
 from apps.users.views_user import LoginView, IndexView, LogoutView
-from personal.views import Direction
+from personal.views import Direction,Check
 from system.views import SystemView
 from adm.views import AdmView, WarehouseView, \
     WarehouseCreateView, WarehouseDeleteView, AssetView, AssetCreateView, AssetAjaxView, AssetUseFlowView, \
@@ -43,6 +43,8 @@ urlpatterns = [
     url(r'^logout/$', LogoutView.as_view(), name="logout"),
     # 操作说明
     url(r'^direction/$', Direction.as_view(), name='direction'),
+    #反馈意见查看
+    url(r'^check/$', Check.as_view(), name='check'),
     # 系统模块
     url(r'^system/$', SystemView.as_view(), name="system"),
     url(r'^system/basic/', include('users.urls', namespace='system-basic')),

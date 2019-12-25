@@ -1,7 +1,7 @@
 import json
 import re
 import calendar
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 
 from django.shortcuts import render
 from django.views.generic.base import View
@@ -18,6 +18,8 @@ from .forms import ImageUploadForm, UserUpdateForm
 from users.forms import AdminPasswdChangeForm
 from .models import WorkOrder, BusinessApply
 from adm.models import Asset, AssetType, AssetApproveDetail, AssetInfo
+from .models import WorkOrder, BusinessApply, Advise
+from adm.models import Asset, AssetType
 from rbac.models import Role, SpecialRole
 
 from utils.toolkit import get_month_work_order_count, get_year_work_order_count
@@ -50,10 +52,10 @@ class PersonalView(LoginRequiredMixin, View):
         ret['start_date'] = start_date
         # 当月个人报销统计
         busin_apply = BusinessApply.objects.filter(
-                                                   Q(cretor_id=request.user.id) |
-                                                   Q(next_user_id=request.user.id))
-        ret['apply_lx'] = busin_apply.filter(next_user_id=request.user.id, status__in = ['1', '0'], type='0').count()
-        ret['apply_cc'] = busin_apply.filter(next_user_id=request.user.id, status__in = ['1', '0'], type='1').count()
+            Q(cretor_id=request.user.id) |
+            Q(next_user_id=request.user.id))
+        ret['apply_lx'] = busin_apply.filter(next_user_id=request.user.id, status__in=['1', '0'], type='0').count()
+        ret['apply_cc'] = busin_apply.filter(next_user_id=request.user.id, status__in=['1', '0'], type='1').count()
         current_user_id = request.user.id
         cashier = SpecialRole.objects.filter(title='0').first()
         if cashier:
@@ -169,8 +171,51 @@ class PhoneBookView(LoginRequiredMixin, View):
 
 
 class Direction(View):
+
     def get(self, request):
         return render(request, 'direction.html')
+
+    def post(self, request):
+        ret = dict()
+        advise = Advise()
+        advise.creator = request.user
+        ret_data = json.loads(request.body.decode())
+        advise.back = ret_data["advise"]
+
+        advise.create_time = datetime.now().year
+        advise.save()
+        return HttpResponse(json.dumps(ret), content_type='application/json')
+
+
+class Check(View):
+
+    def get(self, request):
+        ret = dict()
+        advise = Advise.objects.all()
+        ret["advice"] = advise
+
+        # creator = []
+        # create_time = []
+        # back = []
+        # is_done = []
+        # if advise:
+        #     for x in advise:
+        #         creator.append(x.creator)
+        #         create_time.append(x.create_time)
+        #         back.append(x.back)
+        #         is_done.append(x.is_done)
+        # else:
+        #     creator = ''
+        #     create_time = ''
+        #     back = ''
+        #     is_done = ''
+        # ret.update({
+        #     'create_time': create_time,
+        #     'creator': creator,
+        #     'back': back,
+        #     'is_done': is_done,
+        # })
+        return render(request, 'checkAdvise.html', ret)
 
 
 class DueAssetView(LoginRequiredMixin, View):

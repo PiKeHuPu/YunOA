@@ -4,6 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <title>YunOA操作说明</title>
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap-multiselect/bootstrap-multiselect.css' %}">
     <style>
         li {
             list-style: none;
@@ -51,61 +54,93 @@
 
 {#浮动盒子#}
 <div class="fixedBox"
-     style="z-index:10;width:180px;height:80vh;position:fixed;right:40px;top:50px;background:#f0ffe5;">
+     style="z-index:10;width:185px;height:80vh;position:fixed;right:40px;top:50px;background:#f0ffe5;overflow-x: hidden; overflow-y:auto">
     <ul href="#title">
         <a href="#title">OA系统使用方法</a>
-{#        <li style="left: 2px">#}
-{#            <a href="#title" style="font-size: 18px">#}
-{#                <cite style="">OA系统使用方法</cite>#}
-{#            </a>#}
-{#        </li>#}
+        <li style="font-size: 18px">立项及相关功能使用</li>
+        <ul>
+            <li style="">
+                <a href="#lxsqsyff  ">
+                    新增立项申请
+                </a>
+            </li>
+            <li style="">
+                <a href="#lxsp">
+                    立项审批
+                </a>
+            </li>
+            <li style="">
+                <a href="#ccsp">
+                    出差审批
+                </a>
+            </li>
+            <li style="">
+                <a href="#sqjl">
+                    查看申请记录
+                </a>
+            </li>
+            <li style="">
+                <a href="#spsq">
+                    查看审批申请
+                </a>
+            </li>
+            <li style="">
+                <a href="#spsq1">
+                    审批申请页面操作
+                </a>
+            </li>
+            <li style="">
+                <a href="#bxym">
+                    查看审批报销
+                </a>
+            </li>
+            <li style="">
+                <a href="#bxym1">
+                    审批报销页面操作
+                </a>
+            </li>
+            <li style="">
+                <a href="#spls">
+                    查看审批历史
+                </a>
+            </li>
+        </ul>
+
+        <li><a href="#pc">个人中心</a></li>
+
+        <ul>
+            <li style="">
+                <a href="#enter pc">
+                    进入个人中心
+                </a>
+            </li>
+            <li style="">
+                <a href="#pc">
+                    个人中心
+                </a>
+            </li>
+        </ul>
         <li style="">
-            <a href="#lxsqsyff  " >
-                新增立项申请
-            </a>
-        </li>
-        <li style="">
-            <a href="#lxsp" >
-                立项审批
-            </a>
-        </li>
-        <li style="">
-            <a href="#ccsp" >
-                出差审批
-            </a>
-        </li>
-        <li style="">
-            <a href="#sqjl" >
-                查看申请记录
-            </a>
-        </li>
-        <li style="" >
-            <a href="#pc" >
-                个人中心使用方法
-            </a>
-        </li>
-        <li style="">
-            <a href="#enter pc" >
-                进入个人中心
-            </a>
-        </li>
-        <li style="">
-            <a href="#pc" >
-                个人中心
-            </a>
-        </li>
-        <li style="">
-            <a href="#bulletin" >
+            <a href="#bulletin">
                 查看公告
             </a>
         </li>
 
+        <li style="">
+            <a href="#btnSave">
+                意见反馈
+            </a>
+        </li>
     </ul>
 </div>
 <div class="xbox" style="width:80%;top: 20px;right:200px">
     <div class="inbox" id="title" style="margin-left: 15px">
         <h3>云谷办公平台使用方法</h3>
-        <p>云谷办公平台的网址为：http://39.104.118.239:9090，点击查看大图，大图点击可取消</p>
+        <p>云谷办公平台的网址为：http://39.104.118.239:9090</p>
+    </div>
+    <div class="usebox" style="margin-left: 15px">
+        <h3>本页面使用方法</h3>
+        <p>本页面图片点击可以放大，再次点击取消放大，右侧导航栏可以点击进行跳转</p>
     </div>
     <div class="inbox" id="lxsq" style="margin-left: 15px">
         <h3>立项申请的使用方法</h3>
@@ -131,16 +166,34 @@
         <div class="logoImg amplifyImg" ><!--注意：此处的amlifyImg不可少-->
             <img style="height: 300px;width: 300px" src="{% static 'image/1-4.png' %}"/>
         </div>
-        <p id="sqjl">5.查看当前的申请记录，以及报销</p>
+{#        <p id="sqjl">5.查看当前的申请记录，以及报销</p>#}
+{#        <div class="logoImg amplifyImg" ><!--注意：此处的amlifyImg不可少-->#}
+{#            <img style="height: 300px;width: 150px" src="{% static 'image/1-7.png' %}"/>#}
+{#        </div>#}
+        <p id="sqjl1">5.在我的工作台查看当前的申请记录，以及报销记录</p>
         <div class="logoImg amplifyImg" ><!--注意：此处的amlifyImg不可少-->
-            <img style="height: 300px;width: 150px" src="{% static 'image/1-7.png' %}"/>
+            <img style="height: 200px;width: 400px" src="{% static 'image/1-13.png' %}"/>
         </div>
-        <p id="sqjl1">5.在我的工作台查看当前的申请记录，以及报销</p>
+        <p id="spsq">6. 查看审批申请</p>
         <div class="logoImg amplifyImg" ><!--注意：此处的amlifyImg不可少-->
-            <img style="height: 200px;width: 400px" src="{% static 'image/1-8.png' %}"/>
+            <img style="height: 200px;width: 400px" src="{% static 'image/1-14.png' %}"/>
         </div>
-
-
+        <p id="spsq1">6.1 审批申请页面操作</p>
+        <div class="logoImg amplifyImg" ><!--注意：此处的amlifyImg不可少-->
+            <img style="height: 200px;width: 400px" src="{% static 'image/1-15.png' %}"/>
+        </div>
+        <p id="bxym">7 查看审批报销</p>
+        <div class="logoImg amplifyImg" ><!--注意：此处的amlifyImg不可少-->
+            <img style="height: 200px;width: 400px" src="{% static 'image/1-16.png' %}"/>
+        </div>
+        <p id="bxym1">7.1 审批报销页面操作</p>
+        <div class="logoImg amplifyImg" ><!--注意：此处的amlifyImg不可少-->
+            <img style="height: 200px;width: 400px" src="{% static 'image/1-17.png' %}"/>
+        </div>
+        <p id="spls">8 查看审批历史</p>
+        <div class="logoImg amplifyImg" ><!--注意：此处的amlifyImg不可少-->
+            <p>审批历史进入流程与审批历史页面操作流程与审批报销页面基本一致，可以参考上述过程</p>
+        </div>
     </div>
     <div class="personal center" id="pc" style="margin-left: 15px">
         <h3>个人中心使用用方法</h3>
@@ -157,16 +210,68 @@
         <h3>查看公司公告</h3>
         <p id="bulletin">查看公司公告方法</p>
         <div class="logoImg amplifyImg"><!--注意：此处的amlifyImg不可少-->
-            <img style="height: 200px;width: 450px" src="{% static 'image/1-11.png' %}"/>
+            <img style="height: 200px;width: 450px" src="{% static 'image/bulletin1.png' %}"/>
         </div>
     </div>
 </div>
 
+ <div class="box box-danger">
+        <form class="form-horizontal" id="addForm" method="post">
+            <input type="hidden" name='order' value="{{ work_order.id }}" id="orderId"/>
+            <label class="col-sm-2 control-label">意见/建议</label>
+            <div class="col-sm-8">
+                <textarea class="form-control" name="title" id="advise" style="height:150px;width: 600px"></textarea>
+            </div>
+            <div class="box-footer ">
+                <div class="row span7 text-center">
+                    <button type="button" id="btnSave" class="btn btn-info margin-right " onclick="Save()">保存</button>
+                </div>
+            </div>
+        </form>
+    </div>
+<script>
+    function Save() {
+        var advise = $("#advise").val();
+        if (advise == '') {
+            alert('请输入反馈内容！');
+        } else if (advise.length>300) {
+            alert('建议内容过长，请删减内容')
+        }
+        else {
+            retData = {
+                advise: advise,
+            }
+            var data = retData;
+            if (data === false) {
+                return
+            }
+            var url = "/direction/";
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: JSON.stringify(data),
+                contentType: "application/json; charset=UTF-8",
+                success: function (data) {
+                    alert('提交成功');
+                }
+            });
+        }
+
+    }
+</script>
 </body>
 
 </html>
 <!-- jQuery 2.2.3 -->
 <script src="/static/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-multiselect/bootstrap-multiselect.js' %}"></script>
+    <script src="{% static 'plugins/fileinput/fileinput.js' %}"></script>
+    <script src="{% static 'plugins/fileinput/zh.js' %}"></script>
+    <script src="{% static 'js/vue-2.6.10.js' %}"></script>
+
+
 <script>
     var imgsObj = $('.amplifyImg img');//需要放大的图像
     if (imgsObj) {

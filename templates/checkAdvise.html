@@ -1,0 +1,60 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>意见查看</title>
+
+    <style>
+        th{
+            margin-left: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <table>
+        <tr>
+            <th>创建人</th>
+            <th>创建时间</th>
+            <th>反馈信息</th>
+            <th>是否完成</th>
+        </tr>
+        {% for adv in advice %}
+            <tr>
+                <td>{{ adv.creator.name }}</td>
+                <td>{{ adv.create_time }}</td>
+                <td>{{ adv.back }}</td>
+                <td>{{ adv.is_done }}</td>
+            </tr>
+        {% endfor %}
+
+    </table>
+{#    <div class="col-sm-2">#}
+{#        创建人#}
+{#        {% for foo in creator.name %}#}
+{#        <p>{{ foo }}</p>#}
+{#        {% endfor %}#}
+{#    </div>#}
+{#    <div class="col-sm-2">#}
+{#    创建时间#}
+{#        {% for foo in create_time %}#}
+{#        <p>{{ foo }}</p>#}
+{#        {% endfor %}#}
+{#    </div>#}
+{#    <div class="col-sm-4">#}
+{#    反馈信息#}
+{#        {% for foo in back %}#}
+{#        <p>{{ foo }}</p>#}
+{#        {% endfor %}#}
+{#    </div>#}
+{#    <div class="col-sm-2">#}
+{#    是否完成#}
+{#        {% for foo in is_done %}#}
+{#        <p>{{ foo }}</p>#}
+{#        {% endfor %}#}
+{#    </div>#}
+</body>
+</html>
+<script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+<script src="{% static 'plugins/bootstrap-multiselect/bootstrap-multiselect.js' %}"></script>
