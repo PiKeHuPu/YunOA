@@ -4,6 +4,7 @@ from django.views.generic.base import View
 from django.http import HttpResponse
 from django.conf import settings
 
+from adm.migrate_asset import migrate_asset, migrate_asset_flow
 from utils.mixin_utils import LoginRequiredMixin
 from rbac.models import Menu
 from .models import SystemSetup
@@ -25,6 +26,8 @@ class SystemSetupView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
+        migrate_asset()
+        migrate_asset_flow()  # TODO
         ret = Menu.getMenuByRequestUrl(url=request.path_info)
         ret.update(SystemSetup.getSystemSetupLastData())
         return render(request, 'system/tools/system-setup.html', ret)

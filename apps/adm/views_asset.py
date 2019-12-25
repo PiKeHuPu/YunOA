@@ -430,7 +430,8 @@ class AssetUseInfoView(LoginRequiredMixin, View):
         asset_order.asset_id = asset_id
         asset_order.quantity = use_quantity
         asset_order.purpose = request.POST.get('title')
-        asset_order.return_date = request.POST.get('use_time')
+        if request.POST.get('use_time'):
+            asset_order.return_date = request.POST.get('use_time')
         asset_order.status = '0'
         asset_order.use_status = '0'
         asset_order.type = "0"

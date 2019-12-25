@@ -19,7 +19,8 @@ def migrate_asset():
         new_asset.remark = old_asset.desc
         new_asset.operator = User.objects.get(name=old_asset.operator)
         new_asset.department = Structure.objects.get(title='内蒙古云谷电力科技股份有限公司')
-        new_asset.warehouse_id = '3'
+        new_asset.warehouse_id = '3'  #TODO
+        new_asset.is_no_approve = True
         new_asset.save()
 
 def migrate_asset_flow():
