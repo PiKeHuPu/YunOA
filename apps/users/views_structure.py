@@ -166,7 +166,7 @@ class StructureAssetAdmView(LoginRequiredMixin, View):
         ret = dict()
         id0 = request.GET.get("id")
         department = Structure.objects.get(id=id0)
-        users = department.userprofile_set.all()
+        users = department.userprofile_set.filter(is_active='1')
         approver = User.objects.filter(is_active='1')
         ret['department'] = department
         ret['users'] = users

@@ -26,8 +26,6 @@ class SystemSetupView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        migrate_asset()
-        migrate_asset_flow()  # TODO
         ret = Menu.getMenuByRequestUrl(url=request.path_info)
         ret.update(SystemSetup.getSystemSetupLastData())
         return render(request, 'system/tools/system-setup.html', ret)
