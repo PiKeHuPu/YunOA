@@ -11,12 +11,13 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
 from bulletin.models import Bulletin
+from users.models import UserProfile
 from utils.mixin_utils import LoginRequiredMixin
 from rbac.models import Menu
 from system.models import SystemSetup
 from .forms import ImageUploadForm, UserUpdateForm
 from users.forms import AdminPasswdChangeForm
-from .models import WorkOrder, BusinessApply
+from .models import WorkOrder, BusinessApply, FeeType
 from adm.models import Asset, AssetType, AssetApproveDetail, AssetInfo
 from .models import WorkOrder, BusinessApply, Advise
 from adm.models import Asset, AssetType
@@ -86,7 +87,91 @@ class PersonalView(LoginRequiredMixin, View):
         user_id = request.session.get("_auth_user_id")
         asset_approve_num = len(AssetApproveDetail.objects.filter(approver_id=user_id, is_pass=None))
         ret['asset_approve_num'] = asset_approve_num
+
+        #个人报表
+        feeid = []
+        manid = UserProfile.objects.filter(name=request.user)[0].id
+        exist = WorkOrder.objects.filter(cretor_id=manid)
+        if len(exist) == 0:
+            ret.update({
+                'status': '请提交工单在使用'
+            })
+        else:
+            for x in exist:
+                if x.feeid_id not in feeid and x.feeid_id !=None:
+                    feeid.append(x.feeid_id)
+
+            if len(feeid) == 0:
+                ret['status'] = '你的工单里还没有使用费用类型的工单'
+            else:
+                feetype = []
+                allcost = []
+                for x in feeid:
+                    li = FeeType.objects.filter(fee_id=x)
+                    if li[0].fee_type not in feetype:
+                        feetype.append(li[0].fee_type)
+                for x in feeid:
+                    cost = 0
+                    li = WorkOrder.objects.filter(feeid_id=x, cretor_id=manid)
+                    for y in li:
+                        cost += float(y.cost)
+                    allcost.append(cost)
+                perdata = []
+                for x in range(len(allcost)):
+                    dic = {}
+                    dic['value'] = allcost[x]
+                    dic['name'] = feetype[x]
+                    perdata.append(dic)
+                ret.update({
+                    'feetype': feetype,
+                    'perdata': perdata
+                })
+
         return render(request, 'personal/personal_index.html', ret)
+
+    def post(self, request):
+        ret = {}
+        parafeeid = []
+        parafeetype = []
+        paraallcost = []
+        paradata = []
+        if request.POST.get("start_time") and request.POST.get("end_time"):
+            start_time = request.POST.get("start_time")
+            end_time = request.POST.get("end_time")
+            manid = UserProfile.objects.filter(name=request.user)[0].id
+            exist = WorkOrder.objects.filter(cretor_id=manid)
+            if len(exist) == 0:
+                ret['status'] = 'fail0'
+                ret['errors_info'] = '请提交工单使用'
+            else:
+                li = WorkOrder.objects.filter(create_time__range=(start_time, end_time),cretor_id=manid)
+                for x in li:
+                    if x.feeid_id not in parafeeid and x.feeid_id != None:
+                        parafeeid.append(x.feeid_id)
+                if len(parafeeid) == 0:
+                    ret['status'] = 'fail'
+                    ret['errors_info'] = '该时间段内没有使用费用类型'
+                else:
+                    for x in parafeeid:
+                        li = FeeType.objects.filter(fee_id=x)
+                        if li[0].fee_type not in parafeetype:
+                            parafeetype.append(li[0].fee_type)
+                    for x in parafeeid:
+                        cost = 0
+                        li = WorkOrder.objects.filter(feeid=x, cretor_id=manid)
+                        for y in li:
+                            cost += float(y.cost)
+                        paraallcost.append(cost)
+                    for x in range(len(paraallcost)):
+                        dic = {}
+                        dic['value'] = paraallcost[x]
+                        dic['name'] = parafeetype[x]
+                        paradata.append(dic)
+                    ret.update({
+                        'paradata': paradata,
+                        'parafeetype': parafeetype
+                    })
+        return HttpResponse(json.dumps(ret), content_type='application/json')
 
 
 class UserInfoView(LoginRequiredMixin, View):

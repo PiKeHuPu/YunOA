@@ -7,7 +7,9 @@
 
     <section class="content-header">
         <h1 style="font-family: 楷体; font-size: 30px; margin-left: 15px">
-            我的工作台 &nbsp;<button type="button" class="btn btn-success" onclick="window.open('{% url "direction" %}')" style="font-size: 18px">操作说明</button>
+            我的工作台 &nbsp;<button type="button" class="btn btn-success" onclick="window.open('{% url "direction" %}')"
+                                style="font-size: 18px">操作说明
+        </button>
         </h1>
 
         <ol class="breadcrumb">
@@ -18,16 +20,22 @@
 
     <section class="content">
 
-{#        新我的工作台页面#}
+        {#        新我的工作台页面#}
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
-            <div class="small-box" style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #3ce6e9, #15c1cc)">
-                <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">查看我的申请</p>
-                <div class="inner" >
+            <div class="small-box"
+                 style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #3ce6e9, #15c1cc)">
+                <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">
+                    查看我的申请</p>
+                <div class="inner">
                     <a href="/personal/workorder_Icrt/?type=0"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='#ff9d9d'" onmouseout="this.style.color='white'">立项申请</p></a>
+                       class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体"
+                                                   onmouseover="this.style.color='#ff9d9d'"
+                                                   onmouseout="this.style.color='white'">立项申请</p></a>
                     <a href="/personal/workorder_Icrt/?type=1"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='#ff9d9d'" onmouseout="this.style.color='white'">出差申请</p></a>
+                       class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体"
+                                                   onmouseover="this.style.color='#ff9d9d'"
+                                                   onmouseout="this.style.color='white'">出差申请</p></a>
                 </div>
                 <div class="icon" style="margin-top: 40px">
                     <i class="fa fa-pencil"></i>
@@ -37,13 +45,19 @@
 
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
-            <div class="small-box" style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #ffbd47, #ee7b1e)">
-                <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">查看我的报销</p>
+            <div class="small-box"
+                 style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #ffbd47, #ee7b1e)">
+                <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">
+                    查看我的报销</p>
                 <div class="inner">
                     <a href="/personal/workorder_ap_cost/?type=0"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">立项报销</p></a>
+                       class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体"
+                                                   onmouseover="this.style.color='lightblue'"
+                                                   onmouseout="this.style.color='white'">立项报销</p></a>
                     <a href="/personal/workorder_ap_cost/?type=1"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">出差报销</p></a>
+                       class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体"
+                                                   onmouseover="this.style.color='lightblue'"
+                                                   onmouseout="this.style.color='white'">出差报销</p></a>
                 </div>
                 <div class="icon" style="margin-top: 40px">
                     <i class="fa fa-pencil"></i>
@@ -53,13 +67,21 @@
 
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
-            <div class="small-box" style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #c29cff, #6d22ff)">
-                <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">审批申请</p>
+            <div class="small-box"
+                 style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #c29cff, #6d22ff)">
+                <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">
+                    审批申请</p>
                 <div class="inner">
                     <a href="/personal/workorder_app/?type=0"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">立项申请：{{ work_order_lx }}</p></a>
+                       class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体"
+                                                   onmouseover="this.style.color='lightblue'"
+                                                   onmouseout="this.style.color='white'">立项申请：{{ work_order_lx }}</p>
+                    </a>
                     <a href="/personal/workorder_app/?type=1"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">出差申请：{{ work_order_cc }}</p></a>
+                       class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体"
+                                                   onmouseover="this.style.color='lightblue'"
+                                                   onmouseout="this.style.color='white'">出差申请：{{ work_order_cc }}</p>
+                    </a>
                 </div>
                 <div class="icon" style="margin-top: 40px">
                     <i class="fa fa-check"></i>
@@ -69,13 +91,19 @@
 
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
-            <div class="small-box" style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #ff71a8, #ff3a72)">
-                <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">审批报销</p>
+            <div class="small-box"
+                 style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #ff71a8, #ff3a72)">
+                <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">
+                    审批报销</p>
                 <div class="inner">
                     <a href="/personal/workorder_ap_cost_app/?type=0"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">立项报销：{{ apply_lx }}</p></a>
+                       class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体"
+                                                   onmouseover="this.style.color='lightblue'"
+                                                   onmouseout="this.style.color='white'">立项报销：{{ apply_lx }}</p></a>
                     <a href="/personal/workorder_ap_cost_app/?type=1"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">出差报销：{{ apply_cc }}</p></a>
+                       class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体"
+                                                   onmouseover="this.style.color='lightblue'"
+                                                   onmouseout="this.style.color='white'">出差报销：{{ apply_cc }}</p></a>
                 </div>
                 <div class="icon" style="margin-top: 40px">
                     <i class="fa fa-check"></i>
@@ -87,13 +115,21 @@
 
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
-            <div class="small-box" style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #ff8a74, #ff1f1a)">
-                <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">公告</p>
+            <div class="small-box"
+                 style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #ff8a74, #ff1f1a)">
+                <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">
+                    公告</p>
                 <div class="inner">
                     <a href="#" data-toggle="control-sidebar" onclick="getBulletin()"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">公告数量：{{ bulletin_amount }}</p></a>
+                       class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体"
+                                                   onmouseover="this.style.color='lightblue'"
+                                                   onmouseout="this.style.color='white'">公告数量：{{ bulletin_amount }}</p>
+                    </a>
                     <a href="#" data-toggle="control-sidebar" onclick="getBulletin()"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">未读数量：{{ unread_bulletin_num }}</p></a>
+                       class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体"
+                                                   onmouseover="this.style.color='lightblue'"
+                                                   onmouseout="this.style.color='white'">
+                        未读数量：{{ unread_bulletin_num }}</p></a>
                 </div>
                 <div class="icon" style="margin-top: 40px">
                     <i class="fa fa-envelope-o"></i>
@@ -104,11 +140,19 @@
         {% if asset or gone_asset %}
             <div class="col-lg-3 col-xs-6">
                 <!-- small box -->
-                <div class="small-box" style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #8187ff, #6b4cff)">
-                    <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">物资续期提醒</p>
+                <div class="small-box"
+                     style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #8187ff, #6b4cff)">
+                    <p class="small-box-footer"
+                       style="font-weight: bolder; height: 35px; font-size: 20px; color: white">物资续期提醒</p>
                     <div class="inner">
-                        <a href="#" class="small-box-footer" onclick="due_asset(0)"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">{{ asset_num }}件即将到期</p></a>
-                        <a href="#" class="small-box-footer" onclick="due_asset(1)"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">{{ gone_asset_num }}件已过期</p></a>
+                        <a href="#" class="small-box-footer" onclick="due_asset(0)"><p
+                                style="font-size:28px; color: white; font-family: 楷体"
+                                onmouseover="this.style.color='lightblue'"
+                                onmouseout="this.style.color='white'">{{ asset_num }}件即将到期</p></a>
+                        <a href="#" class="small-box-footer" onclick="due_asset(1)"><p
+                                style="font-size:28px; color: white; font-family: 楷体"
+                                onmouseover="this.style.color='lightblue'"
+                                onmouseout="this.style.color='white'">{{ gone_asset_num }}件已过期</p></a>
                     </div>
                     <div class="icon" style="margin-top: 40px">
                         <i class="fa fa-bell-o"></i>
@@ -119,13 +163,19 @@
 
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
-            <div class="small-box" style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #86b1f9, #246fb3)">
-                <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">油耗表</p>
+            <div class="small-box"
+                 style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #86b1f9, #246fb3)">
+                <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">
+                    油耗表</p>
                 <div class="inner">
                     <a href="/personal/oilWear/oil/order"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">油耗记录</p></a>
+                       class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体"
+                                                   onmouseover="this.style.color='lightblue'"
+                                                   onmouseout="this.style.color='white'">油耗记录</p></a>
                     <a href="/personal/oilWear/oil/order/statistic"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='lightblue'" onmouseout="this.style.color='white'">油耗统计</p></a>
+                       class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体"
+                                                   onmouseover="this.style.color='lightblue'"
+                                                   onmouseout="this.style.color='white'">油耗统计</p></a>
                 </div>
                 <div class="icon" style="margin-top: 40px">
                     <i class="fa fa-car"></i>
@@ -135,13 +185,20 @@
 
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
-            <div class="small-box" style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #73ee03, #06b600)">
-                <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">物资相关</p>
+            <div class="small-box"
+                 style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #73ee03, #06b600)">
+                <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">
+                    物资相关</p>
                 <div class="inner">
                     <a href="/personal/asset/use/info"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='#d8a7ff'" onmouseout="this.style.color='white'">物资领用</p></a>
+                       class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体"
+                                                   onmouseover="this.style.color='#d8a7ff'"
+                                                   onmouseout="this.style.color='white'">物资领用</p></a>
                     <a href="/personal/approve"
-                                                    class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='#d8a7ff'" onmouseout="this.style.color='white'">物资审批: {{ asset_approve_num }}</p></a>
+                       class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体"
+                                                   onmouseover="this.style.color='#d8a7ff'"
+                                                   onmouseout="this.style.color='white'">
+                        物资审批: {{ asset_approve_num }}</p></a>
                 </div>
                 <div class="icon" style="margin-top: 40px">
                     <i class="fa fa-briefcase"></i>
@@ -151,10 +208,14 @@
 
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
-            <div class="small-box" style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #d4d4d4, #7f7f7f)">
-                <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">意见或建议</p>
+            <div class="small-box"
+                 style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #d4d4d4, #7f7f7f)">
+                <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">
+                    意见或建议</p>
                 <div class="inner">
-                    <a href="#" onclick="feedback()" class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='#060507'" onmouseout="this.style.color='white'">提交反馈</p></a>
+                    <a href="#" onclick="feedback()" class="small-box-footer"><p
+                            style="font-size:28px; color: white; font-family: 楷体"
+                            onmouseover="this.style.color='#060507'" onmouseout="this.style.color='white'">提交反馈</p></a>
                     <p style="font-size:28px; color: rgba(217, 107, 116, 0.0); font-family: 楷体">提交反馈</p>
                 </div>
                 <div class="icon" style="margin-top: 40px">
@@ -163,80 +224,153 @@
             </div>
         </div>
     </section>
+    <div style="width: 50%">
+        <h1 style="font-family: 楷体; font-size: 30px; margin-left: 15px">报表</h1>
+        <form class="form-inline" id="queryForm">
+            <div class="form-group searchArea margin-r-5 margin-top-5">
+                <label>开始日期：</label>
+                <input class="form-control timepick" name="start_time" id="start_time" type="text"
+                       autocomplete="off"/>
+            </div>
+            <div class="form-group searchArea margin-r-5 margin-top-5">
+                <label>结束日期：</label>
+                <input class="form-control timepick" name="end_time" id="end_time" type="text" autocomplete="off"/>
+            </div>
+            <button type="button" id="btnWorkorderSearch" class="btn btn-default">
+                <i class="glyphicon glyphicon-search"></i>查询
+            </button>
+        </form>
+    </div>
+    <div id="content">
+        <div id="chanpin2">
+            <div id="main3" class="chart" style="width: 60vw;height: 300px;"></div>
+        </div>
+    </div>
 
 {% endblock %}
 
 {% block javascripts %}
+    <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
     <script type="text/javascript" src="{% static 'plugins/echarts/echarts.min.js' %}"></script>
-    <script type="text/javascript">
-        $(function () {
-            $('#index').addClass('active');
+    <script>
+            var myChart3 = echarts.init(document.getElementById('main3'));
+            var option3 = {
+                title: {
+                    text: '总花销',
+                    subtext: ' ',
+                    x: 'center'
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left',
+                    data: {{ feetype|safe }}
+                },
+                series: [
+                    {
+                        name: '访问来源',
+                        type: 'pie',
+                        radius: '55%',
+                        center: ['50%', '60%'],
+                        data:{{ perdata|safe }},
+                        itemStyle: {
+                            emphasis: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            myChart3.setOption(option3);
+    </script>
+    <script>
+        $(".timepick").datetimepicker({
+            format: 'yyyy-mm-dd',
+            language: 'zh',
+            autoclose: 1,
+            forceParse: 0,
+            minView: 2,
         });
 
-
-        //echarts
-        var bar_dom = document.getElementById("bar_container");
-        var myBarChart = echarts.init(bar_dom);
-        option = null;
-        option = {
-            title: {
-                text: '月度工单统计',
-                subtext: ''
-            },
-            tooltip: {
-                trigger: 'axis'
-            },
-            legend: {
-                data: [{% for data in month_work_order_count %}'{{ data.name }}',{% endfor %}]
-            },
-            toolbox: {
-                show: true,
-                feature: {
-                    dataView: {show: true, readOnly: false},
-                    saveAsImage: {show: true}
+        $("#btnWorkorderSearch").click(function () {
+            if ($("#start_time").val() == '' && $("#end_time").val() == '') {
+                alert('起始时间或结束时间不能为空')
+            } else if ($("#start_time").val() > $("#end_time").val()) {
+                alert('起始时间不能晚于结束时间')
+            } else {
+                var start_time = $("#start_time").val();
+                var end_time = $("#end_time").val();
+                retdata = {
+                    start_time: start_time,
+                    end_time: end_time
                 }
-            },
-            calculable: true,
-            xAxis: [
-                {
-                    type: 'category',
-                    data: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
-                }
-            ],
-            yAxis: [
-                {
-                    type: 'value'
-                }
-            ],
-            series: [
-                {% for data in month_work_order_count %}
-                    {
-                        name: '{{ data.name }}',
-                        type: 'bar',
-                        data:{{ data.count }},
-                        markPoint: {
-                            data: [
-                                {type: 'max', name: '最大值'},
-                                {type: 'min', name: '最小值'}
-                            ]
-                        },
+                $.ajax({
+                    url: "{% url 'personal' %}",
+                    type: "post",
+                    data: {
+                        "start_time": start_time,
+                        "end_time": end_time
                     },
-                {% endfor %}
-            ]
-        };
+                    dataType: "json",
+                    success: function (d) {
+                        if (d.status == 'fail') {
+                            layer.alert(d.errors_info, {icon: 1})
+                        } else if (d.status == 'fail0'){
+                            layer.alert(d.errors_info, {icon: 1})
+                        }
+                        else{
+                            var myChart3 = echarts.init(document.getElementById('main3'));
+                            var option3 = {
+                                title: {
+                                    text: '花销',
+                                    subtext: ' ',
+                                    x: 'center'
+                                },
+                                tooltip: {
+                                    trigger: 'item',
+                                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                                },
+                                legend: {
+                                    orient: 'vertical',
+                                    left: 'left',
+                                    data: d.parafeetype
+                                },
+                                series: [
+                                    {
+                                        name: '访问来源',
+                                        type: 'pie',
+                                        radius: '55%',
+                                        center: ['50%', '60%'],
+                                        data: d.paradata,
+                                        itemStyle: {
+                                            emphasis: {
+                                                shadowBlur: 10,
+                                                shadowOffsetX: 0,
+                                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                            }
+                                        }
+                                    }
+                                ]
+                            };
+                            myChart3.setOption(option3, true);
+                        }
+                    }
+                })
+            }
+        });
+    </script>
 
-        if (option && typeof option === "object") {
-            myBarChart.setOption(option, true);
-        }
-
-        if (option && typeof option === "object") {
-            myPieChart.setOption(option, true);
-        }
-
+    <script type="text/javascript">
         //图表窗体自适应
         $(window).resize(function () {
-            myBarChart.resize();
-            myPieChart.resize();
+            myChart3.resize();
+
         });
 
         function due_asset(type) {
