@@ -48,6 +48,7 @@
             text-decoration:none;
             color: #0c0c0c;
         }
+
     </style>
 </head>
 <body>
@@ -56,9 +57,13 @@
 <div class="fixedBox"
      style="z-index:10;width:185px;height:80vh;position:fixed;right:40px;top:50px;background:#f0ffe5;overflow-x: hidden; overflow-y:auto">
     <ul href="#title">
-        <a href="#title">OA系统使用方法</a>
-        <li style="font-size: 18px">立项及相关功能使用</li>
+        <a href="#title">OA平台操作说明</a>
         <ul>
+            <li style="">
+                <a href="#title">
+                    提交申请流程
+                </a>
+            </li>
             <li style="">
                 <a href="#lxsqsyff  ">
                     新增立项申请
@@ -135,12 +140,9 @@
 </div>
 <div class="xbox" style="width:80%;top: 20px;right:200px">
     <div class="inbox" id="title" style="margin-left: 15px">
-        <h3>云谷办公平台使用方法</h3>
-        <p>云谷办公平台的网址为：http://39.104.118.239:9090</p>
-    </div>
-    <div class="usebox" style="margin-left: 15px">
-        <h3>本页面使用方法</h3>
-        <p>本页面图片点击可以放大，再次点击取消放大，右侧导航栏可以点击进行跳转</p>
+        <h1 style="text-align: center">云谷办公平台操作说明</h1>
+        <h3 style="text-align: center">http://39.104.118.239:9090</h3>
+        <p style="text-align: center">图片可点击放大，点击右侧导航栏跳转到相关内容</p>
     </div>
     <div class="inbox" id="lxsq" style="margin-left: 15px">
         <h3>立项申请的使用方法</h3>
@@ -270,8 +272,6 @@
     <script src="{% static 'plugins/fileinput/fileinput.js' %}"></script>
     <script src="{% static 'plugins/fileinput/zh.js' %}"></script>
     <script src="{% static 'js/vue-2.6.10.js' %}"></script>
-
-
 <script>
     var imgsObj = $('.amplifyImg img');//需要放大的图像
     if (imgsObj) {
