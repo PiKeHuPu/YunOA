@@ -254,6 +254,42 @@
     <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
     <script type="text/javascript" src="{% static 'plugins/echarts/echarts.min.js' %}"></script>
     <script>
+            var myChart3 = echarts.init(document.getElementById('main3'));
+            var option3 = {
+                title: {
+                    text: '总花销',
+                    subtext: ' ',
+                    x: 'center'
+                },
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                },
+                legend: {
+                    orient: 'vertical',
+                    left: 'left',
+                    data: {{ feetype|safe }}
+                },
+                series: [
+                    {
+                        name: '访问来源',
+                        type: 'pie',
+                        radius: '55%',
+                        center: ['50%', '60%'],
+                        data:{{ perdata|safe }},
+                        itemStyle: {
+                            emphasis: {
+                                shadowBlur: 10,
+                                shadowOffsetX: 0,
+                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            }
+                        }
+                    }
+                ]
+            };
+            myChart3.setOption(option3);
+    </script>
+    <script>
         $(".timepick").datetimepicker({
             format: 'yyyy-mm-dd',
             language: 'zh',
@@ -285,7 +321,10 @@
                     success: function (d) {
                         if (d.status == 'fail') {
                             layer.alert(d.errors_info, {icon: 1})
-                        } else {
+                        } else if (d.status == 'fail0'){
+                            layer.alert(d.errors_info, {icon: 1})
+                        }
+                        else{
                             var myChart3 = echarts.init(document.getElementById('main3'));
                             var option3 = {
                                 title: {
@@ -326,50 +365,12 @@
             }
         });
     </script>
-    <script>
-        (function () {
-            var myChart3 = echarts.init(document.getElementById('main3'));
-            var option3 = {
-                title: {
-                    text: '总花销',
-                    subtext: ' ',
-                    x: 'center'
-                },
-                tooltip: {
-                    trigger: 'item',
-                    formatter: "{a} <br/>{b} : {c} ({d}%)"
-                },
-                legend: {
-                    orient: 'vertical',
-                    left: 'left',
-                    data: {{ feetype|safe }}
-                },
-                series: [
-                    {
-                        name: '访问来源',
-                        type: 'pie',
-                        radius: '55%',
-                        center: ['50%', '60%'],
-                        data:{{ perdata|safe }},
-                        itemStyle: {
-                            emphasis: {
-                                shadowBlur: 10,
-                                shadowOffsetX: 0,
-                                shadowColor: 'rgba(0, 0, 0, 0.5)'
-                            }
-                        }
-                    }
-                ]
-            };
-            myChart3.setOption(option3);
-        })()
 
-    </script>
     <script type="text/javascript">
         //图表窗体自适应
         $(window).resize(function () {
-            myBarChart.resize();
-            myPieChart.resize();
+            myChart3.resize();
+
         });
 
         function due_asset(type) {
