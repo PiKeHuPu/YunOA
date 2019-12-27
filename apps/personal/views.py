@@ -173,7 +173,7 @@ class PhoneBookView(LoginRequiredMixin, View):
 class Direction(View):
 
     def get(self, request):
-        return render(request, 'direction.html')
+        return render(request, 'direction0.html')
 
     def post(self, request):
         ret = dict()
@@ -250,3 +250,12 @@ class DueAssetView(LoginRequiredMixin, View):
             ret['asset'] = asset
             ret['asset_num'] = len(asset)
         return render(request, "adm/asset/due_asset.html", ret)
+
+
+class FeedbackView(LoginRequiredMixin, View):
+    """
+    意见反馈
+    """
+    def get(self, request):
+        ret = dict()
+        return render(request, "feedback.html", ret)
