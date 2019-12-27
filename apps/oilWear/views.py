@@ -309,9 +309,9 @@ class OilStatisticView(LoginRequiredMixin, View):
                     weight += i['weight']
                     amount += i['amount']
 
+                weight = round(weight, 2)
                 if weight % 1 == 0:
                     weight = int(weight)
-
                 if amount % 1 == 0:
                     amount = int(amount)
 

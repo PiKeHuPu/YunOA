@@ -22,15 +22,17 @@ import xadmin
 from apps.users.views_user import LoginView, IndexView, LogoutView
 from personal.views import Direction,Check
 from system.views import SystemView
-from adm.views import AdmView, DepartmentManageView, DepartmentCreateView, DepartmentDeleteView, WarehouseView, \
-    WarehouseCreateView, WarehouseDeleteView, AssetView, AssetCreateView, AssetAjaxView
+from adm.views import AdmView, WarehouseView, \
+    WarehouseCreateView, WarehouseDeleteView, AssetView, AssetCreateView, AssetAjaxView, AssetUseFlowView, \
+    AssetApplyView, AssetApproveView, AssetApproveresultView, AssetApproveHistoryView, AssetOrderDetailView, \
+    AssetTransferView
 from oilWear.views import OilOrderCreateView
 from personal import views as personal_views
 from personal import views_work_order as order
 from adm.views_asset import AssetUseHtmlView, AssetUseInfoView, AssetBackView
 from bulletin import views as bulletin_views
 from oilWear import views as oilWear_views
-
+from users.views_structure import StructureAssetAdmView
 
 urlpatterns = [
     url(r'^xadmin/', xadmin.site.urls),
@@ -55,17 +57,22 @@ urlpatterns = [
     url(r'^adm/bsm/', include('adm.urls', namespace='adm-bsm')),
     url(r'^adm/equipment/', include('adm.urls_equipment', namespace='adm-equipment')),
     url(r'^adm/asset/', include('adm.urls_asset', namespace='adm-asset')),
-    url(r'^adm/department', DepartmentManageView.as_view(), name='adm-department'),
-    url(r'^adm/create', DepartmentCreateView.as_view(), name='adm-department-create'),
-    url(r'^adm/delete', DepartmentDeleteView.as_view(), name='adm-department-delete'),
+    url(r'^adm/department', StructureAssetAdmView.as_view(), name='adm-department'),
+    url(r'^personal/approve/history', AssetApproveHistoryView.as_view(), name='personal-approve-history'),
+    url(r'^personal/apply/detail', AssetOrderDetailView.as_view(), name='personal-apply-detail'),
     url(r'^adm/warehouse', WarehouseView.as_view(), name='adm-warehouse'),
     url(r'^adm/whCreate', WarehouseCreateView.as_view(), name='adm-warehouse-create'),
     url(r'^adm/whDelete', WarehouseDeleteView.as_view(), name='adm-warehouse-delete'),
     url(r'^adm/n_asset', AssetView.as_view(), name='adm-n-asset'),
     url(r'^adm/n_create', AssetCreateView.as_view(), name='adm-n-create'),
     url(r'^adm/ajax', AssetAjaxView.as_view(), name='adm-ajax'),
+    url(r'^adm/use_flow', AssetUseFlowView.as_view(), name='adm-useflow'),
+    url(r'^personal/apply', AssetApplyView.as_view(), name='personal-apply'),
+    url(r'^personal/approve/result', AssetApproveresultView.as_view(), name='personal-approve-result'),
+    url(r'^personal/approve', AssetApproveView.as_view(), name='personal-approve'),
+    url(r'^personal/transfer', AssetTransferView.as_view(), name='personal-transfer'),
     # 工作台模块
-    ## 审批报销
+    # 审批报销
     url(r'^personal/$', personal_views.PersonalView.as_view(), name="personal"),
     url(r'^personal/userinfo', personal_views.UserInfoView.as_view(), name="personal-user_info"),
     url(r'^personal/uploadimage', personal_views.UploadImageView.as_view(), name="personal-uploadimage"),
@@ -139,4 +146,6 @@ urlpatterns = [
     url(r'system/bulletin/unread_bulletin$', bulletin_views.UnreadBulletinView.as_view(), name="unread_bulletin"),
     # 物资续期提醒
     url(r'due_asset', personal_views.DueAssetView.as_view(), name="due_asset"),
+    # 意见反馈
+    url(r'feedback', personal_views.FeedbackView.as_view(), name="feedback"),
 ]

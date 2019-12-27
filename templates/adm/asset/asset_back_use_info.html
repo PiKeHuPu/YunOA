@@ -21,51 +21,50 @@
                         <input class="form-control" name="id" type="hidden" value="{{ asset.id }}"/>
                         <label class="col-sm-2 control-label">资产编号</label>
                         <div class="col-sm-3">
-                            <input class="form-control" name="assetNum" type="text" value="{{ asset.assetNum }}"
+                            <input class="form-control" name="assetNum" type="text" value="{{ asset_order.asset.number }}"
                                    disabled="1"/>
                         </div>
                         <label class="col-sm-2 control-label">仓库</label>
                         <div class="col-sm-3">
                             <select class="form-control select2" style="width:100%;" name="assetType" disabled="1">
-                                <option value="{{ asset.assetType_id }}">{{ asset.assetType.name }}</option>
-                                {% for type in asset_type %}
-                                    <option value="{{ type.id }}">{{ type.name }}</option>
-                                {% endfor %}
+                                <option value="{{ asset_order.asset.warehouse_id }}">{{ asset_order.asset.warehouse.name }}</option>
                             </select>
                         </div>
                     </div>
                     <div class="form-group has-feedback">
                         <label class="col-sm-2 control-label">名称</label>
                         <div class="col-sm-3">
-                            <input class="form-control" name="brand" type="text" value="{{ asset.brand }}"
-                                   disabled="1"/>
+                            <input class="form-control" name="brand" type="text" value="{{ asset_order.asset.name }}" disabled="1"/>
                         </div>
                         <label class="col-sm-2 control-label">型号</label>
                         <div class="col-sm-3">
-                            <input class="form-control" name="model" type="text" value="{{ asset.model }}"
-                                   disabled="1"/>
+                            <input class="form-control" name="model" type="text" value="{{ asset_order.asset.type }}" disabled="1"/>
                         </div>
-
-
                     </div>
                     <div class="form-group has-feedback">
                         <label class="col-sm-2 control-label">领用数量</label>
                         <div class="col-sm-3">
                             <div class="input-group">
-                                <input class="form-control" name="assetCount" type="Number" min="1" disabled="1"
-                                       max="{{ asset_use.useCount }}" value="{{ asset_use.useCount }}"/>
-                                <span class="input-group-addon">{{ asset.assetUnit }}</span>
+                                <input class="form-control" name="assetCount" type="Number" min="1" disabled="1" max="{{ asset_order.quantity }}" value="{{ asset_order.quantity }}"/>
+                                <span class="input-group-addon">{{ asset_order.asset.unit }}</span>
                             </div>
                         </div>
 
+                        <label class="col-sm-2 control-label">已归还数量</label>
+                        <div class="col-sm-3">
+                            <div class="input-group">
+                                <input class="form-control" name="assetCount" type="Number" min="1" disabled="1" max="{{ asset_order.return_quantity }}" value="{{ asset_order.return_quantity }}"/>
+                                <span class="input-group-addon">{{ asset_order.asset.unit }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
                         <label class="col-sm-2 control-label">归还数量</label>
                         <div class="col-sm-3">
                             <div class="input-group">
-                                <input class="form-control" name="assetCount" type="Number" min="0" id="backCount"
-                                       max="{{ asset_use.useCount }}" value="{{ asset_use.useCount }}"/>
-                                <span class="input-group-addon">{{ asset.assetUnit }}</span>
+                                <input class="form-control" name="assetCount" type="Number" min="0" id="backCount" max="{{ back_count }}" value="{{ back_count }}"/>
+                                <span class="input-group-addon">{{ asset_order.asset.unit }}</span>
                             </div>
-
                         </div>
                     </div>
                 </fieldset>
@@ -93,24 +92,24 @@
                 layer.alert("归还数量不能为空", {icon: 5});
                 return
             }
-            var useCount = Number({{ asset_use.useCount }});
+            var useCount = Number({{ asset_order.quantity }});
             var backCount = Number($("#backCount").val());
             if (backCount < 0) {
                 layer.alert("归还数量为正整数", {icon: 5});
                 return
             }
-            if (backCount > useCount) {
-                layer.alert("归还数量超出领用数量({{ asset_use.useCount }})", {icon: 5});
+            if (backCount > {{ back_count }}) {
+                layer.alert("归还数量超出领用数量({{ asset_order.quantity }})", {icon: 5});
                 return
             }
             var data = {
-                id: {{ asset_use.id }},
+                id: {{ asset_order.id }},
                 backCount: backCount
             };
             $.ajax({
                 type: "POST",
                 url: "{% url 'personal-asset-use-back' %}",
-                data: JSON.stringify(data),
+                data: data,
                 cache: false,
                 success: function (msg) {
                     if (msg.status == 'success') {
@@ -129,7 +128,7 @@
         $("#btnCancel").click(function () {
             window.location.reload();
 
-        })
+        });
 
 
         // select2

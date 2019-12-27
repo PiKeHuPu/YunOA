@@ -8,10 +8,12 @@ from django.http import HttpResponse
 from django.contrib.auth import get_user_model
 from django.core.serializers.json import DjangoJSONEncoder
 
+from adm.views import department_admin, warehouse_admin
 from utils.mixin_utils import LoginRequiredMixin
 from rbac.models import Menu
 from system.models import SystemSetup
-from .models import Asset, AssetType, AssetLog, AssetUseLog, AssetFile, AssetUseAddress
+from .models import Asset, AssetType, AssetLog, AssetUseLog, AssetFile, AssetUseAddress, AssetInfo, AssetWarehouse, \
+    AssetApprove, AssetApproveDetail
 from .forms import AssetCreateForm, AssetUpdateForm, AssetUploadForm
 from rbac.models import Role
 from datetime import datetime
@@ -37,27 +39,39 @@ class AssetView(LoginRequiredMixin, View):
         return render(request, 'adm/asset/asset.html', ret)
 
 
+##
 class AssetListView(LoginRequiredMixin, View):
     """
     资产获取list
     """
 
     def get(self, request):
-        fields = ['assetNum', 'assetType__name', 'brand', 'model', 'status', 'assetCount', 'assetUnit', 'operator',
-                  'add_time', 'id', 'dueDate', 'dueremind']
-        filters = dict()
+        user_id = request.session.get("_auth_user_id")
+        user = User.objects.get(id=user_id)
+        department = user.department
+        warehouses = department.assetwarehouse_set.filter(is_delete=False)
+        warehouse_id_list = []
+        for w in warehouses:
+            warehouse_id_list.append(w.id)
+        all_view_warehouse = AssetWarehouse.objects.filter(is_all_view=True)
+        for w in all_view_warehouse:
+            warehouse_id_list.append(w.id)
 
+        fields = ['id', 'warehouse__name', 'number', 'name', 'quantity', 'status', 'unit', 'type', 'remark']
+        filters = dict()
+        filters['is_delete'] = False
+        filters['warehouse_id__in'] = warehouse_id_list
         if 'assetNum' in request.GET and request.GET['assetNum']:
-            filters['assetNum__icontains'] = request.GET['assetNum']
-        if 'assetType' in request.GET and request.GET['assetType']:
-            filters['assetType'] = request.GET['assetType']
+            filters['number__icontains'] = request.GET['assetNum']
+        if 'warehouse' in request.GET and request.GET['warehouse']:
+            filters['warehouse_id'] = request.GET['warehouse']
         if 'model' in request.GET and request.GET['model']:
-            filters['model__icontains'] = request.GET['model']
+            filters['type__icontains'] = request.GET['model']
         if 'status' in request.GET and request.GET['status']:
             filters['status'] = request.GET['status']
         if 'brand' in request.GET and request.GET['brand']:
-            filters['brand'] = request.GET['brand']
-        ret = dict(data=list(Asset.objects.filter(**filters).values(*fields).order_by("-add_time")))
+            filters['name'] = request.GET['brand']
+        ret = dict(data=list(AssetInfo.objects.filter(**filters).values(*fields).order_by("status")))
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
 
 
@@ -150,12 +164,10 @@ class AssetDetailView(LoginRequiredMixin, View):
     def get(self, request):
         ret = dict()
         if 'id' in request.GET and request.GET['id']:
-            asset = get_object_or_404(Asset, pk=request.GET.get('id'))
-            asset_log = asset.assetlog_set.all()
-            asset_file = asset.assetfile_set.all()
+            asset = get_object_or_404(AssetInfo, pk=request.GET.get('id'))
+            asset_log = asset.asseteditflow_set.all()
             ret['asset'] = asset
             ret['asset_log'] = asset_log
-            ret['asset_file'] = asset_file
         return render(request, 'adm/asset/asset_detail.html', ret)
 
 
@@ -199,22 +211,20 @@ class AssetUseFlowListView(LoginRequiredMixin, View):
     """
     领取资产信息获取list
     """
-
     def get(self, request):
-        fields = ['asset__assetNum', 'asset__assetType__name', 'asset__brand', 'asset__model', 'asset__status','useCount', 'asset__assetUnit', 'operator', 'add_time', 'area','title', 'id', 'party', 'give_back','back_date', 'use_time']
+        user_id = request.session.get("_auth_user_id")
+        department_list = department_admin(user_id)
+        warehouse_list = warehouse_admin(department_list)
+        fields = ['id', 'asset__number', "asset__warehouse__id", 'asset__warehouse__name', 'asset__name', 'asset__type', 'quantity', 'proposer__name', 'create_time', 'return_date', 'purpose', 'use_status', 'status', 'type']
         filters = dict()
-
-        if request.GET.get('assetNum'):
-            filters['asset__assetNum__icontains'] = request.GET['assetNum']
-        if request.GET.get('assetType'):
-            filters['asset__assetType'] = request.GET['assetType']
-        if request.GET.get('party'):
-            filters['party__icontains'] = request.GET['party']
-        if request.GET.get('status'):
-            filters['asset__status'] = request.GET['status']
-        if request.GET.get('asset__brand'):
-            filters['asset__brand'] = request.GET['asset__brand']
-        ret = dict(data=list(AssetUseLog.objects.filter(**filters).values(*fields).order_by("-add_time")))
+        if request.GET.get('asset_number'):
+            filters['asset__number'] = request.GET['asset_number']
+        if request.GET.get('asset_warehouse'):
+            filters['asset__warehouse__id'] = request.GET['asset_warehouse']
+        if request.GET.get('asset_name'):
+            filters['asset__name'] = request.GET['asset_name']
+        filters['asset__warehouse__in'] = warehouse_list
+        ret = dict(data=list(AssetApprove.objects.values(*fields).filter(**filters).order_by("-create_time")))
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
 
 
@@ -334,7 +344,6 @@ class AssetUseView(View):
             use_count = ret_info.get('useCount')
             if use_count:
                 if int(use_count) <= int(asset.assetCount):
-                    # status = asset.get_status_display()  # TODO 状态是否修改
                     asset_use = AssetUseLog()
                     asset_use.asset_id = asset.id
                     asset_use.operator = ret_info.get('operator')
@@ -359,109 +368,149 @@ class AssetUseView(View):
         return HttpResponse(json.dumps(res), content_type='application/json')
 
 
+##
 class AssetUseHtmlView(LoginRequiredMixin, View):
     """
     物资领用页面
     """
 
     def get(self, request):
-        ret = Menu.getMenuByRequestUrl(url=request.path_info)
-        ret.update(SystemSetup.getSystemSetupLastData())
+        ret = dict()
+        user_id = request.session.get('_auth_user_id')
+        user = User.objects.get(id=user_id)
+        department = user.department
+        warehouses = department.assetwarehouse_set.filter(is_delete=False)
+        all_view_warehouses = AssetWarehouse.objects.filter(is_all_view=True)
+        warehouses = warehouses | all_view_warehouses
         status_list = []
         for status in Asset.asset_status:
             status_dict = dict(item=status[0], value=status[1])
             status_list.append(status_dict)
-        asset_types = AssetType.objects.all()
+        ret['warehouses'] = warehouses
         ret['status_list'] = status_list
-        ret['asset_types'] = asset_types
         return render(request, 'adm/asset/asset_use.html', ret)
 
+
+##
 class AssetUseInfoView(LoginRequiredMixin, View):
     """
     领用弹窗填写信息
     """
 
     def get(self, request):
-        ret = Menu.getMenuByRequestUrl(url=request.path_info)
-        if 'id' in request.GET and request.GET['id']:
-            asset = get_object_or_404(Asset, pk=request.GET.get('id'))
-            ret['asset'] = asset
+        ret = dict()
+        id = request.GET.get("id")
+        asset = AssetInfo.objects.get(id=id)
+        ret['asset'] = asset
         return render(request, 'adm/asset/asset_detail_use.html', ret)
 
     def post(self, request):
         res = dict()
-        ret_info = json.loads(request.body)
-        if ret_info.get('id'):
-            asset = Asset.objects.filter(id=ret_info.get('id')).first()
-            use_count = ret_info.get('useCount')
-            use_time = ret_info.get('use_time')
-            if use_count:
-                if int(use_count) <= int(asset.assetCount):
-                    # status = asset.get_status_display()  # TODO 状态是否修改
-                    asset_use = AssetUseLog()
-                    asset_use.asset_id = asset.id
-                    asset_use.operator = request.user.name
-                    asset_use.useCount = use_count
-                    if use_time:
-                        asset_use.use_time = use_time
-                    asset_use.title = ret_info.get('title', '')
-                    asset.assetCount = int(asset.assetCount) - int(use_count)
-                    asset_use.save()
-                    asset.save()
-                    res['status'] = 'success'
-                    res['assetCount'] = asset.assetCount
-                else:
-                    res = {
-                        'status': 'fail',
-                        'errors': '仓库没有这么多数量， 请与仓库部门人联系'
-                    }
+        # 创建相应的在用物资
+        asset_id = request.POST.get('id0')
+        use_quantity = request.POST.get('useCount')
+        asset = AssetInfo.objects.get(id=asset_id)
+        asset.quantity = int(asset.quantity) - int(use_quantity)
+        asset.save()
+        if asset.is_no_return:
+            pass
         else:
-            res = {
-                'status': 'fail',
-                'errors': '登记失败， 请重试'
-            }
+            use_asset = asset
+            use_asset.id = None
+            use_asset.save()
+            use_asset.quantity = int(use_quantity)
+            use_asset.create_time = asset.create_time
+            use_asset.status = '1'
+            use_asset.user_id = request.session.get('_auth_user_id')
+            use_asset.save()
+
+        user_id = request.session.get('_auth_user_id')
+        asset_order = AssetApprove()
+        asset_order.proposer_id = user_id
+        asset_order.asset_id = asset_id
+        asset_order.quantity = use_quantity
+        asset_order.purpose = request.POST.get('title')
+        if request.POST.get('use_time'):
+            asset_order.return_date = request.POST.get('use_time')
+        asset_order.status = '0'
+        asset_order.use_status = '0'
+        asset_order.type = "0"
+        asset_order.save()
+
+        if asset.is_no_approve:
+            pass
+        else:
+            if asset.department.administrator_id:
+                if int(user_id) != int(asset.department.administrator_id):
+                    approve = AssetApproveDetail()
+                    approve.approver_id = asset.department.administrator_id
+                    approve.asset_order_id = asset_order.id
+                    approve.save()
+
+            if asset.department.approver_id:
+                if int(user_id) != int(asset.department.approver_id):
+                    approve = AssetApproveDetail()
+                    approve.approver_id = asset.department.approver_id
+                    approve.asset_order_id = asset_order.id
+                    approve.save()
+
+        if AssetApproveDetail.objects.filter(asset_order=asset_order):
+            pass
+        else:
+            asset_order.status = "2"
+            asset_order.save()
+
+        res['status'] = 'success'
         return HttpResponse(json.dumps(res), content_type='application/json')
 
+
+##
 class AssetBackView(LoginRequiredMixin, View):
     """
     物资归还
     """
 
     def get(self, request):
-        ret = Menu.getMenuByRequestUrl(url=request.path_info)
-        if 'id' in request.GET and request.GET['id']:
-            asset_use = get_object_or_404(AssetUseLog, pk=request.GET.get('id'))
-            ret['asset_use'] = asset_use
-            ret['asset'] = asset_use.asset
+        ret = dict()
+        id = request.GET.get("id")
+        asset_order = AssetApprove.objects.filter(id=id)[0]
+        ret['asset_order'] = asset_order
+        back_count = int(asset_order.quantity) - int(asset_order.return_quantity)
+        ret["back_count"] = back_count
         return render(request, 'adm/asset/asset_back_use_info.html', ret)
 
     def post(self, request):
-        res = dict()
-        ret_info = json.loads(request.body)
-        if ret_info.get('id'):
-            asset_use = AssetUseLog.objects.filter(id=ret_info.get('id')).first()
-            back_count = ret_info.get('backCount')
-            if back_count or back_count==0:
-                if int(back_count) <= int(asset_use.useCount):
-                    # status = asset.get_status_display()  # TODO 状态是否修改
-                    asset_use.back_creator = request.user
-                    asset_use.back_count = back_count
-                    asset_use.back_date = datetime.now()
-                    asset_use.give_back = "1"
-                    asset = asset_use.asset
-                    asset.assetCount = int(asset.assetCount) + int(back_count)
-                    asset_use.save()
-                    asset.save()
-                    res['status'] = 'success'
-                    res['assetCount'] = asset.assetCount
-                else:
-                    res = {
-                        'status': 'fail',
-                        'errors': '领取数量比归还数量少， 请仔细检查'
-                    }
-        else:
-            res = {
-                'status': 'fail',
-                'errors': '登记失败， 请稍后重试'
-            }
-        return HttpResponse(json.dumps(res), content_type='application/json')
+        ret = dict()
+        user_id = request.session.get("_auth_user_id")
+        id = request.POST.get("id")
+        back_count = request.POST.get("backCount")
+        asset_order = AssetApprove.objects.filter(id=id)[0]
+        if int(back_count) + int(asset_order.return_quantity) == int(asset_order.quantity):
+            asset_order.use_status = "2"
+            asset_order.return_operator_id = user_id
+            asset_order.return_quantity = back_count
+            asset_order.t_return_date = datetime.today()
+
+            asset = asset_order.asset
+            asset.quantity += int(back_count)
+            asset.save()
+
+            use_asset = AssetInfo.objects.filter(name=asset_order.asset.name, user_id=asset_order.proposer_id, quantity__lte=asset_order.quantity, warehouse=asset_order.asset.warehouse)[0]
+            use_asset.delete()
+            asset_order.save()
+        elif int(back_count) < int(asset_order.quantity) - int(asset_order.return_quantity):
+            use_asset = AssetInfo.objects.filter(name=asset_order.asset.name, user_id=asset_order.proposer_id, quantity__lte=asset_order.quantity, warehouse=asset_order.asset.warehouse)[0]
+            use_asset.quantity -= int(back_count)
+            use_asset.save()
+
+            asset_order.return_quantity += int(back_count)
+            asset_order.return_operator_id = user_id
+            asset_order.t_return_date = datetime.today()
+            asset_order.save()
+
+            asset = asset_order.asset
+            asset.quantity += int(back_count)
+            asset.save()
+        ret["status"] = "success"
+
+        return HttpResponse(json.dumps(ret), content_type='application/json')

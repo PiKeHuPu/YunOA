@@ -17,17 +17,17 @@
         {% for aa in asset %}
             <div class="col-md-3">
                 <div style="background-image: linear-gradient(to bottom right, #e9fffa, #affff3); opacity: 0.7; box-shadow: 5px 5px 10px #185a80">
-                    <a href="{% url 'adm-asset:update' %}?id={{ aa.id }}">
-                        <h3 style="text-align: center; font-weight: 900; font-size: 25px; padding-top: 10px">{{ aa.brand }}</h3>
-                        <p style="text-align: center">{{ aa.assetNum }}</p>
+                    <a href="{% url 'adm-n-create' %}?id={{ aa.id }}">
+                        <h3 style="text-align: center; font-weight: 900; font-size: 25px; padding-top: 10px">{{ aa.name }}</h3>
+                        <p style="text-align: center">{{ aa.number }}</p>
                         <hr style="background-color: #45beff; margin: 0; height: 10px; border: none"/>
                         <div style="text-align: center; padding-top: 10px; padding-bottom: 10px">
                             <span style="font-weight: bolder">到期时间:</span>
-                            <span>{{ aa.dueDate }}</span>
+                            <span>{{ aa.due_time }}</span>
                         </div>
                         <hr style="background-color: #45beff; margin: 0; height: 10px; border: none"/>
                         <div style="padding-left: 12px; padding-top: 10px; font-weight: bolder; padding-bottom: 10px">
-                            备注：{{ aa.desc }}
+                            备注：{{ aa.remark }}
                         </div>
                     </a>
                 </div>

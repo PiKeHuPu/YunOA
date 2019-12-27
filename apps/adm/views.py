@@ -1,18 +1,30 @@
+import copy
 import json
 
 from django.contrib.auth import get_user_model
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
+from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic.base import View
 
-from adm.models import AssetDepartment, AssetWarehouse, AssetInfo
+from adm import migrate_asset
+from adm.migrate_asset import migrate_asset_flow, create_no_back
+from adm.models import AssetWarehouse, AssetInfo, AssetEditFlow, AssetApprove, AssetApproveDetail
+from users.models import Structure
 from utils.mixin_utils import LoginRequiredMixin
 from rbac.models import Menu, Role
 from system.models import SystemSetup
 
 User = get_user_model()
+
+
+def switch_date_str(str0):
+    str0 = str0.replace("年", "-")
+    str0 = str0.replace("月", "-")
+    str0 = str0.replace("日", "")
+    return str0
 
 
 def department_admin(user_id):
@@ -21,11 +33,11 @@ def department_admin(user_id):
     :param user_id:
     :return:
     """
-    departments = AssetDepartment.objects.filter(is_delete=False, administrator_id=user_id)
+    departments = Structure.objects.filter(administrator_id=user_id)
     if departments:
         for department in departments:
             if department.super_adm:
-                department_list = AssetDepartment.objects.filter(is_delete=False)
+                department_list = Structure.objects.all()
                 break
         else:
             department_list = departments
@@ -59,76 +71,76 @@ class AdmView(LoginRequiredMixin, View):
         return render(request, 'adm/adm_index.html', ret)
 
 
-class DepartmentManageView(LoginRequiredMixin, View):
-    """
-    资产部门管理
-    """
-
-    def get(self, request):
-        ret = dict()
-        assetDepartments = AssetDepartment.objects.filter(is_delete=False)
-        ret["assetDepartments"] = assetDepartments
-        return render(request, "adm/layer/department.html", ret)
-
-
-class DepartmentCreateView(LoginRequiredMixin, View):
-    """
-    创建资产部门
-    """
-
-    def get(self, request):
-        ret = dict()
-        if request.GET.get("id"):
-            assetDepartment = AssetDepartment.objects.get(id=request.GET.get("id"))
-            ret['assetDepartment'] = assetDepartment
-        users = User.objects.filter(is_active=1, is_staff=0)
-        ret['users'] = users
-        return render(request, "adm/layer/department_create.html", ret)
-
-    def post(self, request):
-        ret = dict()
-        department_id = request.POST.get("id")
-        name = request.POST.get("department")
-        administrator = request.POST.get("operator")
-        super_department = request.POST.get("admin").startswith("t")
-
-        if name:
-            if department_id:
-                assetDepartment = AssetDepartment.objects.get(id=department_id)
-            else:
-                assetDepartment = AssetDepartment()
-            assetDepartment.name = name
-            assetDepartment.administrator_id = administrator
-            assetDepartment.super_adm = super_department
-            assetDepartment.save()
-
-            if administrator:
-                role = Role.objects.get(title="仓库管理")
-                user = User.objects.get(id=administrator)
-                role.userprofile_set.add(user)
-            ret['result'] = True
-        else:
-            ret['result'] = False
-        return HttpResponse(json.dumps(ret), content_type='application/json')
+# class DepartmentManageView(LoginRequiredMixin, View):
+#     """
+#     资产部门管理
+#     """
+#
+#     def get(self, request):
+#         ret = dict()
+#         assetDepartments = AssetDepartment.objects.filter(is_delete=False)
+#         ret["assetDepartments"] = assetDepartments
+#         return render(request, "adm/layer/department.html", ret)
 
 
-class DepartmentDeleteView(LoginRequiredMixin, View):
-    """
-    删除资产部门
-    """
-
-    def get(self, request):
-        ret = dict()
-        department_id = request.GET.get("id")
-        assetDepartment = AssetDepartment.objects.get(id=department_id)
-        assetDepartment.is_delete = True
-        warehouses = assetDepartment.assetwarehouse_set.all()
-        for warehouse in warehouses:
-            warehouse.is_delete = True
-            warehouse.save()
-        assetDepartment.save()
-        ret['result'] = True
-        return HttpResponse(json.dumps(ret), content_type='application/json')
+# class DepartmentCreateView(LoginRequiredMixin, View):
+#     """
+#     创建资产部门
+#     """
+#
+#     def get(self, request):
+#         ret = dict()
+#         if request.GET.get("id"):
+#             assetDepartment = AssetDepartment.objects.get(id=request.GET.get("id"))
+#             ret['assetDepartment'] = assetDepartment
+#         users = User.objects.filter(is_active=1, is_staff=0)
+#         ret['users'] = users
+#         return render(request, "adm/layer/department_create.html", ret)
+#
+#     def post(self, request):
+#         ret = dict()
+#         department_id = request.POST.get("id")
+#         name = request.POST.get("department")
+#         administrator = request.POST.get("operator")
+#         super_department = request.POST.get("admin").startswith("t")
+#
+#         if name:
+#             if department_id:
+#                 assetDepartment = AssetDepartment.objects.get(id=department_id)
+#             else:
+#                 assetDepartment = AssetDepartment()
+#             assetDepartment.name = name
+#             assetDepartment.administrator_id = administrator
+#             assetDepartment.super_adm = super_department
+#             assetDepartment.save()
+#
+#             if administrator:
+#                 role = Role.objects.get(title="仓库管理")
+#                 user = User.objects.get(id=administrator)
+#                 role.userprofile_set.add(user)
+#             ret['result'] = True
+#         else:
+#             ret['result'] = False
+#         return HttpResponse(json.dumps(ret), content_type='application/json')
+#
+#
+# class DepartmentDeleteView(LoginRequiredMixin, View):
+#     """
+#     删除资产部门
+#     """
+#
+#     def get(self, request):
+#         ret = dict()
+#         department_id = request.GET.get("id")
+#         assetDepartment = AssetDepartment.objects.get(id=department_id)
+#         assetDepartment.is_delete = True
+#         warehouses = assetDepartment.assetwarehouse_set.all()
+#         for warehouse in warehouses:
+#             warehouse.is_delete = True
+#             warehouse.save()
+#         assetDepartment.save()
+#         ret['result'] = True
+#         return HttpResponse(json.dumps(ret), content_type='application/json')
 
 
 class WarehouseView(LoginRequiredMixin, View):
@@ -211,6 +223,7 @@ class AssetView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
+        # migrate_asset.migrate_asset()
         ret = dict()
         user_id = request.session.get("_auth_user_id")
         department_list = department_admin(user_id)
@@ -256,32 +269,54 @@ class AssetCreateView(LoginRequiredMixin, View):
             ret['asset'] = asset
         department_list = department_admin(user_id)
         ret['department_list'] = department_list
+        ret['none'] = ''
         return render(request, "adm/layer/asset_create.html", ret)
 
     def post(self, request):
         ret = dict()
-        user_id = request.session.get("_auth_user_id")
         try:
-            id = request.POST.get("id")
-            if id:
-                asset = AssetInfo.objects.get(id=id)
+            user_id = request.session.get("_auth_user_id")
+            id0 = request.POST.get("id0")
+            number = request.POST.get("number")
+            if id0:
+                asset = AssetInfo.objects.get(id=id0)
+                if AssetInfo.objects.filter(Q(number=number) & ~Q(id=id0) & Q(is_delete=False)):
+                    ret['asset_form_errors'] = "资产编号已存在"
+                    raise AttributeError
+                asset_edit_flow = AssetEditFlow()
+                asset_edit_flow.asset_id = asset.id
+                asset_edit_flow.operator_id = user_id
+                asset_edit_flow.content = '修改'
+                asset_edit_flow.save()
             else:
                 asset = AssetInfo()
-            asset.number = request.POST.get("number")
-            if AssetInfo.objects.filter(number=request.POST.get("number")):
-                ret['asset_form_errors'] = "资产编号已存在"
-                raise AttributeError
+                if AssetInfo.objects.filter(Q(number=number) & Q(is_delete=False)):
+                    ret['asset_form_errors'] = "资产编号已存在"
+                    raise AttributeError
+            asset.number = number
             asset.name = request.POST.get("name")
             asset.department_id = request.POST.get("department")
             asset.warehouse_id = request.POST.get("warehouse")
             asset.quantity = request.POST.get("quantity")
             asset.operator_id = user_id
-            if request.POST.get("due_time"):
-                asset.due_time = request.POST.get("due_time")
+            if request.POST.get("due_time") and request.POST.get("due_time") != "None":
+                due_time = switch_date_str(request.POST.get("due_time"))
+                print(due_time)
+                asset.due_time = due_time
             asset.unit = request.POST.get("unit")
             asset.type = request.POST.get("type")
             asset.remark = request.POST.get("remark")
+            if request.POST.get("no_approve") == "on":
+                asset.is_no_approve = True
+            if request.POST.get("no_return") == "on":
+                asset.is_no_return = True
             asset.save()
+            if id0 == "":
+                asset_edit_flow = AssetEditFlow()
+                asset_edit_flow.asset_id = asset.id
+                asset_edit_flow.operator_id = user_id
+                asset_edit_flow.content = '创建'
+                asset_edit_flow.save()
             ret['status'] = "success"
         except:
             ret['status'] = "fail"
@@ -298,7 +333,7 @@ class AssetAjaxView(LoginRequiredMixin, View):
         # 根据所选择的部门获取相应的仓库
         department_id = request.GET.get("department_id")
         if department_id:
-            department = AssetDepartment.objects.get(id=department_id)
+            department = Structure.objects.get(id=department_id)
             warehouses = department.assetwarehouse_set.filter(is_delete=False)
             warehouse_list = ""
             for warehouse in warehouses:
@@ -307,7 +342,7 @@ class AssetAjaxView(LoginRequiredMixin, View):
             ret['warehouse_list'] = warehouse_list
 
         # 获取资产列表
-        fields = ['id', 'number', 'name', 'department__name', 'warehouse__name', 'quantity', 'type', 'status', 'unit',
+        fields = ['id', 'number', 'name', 'department__title', 'warehouse__name', 'quantity', 'type', 'status', 'unit',
                   'create_time', 'due_time']
         filter = dict()
         if request.GET.get('number'):
@@ -334,5 +369,253 @@ class AssetAjaxView(LoginRequiredMixin, View):
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
 
 
-# class AssetDeleteView(LoginRequiredMixin, View):
-#     def get(self):
+class AssetUseFlowView(LoginRequiredMixin, View):
+    """
+    领用记录页面
+    """
+
+    def get(self, request):
+        ret = dict()
+        user_id = request.session.get("_auth_user_id")
+        department_list = department_admin(user_id)
+        warehouse_list = warehouse_admin(department_list)
+        ret['warehouse_list'] = warehouse_list
+        return render(request, "adm/layer/asset_useflow.html", ret)
+
+    def post(self, request):
+        ret = dict()
+        try:
+            id = request.POST.get("id")
+            asset_order = AssetApprove.objects.filter(id=id)[0]
+            if asset_order.asset.is_no_return:
+                asset_order.use_status = "3"
+            else:
+                if asset_order.type == "1":
+                    asset_order.use_status = "4"
+                    asset = copy.deepcopy(asset_order.asset)
+                    asset.id = None
+                    asset.save()
+                    asset.quantity = asset_order.quantity
+                    asset.status = "0"
+                    asset.is_delete = False
+                    asset.operator_id = asset_order.proposer_id
+                    asset.department_id = asset_order.transfer_department_id
+                    asset.warehouse_id = asset_order.transfer_warehouse_id
+                    asset.save()
+
+                    use_asset = AssetInfo.objects.filter(name=asset_order.asset.name, user_id=asset_order.proposer_id, quantity__lte=asset_order.quantity, warehouse=asset_order.asset.warehouse)[0]
+                    use_asset.delete()
+                else:
+                    asset_order.use_status = "1"
+            asset_order.save()
+            ret["success"] = True
+        except:
+            ret["success"] = False
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
+
+
+class AssetApplyView(LoginRequiredMixin, View):
+    '''
+    物资申请页面
+    '''
+
+    def get(self, request):
+        ret = dict()
+        user_id = request.session.get('_auth_user_id')
+        asset_order_list = AssetApprove.objects.filter(proposer_id=user_id).order_by('-create_time')
+        ret['asset_order_list'] = asset_order_list
+
+        return render(request, 'adm/layer/asset_order.html', ret)
+
+
+class AssetApproveresultView(LoginRequiredMixin, View):
+    def get(self, request):
+        """
+        审批意见
+        :param request:
+        :return:
+        """
+        ret = dict()
+        id = request.GET.get("id")
+        ps = request.GET.get("ps")
+        ret["id"] = id
+        ret["ps"] = ps
+        return render(request, "adm/layer/approval_opinion.html", ret)
+
+    def post(self, request):
+        '''
+        物资审批ajax
+        '''
+        ret = dict()
+        id = request.POST.get("id")
+        ps = request.POST.get("ps")
+        content = request.POST.get("content")
+
+        asset_approve = AssetApproveDetail.objects.get(id=id)
+        asset_approve.is_pass = ps
+        asset_approve.remark = content
+        asset_approve.save()
+
+        asset_order = asset_approve.asset_order
+        if ps == "0":
+            asset_order.status = "3"
+            asset_order.save()
+            asset_approve = AssetApproveDetail.objects.filter(asset_order=asset_order, is_pass=None)
+            for approve in asset_approve:
+                approve.delete()
+            use_asset = AssetInfo.objects.filter(name=asset_order.asset.name, user_id=asset_order.proposer_id, quantity__lte=asset_order.quantity,warehouse=asset_order.asset.warehouse)[0]
+            asset = asset_order.asset
+            asset.quantity += int(use_asset.quantity)
+            if asset.is_delete:
+                asset.is_delete = False
+            asset.save()
+            use_asset.delete()
+        else:
+            asset_order = asset_approve.asset_order
+            asset_approve_list = AssetApproveDetail.objects.filter(asset_order=asset_order)
+            asset_order_1 = len(asset_approve_list)
+            asset_order_2 = len(AssetApproveDetail.objects.filter(Q(asset_order=asset_order) & ~Q(is_pass=None)))
+            if asset_order_2 > 0:
+                asset_order.status = "1"
+            if asset_order_2 == asset_order_1:
+                for i in asset_approve_list:
+                    if i.is_pass == "0":
+                        asset_order.status = "3"
+                        break
+                else:
+                    asset_order.status = "2"
+            asset_order.save()
+        ret["success"] = True
+
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
+
+
+class AssetApproveView(LoginRequiredMixin, View):
+    """
+    物资审批页面
+    """
+
+    def get(self, request):
+        ret = dict()
+        user_id = request.session.get("_auth_user_id")
+        approve_list = AssetApproveDetail.objects.filter(approver_id=user_id, is_pass=None)
+        ret['approve_list'] = approve_list
+        return render(request, "adm/layer/asset_approve.html", ret)
+
+
+class AssetApproveHistoryView(LoginRequiredMixin, View):
+    """
+    审批历史页面
+    """
+
+    def get(self, request):
+        ret = dict()
+        user_id = request.session.get("_auth_user_id")
+        asset_approve_history_list = AssetApproveDetail.objects.filter(~Q(is_pass=None) & Q(approver_id=user_id)).order_by("-create_time")
+        ret['asset_approve_history_list'] = asset_approve_history_list
+        return render(request, "adm/layer/asset_approve_history.html", ret)
+
+
+class AssetOrderDetailView(LoginRequiredMixin, View):
+    """
+    物资申请详情页面
+    """
+
+    def get(self, request):
+        ret = dict()
+        # user_id = request.session.get("_auth_user_id")
+        id = request.GET.get("id")
+        asset_order = AssetApprove.objects.get(id=id)
+        ret["asset_order"] = asset_order
+        asset_approve_list = asset_order.assetapprovedetail_set.all()
+        ret['asset_approve_list'] = asset_approve_list
+        return render(request, "adm/layer/asset_order_detail.html", ret)
+
+
+class AssetTransferView(LoginRequiredMixin, View):
+    """
+    资产转移
+    """
+    def get(self, request):
+        ret = dict()
+        asset_id = request.GET.get("id")
+        asset = AssetInfo.objects.get(id=asset_id)
+        ret["asset"] = asset
+        user_id = request.session.get("_auth_user_id")
+        department_list = department_admin(user_id)
+        ret["department_list"] = department_list
+        return render(request, "adm/layer/asset_transfer.html", ret)
+
+    def post(self, request):
+        ret = dict()
+        asset_id = request.POST.get("id0")
+        asset = AssetInfo.objects.get(id=asset_id)
+        depatment0 = asset.department
+        depatment1 = Structure.objects.get(id=int(request.POST.get("department1")))
+        warehouse1 = AssetWarehouse.objects.get(id=int(request.POST.get("warehouse1")))
+        administrator0 = depatment0.administrator
+        approver0 = depatment0.approver
+        administrator1 = depatment1.administrator
+        approver1 = depatment1.approver
+
+        # 创建相应的在用物资
+        use_quantity = request.POST.get('quantity')
+        asset.quantity = int(asset.quantity) - int(use_quantity)
+        if int(asset.quantity) == 0:
+            asset.is_delete = True
+        asset.save()
+        use_asset = asset
+        use_asset.id = None
+        use_asset.save()
+        use_asset.create_time = asset.create_time
+        use_asset.quantity = int(use_quantity)
+        use_asset.status = '1'
+        use_asset.user_id = request.session.get('_auth_user_id')
+        use_asset.is_delete = False
+        use_asset.save()
+        user_id = request.session.get('_auth_user_id')
+
+        # 创建记录单
+        asset_order = AssetApprove()
+        asset_order.proposer_id = user_id
+        asset_order.asset_id = asset_id
+        asset_order.quantity = use_quantity
+        asset_order.purpose = "将" + use_quantity + asset.unit + " '" + asset.name + "' 由 '" + asset.department.title + " - " + asset.warehouse.name + "' 仓库转移至 '" + depatment1.title + " - " + warehouse1.name + "' 仓库"
+        asset_order.return_date = request.POST.get('use_time')
+        asset_order.status = '0'
+        asset_order.use_status = '0'
+        asset_order.type = "1"
+        asset_order.transfer_department = depatment1
+        asset_order.transfer_warehouse = warehouse1
+        asset_order.save()
+
+        # 添加审批
+        if administrator0.id:
+            if int(user_id) != int(administrator0.id):
+                approve = AssetApproveDetail()
+                approve.approver_id = administrator0.id
+                approve.asset_order_id = asset_order.id
+                approve.save()
+
+        if approver0.id:
+            if int(user_id) != int(approver0.id):
+                approve = AssetApproveDetail()
+                approve.approver_id = approver0.id
+                approve.asset_order_id = asset_order.id
+                approve.save()
+
+        if administrator1.id:
+            if int(user_id) != int(administrator1.id):
+                approve = AssetApproveDetail()
+                approve.approver_id = administrator1.id
+                approve.asset_order_id = asset_order.id
+                approve.save()
+
+        if approver1.id:
+            if int(user_id) != int(approver1.id):
+                approve = AssetApproveDetail()
+                approve.approver_id = approver1.id
+                approve.asset_order_id = asset_order.id
+                approve.save()
+        ret['status'] = "success"
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")

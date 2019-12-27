@@ -44,7 +44,10 @@ class Structure(models.Model):
     title = models.CharField(max_length=60, verbose_name="名称")
     type = models.CharField(max_length=20, choices=type_choices, default="department", verbose_name="类型")
     parent = models.ForeignKey("self", null=True, blank=True, verbose_name="父类架构")
-    adm_list = models.CharField(max_length=50, null=True, blank=True, verbose_name="部门管理员")
+    adm_list = models.CharField(max_length=50, null=True, blank=True, verbose_name="部门工单管理员")
+    administrator = models.ForeignKey(UserProfile, blank=True, null=True, related_name='asset_admin', on_delete=models.SET_NULL, verbose_name="部门资产管理员")
+    approver = models.ForeignKey(UserProfile, blank=True, null=True, related_name='asset_approver', on_delete=models.SET_NULL, verbose_name="部门资产审批人")
+    super_adm = models.BooleanField(default=False, verbose_name="是否有全部部门管理权限")
 
     class Meta:
         verbose_name = "组织架构"

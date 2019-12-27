@@ -1,184 +1,97 @@
-{% extends "base-left.html" %}
+{% extends 'base-layer.html' %}
 {% load staticfiles %}
 
 {% block css %}
-<link rel="stylesheet" href="{% static 'plugins/datatables/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
 <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
-<!-- iCheck for checkboxes and radio inputs -->
 {% endblock %}
 
-{% block content %}
+{% block main %}
+<div class="box box-danger">
+	<form class="form-horizontal" id="addForm" method="post">
+		{% csrf_token %}
+		<input type="hidden" name='id0' id="id0" value="{{ department.id }}" />
+		<div class="box-body">
+          <fieldset>
+            <div class="form-group has-feedback">
+               <label class="col-sm-2 control-label">物资管理员</label>
+                  <div class="col-sm-3">
+                    <select class="form-control select2" name="operator" id="operator">
+                        <option></option>
+                        {% for user in users %}
+                        <option value={{ user.id }} {% if department.administrator_id == user.id %}selected{% endif %}> {{ user.name }} </option>
+                        {% endfor %}
+                  </select>
+                </div>
 
-<!-- Content Header (Page header) -->
-<section class="content-header margin-bottom">
-  <ol class="breadcrumb">
-    <li><a href=""><i class="fa fa-dashboard"></i>办公平台</a></li>
-    <li class="active"><a href="{{ menu.parent.parent.url }}">基础管理</a></li>
-    <li class="active"><a href="{{ menu.url }}">部门管理</a></li>
-  </ol>
-</section>
-    <!-- Main content -->
-  <section class="content">
-     <div id="devlist">
-        <div class="box box-primary" id="liebiao">
-            <div class="box-header">
-                <div class="btn-group pull-left">
-                    <button type="button" id="btnRefresh" class="btn btn-success">
-                        <i class="glyphicon glyphicon-repeat"></i>刷新
-                    </button>
-                </div>
-                <div class="btn-group pull-left">&nbsp</div>
-                <div class="btn-group pull-left">
-                    <button type="button" id="btnCreate" class="btn btn-primary">
-                        <i class="glyphicon glyphicon-plus"></i>新增
-                    </button>
-                </div>
-            <div class="box-body">
-                <table id="dtbList" class="display" cellspacing="0" width="100%">
-                    <thead>
-                    <tr valign="middle">
-                        <th>ID</th>
-                        <th>部门名称</th>
-                        <th>物资管理员</th>
-                        <th>管理权限</th>
-                        <th>操作</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                </table>
-                <br> <br>
+                <div class="col-sm-3">
+                    <input name="admin" id="admin" type="checkbox" style="zoom: 150%" {% if department.super_adm %}checked{% endif %}/>
+                    <label style="font-size: 17px; font-weight: bolder">所有部门管理权限</label>
                 </div>
             </div>
-        </div>
-     </div>
-  </section>
+              <br>
+              <label class="col-sm-2 control-label">物资审批人</label>
+                  <div class="col-sm-3">
+                    <select class="form-control select2" name="approver" id="approver">
+                        <option></option>
+                        {% for user in approver %}
+                        <option value={{ user.id }} {% if department.approver_id == user.id %}selected{% endif %}> {{ user.name }} </option>
+                        {% endfor %}
+                  </select>
+                </div>
+          </fieldset>
 
-    <!-- /.content -->
+		</div>
+		<div class="box-footer ">
+			<div class="row span7 text-center ">
+              <button type="button" id="btnCancel" class="btn btn-default margin-right " >重置</button>
+              <button type="button" id="btnSave" class="btn btn-info margin-right " >保存</button>
+			</div>
+		</div>
+
+	</form>
+</div>
 
 {% endblock %}
 
 {% block javascripts %}
-  <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
-  <script src="{% static 'plugins/datatables/dataTables.const.js' %}"></script>
-  <script src="{% static 'plugins/datatables/moment.min.js' %}"></script>
-  <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
-  <!-- iCheck 1.0.1 -->
-  <script type="text/javascript">
-	$(function() {
-	    $('#ADM-BSM').addClass('active');
-		$('#DEPARTMENT-MANAGE-VIEW').addClass('active');
+<script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+<script src="{% static 'plugins/combo-select/jquery.combo.select.js' %}"></script>
+<script type="text/javascript">
 
-	});
-  </script>
-
-    <script type="text/javascript">
-var oDataTable=null;
-$(function() {
-    var data = [
-        {% for assetDepartment in assetDepartments %}
-            {
-                "id": "{{ assetDepartment.id }}",
-                "name": "{{ assetDepartment.name }}",
-                "administrator": "{{ assetDepartment.administrator.name }}",
-                "super_adm": "{{ assetDepartment.super_adm }}"
-            },
-        {% endfor %}
-    ],
-	oDataTable = initTable();
-	function initTable() {
-        return $('#dtbList').DataTable($.extend(true, {},
-            DATATABLES_CONSTANT.DATA_TABLES.DEFAULT_OPTION,
-            {
-                data: data,
-                columns: [
-                    {
-                        data: "id",
-                    },
-                    {
-                        data: "name",
-                    },
-                    {
-                        data: "administrator",
-                    },
-                    {
-                        data: "super_adm",
-                        render: function (data) {
-                            if (data=="True") {
-                                var ret = "是";
-                            } else {
-                                var ret = "否";
-                            }
-                            return ret;
-                        }
-                    },
-                    {
-                        data: "id",
-                        width: "10%",
-                        render : function (data) {
-                            var ret1 = "<button title='编辑' onclick=doUpdate(" + data + ")><i class='glyphicon glyphicon-pencil'></i></button>";
-                            var ret2 = "<button title='删除' onclick=doDelete(" + data + ")><i class='glyphicon glyphicon-trash'></i></button>";
-                            return ret1 + ret2
-                        }
-                    }],
-            }));
-	}
-
-
-	$("#btnCreate").click(function() {
-		layer.open({
-			type : 2,
-			title : '新增',
-			shadeClose : false,
-			maxmin : true,
-			area : [ '800px', '350px' ],
-			content : "{% url 'adm-department-create' %}",
-			end : function() {
-				//关闭时做的事情
-				window.location.reload();
+	$("#btnSave").click(function(){
+		var data = $("#addForm").serialize();
+		$.ajax({
+			type: $("#addForm").attr('method'),
+			url : "{% url 'adm-department' %}",
+			data : data,
+			cache: false,
+			success : function(msg) {
+				if (msg.result){
+					layer.alert('数据保存成功！', {icon: 1},function(index){
+					    parent.layer.closeAll(); //关闭所有弹窗
+                    });
+				}else{
+					layer.alert('数据保存失败', {icon: 5});
+                    //$('errorMessage').html(msg.message)
+				}
+				return ;
 			}
 		});
 	});
 
-	$("#btnRefresh").click(function(){
-		window.location.reload();
-	});
 
-});
+	/*点取消刷新新页面*/
+    $("#btnCancel").click(function () {
+	    window.location.reload();
 
-function doUpdate(id){
-	layer.open({
-		type : 2,
-		title : '编辑-详情',
-		shadeClose : false,
-    	maxmin : true,
-		area : [ '800px', '350px' ],
-		content : [ "{% url 'adm-department-create' %}"+'?id='+id, 'no' ],
-		end : function() {
-			window.location.reload()
-		}
-	});
-}
-
-function doDelete(id) {
-    var check = confirm("确定删除该部门吗？");
-    if (check) {
-        $.ajax({
-            type: "get",
-            url: "{% url 'adm-department-delete' %}",
-            data: {"id": id},
-            success: function (ret) {
-                if (ret.result) {
-                    alert("删除成功");
-                    window.location.reload();
-                } else {
-                    alert("删除失败");
-                }
-            }
-        })
-    }
-}
-
+    });
+    // select2
+    $(function () {
+        //Initialize Select2 Elements
+        $(".select2").select2();
+    });
 
 </script>
+
 {% endblock %}

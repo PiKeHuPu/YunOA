@@ -34,7 +34,7 @@ var DATATABLES_CONSTANT = {
             // 为奇偶行加上样式，兼容不支持CSS伪类的场合  
             stripeClasses : [ "odd", "even" ],  
             // 取消默认排序查询,否则复选框一列会出现小箭头  
-            //order : [],  
+            order : [],
             // 隐藏加载提示,自行处理  
             processing : false,  
             // 禁用服务器端分页

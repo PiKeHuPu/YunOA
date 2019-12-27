@@ -213,14 +213,14 @@ class Equipment(models.Model):
 
 
 
-class AssetDepartment(models.Model):
-    """
-    资产部门
-    """
-    name = models.CharField(max_length=20, verbose_name="名称")
-    administrator = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, verbose_name="资产管理员")
-    super_adm = models.BooleanField(default=False, verbose_name="是否有全部部门管理权限")
-    is_delete = models.BooleanField(default=False, verbose_name="是否删除")
+# class AssetDepartment(models.Model):
+#     """
+#     资产部门
+#     """
+#     name = models.CharField(max_length=20, verbose_name="名称")
+#     administrator = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL, verbose_name="资产管理员")
+#     super_adm = models.BooleanField(default=False, verbose_name="是否有全部部门管理权限")
+#     is_delete = models.BooleanField(default=False, verbose_name="是否删除")
 
 
 class AssetWarehouse(models.Model):
@@ -228,7 +228,7 @@ class AssetWarehouse(models.Model):
     资产仓库
     """
     name = models.CharField(max_length=20, verbose_name="名称")
-    department = models.ForeignKey(AssetDepartment, on_delete=models.CASCADE, verbose_name="所属资产部门")
+    department = models.ForeignKey(Structure, on_delete=models.CASCADE, verbose_name="所属资产部门")
     remark = models.TextField(blank=True, null=True, verbose_name="备注")
     is_delete = models.BooleanField(default=False, verbose_name="是否删除")
     is_all_view = models.BooleanField(default=False, verbose_name="是否所有人可见")
@@ -245,9 +245,9 @@ class AssetInfo(models.Model):
         ("3", "报废"),
         ("4", "售出")
     )
-    number = models.CharField(max_length=20, unique=True, verbose_name="资产编号")
+    number = models.CharField(max_length=20, verbose_name="资产编号")
     name = models.CharField(max_length=50, verbose_name="资产名称")
-    department = models.ForeignKey(AssetDepartment, on_delete=models.CASCADE, verbose_name="所属部门")
+    department = models.ForeignKey(Structure, on_delete=models.CASCADE, verbose_name="所属部门")
     warehouse = models.ForeignKey(AssetWarehouse, on_delete=models.CASCADE, verbose_name="所属仓库")
     quantity = models.IntegerField(verbose_name="数量")
     status = models.CharField(choices=asset_status, max_length=5, default="0", verbose_name="资产状态")
@@ -259,4 +259,53 @@ class AssetInfo(models.Model):
     unit = models.CharField(max_length=20, verbose_name="单位")
     type = models.CharField(max_length=20, verbose_name="型号")
     remark = models.TextField(max_length=500, verbose_name="备注信息")
+    is_no_return = models.BooleanField(default=False, verbose_name="无需归还")
+    is_no_approve = models.BooleanField(default=False, verbose_name="无需审批")
+
+
+class AssetEditFlow(models.Model):
+    """
+    资产变更记录
+    """
+    asset = models.ForeignKey(AssetInfo, on_delete=models.DO_NOTHING, verbose_name='相关资产')
+    operator = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name='操作人')
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name="添加时间")
+    content = models.CharField(max_length=20, verbose_name='内容')
+
+
+class AssetApprove(models.Model):
+    """
+    物资记录
+    """
+    proposer = models.ForeignKey(User, related_name='asset_proposer', on_delete=models.DO_NOTHING, verbose_name="申请人")
+    asset = models.ForeignKey(AssetInfo, on_delete=models.DO_NOTHING, verbose_name="物资")
+    quantity = models.IntegerField(verbose_name="数量")
+    purpose = models.CharField(max_length=100, blank=True, null=True, verbose_name="用途")
+    return_date = models.DateField(null=True, blank=True, verbose_name="预计归还时间")
+    status = models.CharField(max_length=10, verbose_name="状态")  # '0': 未审批  '1': 审批中  '2': 审批通过  '3': 审批未通过
+    use_status = models.CharField(max_length=10, verbose_name="使用状态")
+    # '0': 未领用  '1': 未归还  '2': 已归还  '3': 无需归还  '4': 已转移
+    type = models.CharField(max_length=10, verbose_name="类型")  # '0': 物资领用  '1': 资产转移
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+    t_return_date = models.DateField(null=True, blank=True, verbose_name="归还日期")
+    return_quantity = models.IntegerField(default=0, verbose_name="归还数量")
+    return_operator = models.ForeignKey(User, related_name="return_operator", blank=True, null=True, verbose_name="归还操作人")
+    transfer_department = models.ForeignKey(Structure, blank=True, null=True, verbose_name="转移部门")
+    transfer_warehouse = models.ForeignKey(AssetWarehouse, blank=True, null=True, verbose_name="转移仓库")
+
+
+class AssetApproveDetail(models.Model):
+    """
+    物资
+    """
+    approver = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="审批人")
+    asset_order = models.ForeignKey(AssetApprove, on_delete=models.DO_NOTHING, verbose_name="物资申请")
+    is_pass = models.CharField(max_length=10, blank=True, null=True, verbose_name="是否通过")  # "0": 不通过  "1": 通过
+    remark = models.CharField(max_length=50, blank=True, null=True, verbose_name="审批意见")
+    create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+
+
+
+
+
 

@@ -15,10 +15,8 @@
     <section class="content-header margin-bottom">
         <ol class="breadcrumb">
             <li><a href=""><i class="fa fa-dashboard"></i>办公平台</a></li>
-            {% if menu.parent.parent %}
-                <li class="active"><a href="{{ menu.parent.parent.url }}">{{ menu.parent.parent.title }}</a></li>
-            {% endif %}
-            <li class="active"><a href="{{ menu.url }}">{{ menu.title }}</a></li>
+            <li class="active"><a href="{{ menu.parent.parent.url }}">物资相关</a></li>
+            <li class="active"><a href="{{ menu.url }}">物资领用</a></li>
         </ol>
     </section>
     <!-- Main content -->
@@ -34,10 +32,10 @@
                         </div>
                         <div class="form-group searchArea margin-r-5 margin-top-5">
                             <label>所在仓库：</label>
-                            <select class="form-control inputText select2" name="assetType" , id="assetType">
+                            <select class="form-control inputText select2" name="warehouse"  id="warehouse">
                                 <option></option>
-                                {% for type in asset_types %}
-                                    <option value={{ type.id }}>{{ type.name }}</option>
+                                {% for warehouse in warehouses %}
+                                    <option value={{ warehouse.id }}>{{ warehouse.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -69,10 +67,9 @@
                     <table id="dtbList" class="display" cellspacing="0" width="100%">
                         <thead>
                         <tr valign="middle">
-                            <th><input type="checkbox" id="checkAll"></th>
                             <th>资产编号</th>
-                            <th>仓库</th>
                             <th>名称</th>
+                            <th>仓库</th>
                             <th>型号</th>
                             <th>状态</th>
                             <th>数量</th>
@@ -102,8 +99,8 @@
     <!-- iCheck 1.0.1 -->
     <script type="text/javascript">
         $(function () {
-            $('#ADM-ASSET').addClass('active');
-
+            $('#ASSET-WTF-VIEW').addClass('active');
+            $('#ASSET-USE').addClass('active');
         });
     </script>
 
@@ -120,7 +117,7 @@
                             "url": "{% url 'adm-asset:use-list' %}",
                             "data": function (d) {
                                 d.assetNum = $("#assetNum").val();
-                                d.assetType = $("#assetType").val();
+                                d.warehouse = $("#warehouse").val();
                                 d.brand = $("#brand").val();
                                 d.model = $("#model").val();
                                 d.status = $("#status").val();
@@ -128,18 +125,17 @@
                         },
 
                         columns: [
-                            DATATABLES_CONSTANT.DATA_TABLES.COLUMN.CHECKBOX,
                             {
-                                data: "assetNum",
+                                data: "number",
                             },
                             {
-                                data: "assetType__name",
+                                data: "name",
                             },
                             {
-                                data: "brand",
+                                data: "warehouse__name",
                             },
                             {
-                                data: "model",
+                                data: "type",
                             },
                             {
                                 data: "status",
@@ -169,18 +165,21 @@
                                 }
                             },
                             {
-                                data: "assetCount",
+                                data: "quantity",
                             },
                             {
-                                data: "assetUnit",
+                                data: "unit",
                             },
                             {
                                 data: "id",
                                 {#width : "10%",#}
                                 bSortable: "false",
                                 render: function (data, type, row, meta) {
-                                    var ret = "<button title='领用' onclick='doUse("
-                                        + data + ")'><i class='glyphicon glyphicon-paperclip'></i></button>";
+                                    if (row.status == '0') {
+                                        var ret = "<button title='领用' onclick='doUse(" + data + ")'><i class='glyphicon glyphicon-open'></i></button>";
+                                    } else {
+                                        var ret = ""
+                                    }
                                     return ret;
                                 }
                             }],

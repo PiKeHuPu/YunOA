@@ -23,42 +23,39 @@
                     </legend>
                     <div class="form-group has-feedback">
                         <input class="form-control" name="operator" type="hidden" value="{{ asset.operator }}"/>
-                        <input class="form-control" name="id" type="hidden" value="{{ asset.id }}"/>
+                        <input class="form-control" name="id0" id="id0" type="hidden" value="{{ asset.id }}"/>
                         <div class="form-group has-feedback">
                             <label class="col-sm-2 control-label">领用用途</label>
                             <div class="col-sm-3">
-                                 <input class="form-control" name="title" type="text" id="asset_title"/>
+                                 <input class="form-control" name="title" type="text" id="asset_title" autocomplete="off"/>
                             </div>
 
                             <label class="col-sm-2 control-label">预计归还日期</label>
                             <div class="col-sm-3">
-                                 <input class="form-control" name="use_time" type="date" id="use_time"/>
+                                 <input class="form-control pull-right form_datetime" name="use_time" type="text" id="use_time" autocomplete="off"/>
                             </div>
                         </div>
                         <label class="col-sm-2 control-label">资产编号</label>
                         <div class="col-sm-3">
-                            <input class="form-control" name="assetNum" type="text" value="{{ asset.assetNum }}"
+                            <input class="form-control" name="assetNum" type="text" value="{{ asset.number }}"
                                    disabled="1"/>
                         </div>
                         <label class="col-sm-2 control-label">仓库</label>
                         <div class="col-sm-3">
                             <select class="form-control select2" style="width:100%;" name="assetType" disabled="1">
-                                <option value="{{ asset.assetType_id }}">{{ asset.assetType.name }}</option>
-                                {% for type in asset_type %}
-                                    <option value="{{ type.id }}">{{ type.name }}</option>
-                                {% endfor %}
+                                <option value="{{ asset.warehouse_id }}">{{ asset.warehouse.name }}</option>
                             </select>
                         </div>
                     </div>
                     <div class="form-group has-feedback">
                         <label class="col-sm-2 control-label">名称</label>
                         <div class="col-sm-3">
-                            <input class="form-control" name="brand" type="text" value="{{ asset.brand }}"
+                            <input class="form-control" name="brand" type="text" value="{{ asset.name }}"
                                    disabled="1"/>
                         </div>
                         <label class="col-sm-2 control-label">型号</label>
                         <div class="col-sm-3">
-                            <input class="form-control" name="model" type="text" value="{{ asset.model }}"
+                            <input class="form-control" name="model" type="text" value="{{ asset.type }}"
                                    disabled="1"/>
                         </div>
 
@@ -68,14 +65,10 @@
                         <label class="col-sm-2 control-label">领用数量</label>
                         <div class="col-sm-3">
                             <div class="input-group">
-                                <input class="form-control" name="assetCount" type="Number" min="1"
-                                       max="{{ asset.assetCount }}"
-                                       placeholder="还有{{ asset.assetCount }} {{ asset.assetUnit }}" id="use_count"
-                                />
-                                <span class="input-group-addon">{{ asset.assetUnit }}</span>
+                                <input class="form-control" name="assetCount" type="Number" min="1" max="{{ asset.quantity }}" placeholder="还有{{ asset.quantity }} {{ asset.unit }}" id="use_count" />
+                                <span class="input-group-addon">{{ asset.unit }}</span>
 
                             </div>
-
                         </div>
                     </div>
                 </fieldset>
@@ -96,27 +89,12 @@
     <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
     <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
     <script type="text/javascript">
-        //限制预计归还时间
-        $(function(){
-            //得到当前时间
-            var date_now = new Date();
-            //得到当前年份
-            var year = date_now.getFullYear();
-            //得到当前月份
-            //注：
-            //  1：js中获取Date中的month时，会比当前月份少一个月，所以这里需要先加一
-            //  2: 判断当前月份是否小于10，如果小于，那么就在月份的前面加一个 '0' ， 如果大于，就显示当前月份
-            var month = date_now.getMonth()+1 < 10 ? "0"+(date_now.getMonth()+1) : (date_now.getMonth()+1);
-            //得到当前日子（多少号）
-            var date = date_now.getDate() < 10 ? "0"+date_now.getDate() : date_now.getDate();
-            //设置input标签的min属性
-            $("#use_time").attr("min",year+"-"+month+"-"+date);
-        });
 
         $("#btnSave").click(function () {
             var useCount = $("#use_count").val();
             var title = $("#asset_title").val();
             var use_time = $("#use_time").val();
+            var id0 = $("#id0").val();
             if (useCount == "") {
                 layer.alert("领用数量不能为空", {icon: 5});
                 return
@@ -125,12 +103,12 @@
                 layer.alert("领用数量为正整数", {icon: 5});
                 return
             }
-            if (Number(useCount) > Number({{ asset.assetCount }})) {
-                layer.alert("领用数量超出库存数量({{ asset.assetCount }})", {icon: 5});
+            if (Number(useCount) > Number({{ asset.quantity }})) {
+                layer.alert("领用数量超出库存数量({{ asset.quantity }})", {icon: 5});
                 return
             }
             var data = {
-                id: {{ asset.id }},
+                id0: id0,
                 useCount: useCount,
                 title: title,
                 use_time: use_time,
@@ -138,11 +116,11 @@
             $.ajax({
                 type: "POST",
                 url: "{% url 'personal-asset-use' %}",
-                data: JSON.stringify(data),
+                data: data,
                 cache: false,
                 success: function (msg) {
                     if (msg.status == 'success') {
-                        layer.alert('登记成功，请及时领取物品！', {icon: 1}, function (index) {
+                        layer.alert('已提交申请', {icon: 1}, function (index) {
                             parent.layer.closeAll(); //关闭所有弹窗
                         });
                     } else if (msg.status == 'fail') {
@@ -157,7 +135,22 @@
         $("#btnCancel").click(function () {
             window.location.reload();
 
-        })
+        });
+
+        var date = new Date();
+        /*input 时间输入选择*/
+        $(".form_datetime").datetimepicker({
+            language: 'zh',
+            minView: 'month', //选择范围知道日期，不选择时分
+            autoclose: 1,
+            todayHighlight: 1,
+            forceParse: 0,
+            showMeridian: 1,
+            format: 'yyyy-mm-dd',
+            startDate: date
+        }).on('changeDate', function (ev) {
+            $(this).datetimepicker('hide');
+        });
 
 
         // select2

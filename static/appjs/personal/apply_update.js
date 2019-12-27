@@ -254,7 +254,6 @@ $("#btnSave").click(function () {
     if (data === false) {
         return
     }
-    console.log(data);
     $.ajax({
         type: 'POST',
         url: url,

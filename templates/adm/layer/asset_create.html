@@ -16,7 +16,7 @@
                     <legend>
                     </legend>
                     <div class="form-group has-feedback">
-                        <input class="form-control" name="operator" type="hidden" value="{{ request.user.name }}"/>
+                        <input class="form-control" name="id0" id="id0" type="hidden" value="{{ asset.id }}"/>
                         <label class="col-sm-2 control-label">资产编号</label>
                         <div class="col-sm-3">
                             <input class="form-control" name="number" id="number" type="text" value="{{ asset.number }}"/>
@@ -25,6 +25,8 @@
                         <label class="col-sm-2 control-label">资产名称</label>
                         <div class="col-sm-3">
                             <input class="form-control" name="name" id="name" type="text" value="{{ asset.name }}"/>
+                            <input type="checkbox" name="no_return" id="no_return" {% if asset.is_no_return %}checked{% endif %}>无需归还
+                            <input type="checkbox" name="no_approve" id="no_approve" {% if asset.is_no_approve %}checked{% endif %}>无需审批
                         </div>
                     </div>
                     <div class="form-group has-feedback">
@@ -33,14 +35,13 @@
                             <select class="form-control select2" style="width:100%;" name="department" id="department" onchange="a_ajax()">
                                 <option></option>
                                 {% for department in department_list %}
-                                    <option value="{{ department.id }}" {% if department.id == asset.department_id %}selected{% endif %}>{{ department.name }}</option>
+                                    <option value="{{ department.id }}">{{ department.title }}</option>
                                 {% endfor %}
                             </select>
                         </div>
                         <label class="col-sm-2 control-label">所属仓库</label>
                         <div class="col-sm-3">
                             <select class="form-control select2" style="width:100%;" name="warehouse" id="warehouse" disabled >
-                                <option value="{{ asset.warehouse_id }}">{{ asset.warehouse.name }}</option>
                             </select>
                         </div>
                     </div>
@@ -61,7 +62,7 @@
                         </div>
                         <label class="col-sm-2 control-label">到期时间(选填)</label>
                         <div class="col-sm-3">
-                        <input type="text" class="form-control pull-right form_datetime" name="due_time" id="due_time" value="{{ asset.due_time }}"/>
+                        <input type="text" class="form-control pull-right form_datetime" name="due_time" id="due_time" value="{% if asset.due_time %}{{ asset.due_time }}{% else %}{% endif %}" autocomplete="off"/>
                         </div>
                     </div>
                     <div class="form-group has-feedback">
@@ -106,6 +107,8 @@
                 alert("请输入型号")
             } else {
                 var data = $("#addForm").serialize();
+                {#data.add({"no_approve": $("#no_approve").is(":checked"),#}
+                {#          "no_return": $("#no_return").is(":checked")});#}
                 $.ajax({
                     type: $("#addForm").attr('method'),
                     url: "{% url 'adm-n-create' %}",
