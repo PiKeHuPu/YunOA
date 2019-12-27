@@ -146,4 +146,6 @@ urlpatterns = [
     url(r'system/bulletin/unread_bulletin$', bulletin_views.UnreadBulletinView.as_view(), name="unread_bulletin"),
     # 物资续期提醒
     url(r'due_asset', personal_views.DueAssetView.as_view(), name="due_asset"),
+    # 意见反馈
+    url(r'feedback', personal_views.FeedbackView.as_view(), name="feedback"),
 ]

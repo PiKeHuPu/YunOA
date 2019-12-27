@@ -135,7 +135,7 @@
 
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
-            <div class="small-box" style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #90f900, #19e600)">
+            <div class="small-box" style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #73ee03, #06b600)">
                 <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">物资相关</p>
                 <div class="inner">
                     <a href="/personal/asset/use/info"
@@ -149,43 +149,19 @@
             </div>
         </div>
 
-
-
-        <!--
-    <div class="row">
-        <div class="col-md-12">
-            <div class="box">
-               <div class="box-header with-border">
-                  <h3 class="box-title">工单数据统计</h3>
-                  <div class="box-tools pull-right">
-                    <div class="btn-group">
-                      <button type="button" class="btn btn-box-tool dropdown-toggle" data-toggle="dropdown" title="选择统计类型">
-                        <i class="fa fa-list-alt"></i></button>
-                      <ul class="dropdown-menu bg-aqua" role="menu">
-                        <li><a href="{% url 'personal' %}?value=0">工单提交统计</a></li>
-                        <li><a href="{% url 'personal' %}?value=1">工单执行统计</a></li>
-                      </ul>
-                    </div>
-                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-minus"></i>
-                    </button>
-                    <button type="button" class="btn btn-box-tool" data-widget="remove"><i class="fa fa-times"></i></button>
-                  </div>
-               </div>
-        <div class="box-body">
-            <div class="row">
-                <div class="col-md-8">
-                    <div id="bar_container" style="height: 400px"></div>
+        <div class="col-lg-3 col-xs-6">
+            <!-- small box -->
+            <div class="small-box" style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #d4d4d4, #7f7f7f)">
+                <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">意见或建议</p>
+                <div class="inner">
+                    <a href="#" onclick="feedback()" class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='#060507'" onmouseout="this.style.color='white'">提交反馈</p></a>
+                    <p style="font-size:28px; color: rgba(217, 107, 116, 0.0); font-family: 楷体">提交反馈</p>
                 </div>
-                <div class="col-md-4">
-                    <div id="pie_container" style="height: 400px"></div>
+                <div class="icon" style="margin-top: 40px">
+                    <i class="fa fa-comments"></i>
                 </div>
             </div>
-
         </div>
-        </div>
-        </div>
-        </div>
-        -->
     </section>
 
 {% endblock %}
@@ -253,53 +229,6 @@
             myBarChart.setOption(option, true);
         }
 
-
-        {#//echarts bar#}
-        {#var pie_dom = document.getElementById("pie_container");#}
-        {#var myPieChart = echarts.init(pie_dom);#}
-        {#option = null;#}
-        {#option = {#}
-        {#    title: {#}
-        {#        text: '年度工单比例',#}
-        {#        subtext: '',#}
-        {#        x: 'center'#}
-        {#    },#}
-        {#    tooltip: {#}
-        {#        trigger: 'item',#}
-        {#        formatter: "{a} <br/>{b} : {c} ({d}%)"#}
-        {#    },#}
-        {##}
-        {#    toolbox: {#}
-        {#        show: true,#}
-        {#        feature: {#}
-        {#            saveAsImage: {show: true}#}
-        {#        }#}
-        {#    },#}
-        {#    legend: {#}
-        {#        orient: 'vertical',#}
-        {#        left: 'left',#}
-        {#        data: [{% for data in year_work_order_count %}'{{ data.name }}',{% endfor %}]#}
-        {#    },#}
-        {#    series: [#}
-        {#        {#}
-        {#            name: '工单申请比例',#}
-        {#            type: 'pie',#}
-        {#            radius: '55%',#}
-        {#            center: ['50%', '60%'],#}
-        {#            data: [#}
-        {#                {% for data in year_work_order_count %}#}
-        {#                    {value:{{ data.count }}, name: '{{ data.name }}'},#}
-        {#                {% endfor %}#}
-        {#            ],#}
-        {#            itemStyle: {#}
-        {#                emphasis: {#}
-        {#                    shadowBlur: 10,#}
-        {#                    shadowOffsetX: 0,#}
-        {#                    shadowColor: 'rgba(0, 0, 0, 0.5)'#}
-        {#                }#}
-        {#            }#}
-        {#        }#}
-        {#    ]#}
         if (option && typeof option === "object") {
             myPieChart.setOption(option, true);
         }
@@ -317,6 +246,15 @@
                 content: "{% url 'due_asset' %}" + '?type=' + type,
             });
             layer.full(index)
+        }
+
+        function feedback() {
+            layer.open({
+                type: 2,
+                title: "意见或建议反馈",
+                content: "{% url 'feedback' %}",
+                area: ["650px", "250px"]
+            })
         }
     </script>
 {% endblock %}
