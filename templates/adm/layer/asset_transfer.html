@@ -1,0 +1,150 @@
+{% extends 'base-layer.html' %}
+{% load staticfiles %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-datetimepicker.min.css' %}">
+    <style>
+        input[type=date]::-webkit-inner-spin-button {
+            visibility: hidden;
+        }
+    </style>
+{% endblock %}
+
+{% block main %}
+    <div class="box box-danger">
+        <form class="form-horizontal" id="addForm" method="post">
+
+            {% csrf_token %}
+            <div class="box-body">
+                <fieldset>
+                    <legend>
+                    </legend>
+                    <div class="form-group has-feedback">
+                        <input class="form-control" name="operator" type="hidden" value="{{ asset.operator }}"/>
+                        <input class="form-control" name="id0" id="id0" type="hidden" value="{{ asset.id }}"/>
+
+                        <label class="col-sm-2 control-label">部门</label>
+                        <div class="col-sm-3">
+                            <select class="form-control select2" style="width:100%;" name="department0" id="deparement0" disabled="1">
+                                <option value="{{ asset.department_id }}">{{ asset.department.title }}</option>
+                            </select>
+                        </div>
+                        <label class="col-sm-2 control-label">仓库</label>
+                        <div class="col-sm-3">
+                            <select class="form-control select2" style="width:100%;" name="warehouse0" id="warehouse0" disabled="1">
+                                <option value="{{ asset.warehouse_id }}">{{ asset.warehouse.name }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">转移到: 部门</label>
+                        <div class="col-sm-3">
+                            <select class="form-control select2" name="department1" id="department1" onchange="a_ajax()">
+                                <option></option>
+                                {% for department in department_list %}
+                                    <option value="{{ department.id }}">{{ department.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <label class="col-sm-2 control-label">仓库</label>
+                        <div class="col-sm-3">
+                            <select class="form-control select2" style="width:100%;" name="warehouse1" id="warehouse1" >
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">转移数量</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" type="number" max="{{ asset.quantity }}" placeholder="共有{{ asset.quantity }}{{ asset.unit }}" name="quantity" id="quantity">
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="box-footer ">
+                <div class="row span7 text-center ">
+                    <button type="button" id="btnCancel" class="btn btn-default margin-right ">重置</button>
+                    <button type="button" id="btnSave" class="btn btn-info margin-right ">保存</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
+    <script type="text/javascript">
+
+        $("#btnSave").click(function () {
+            if($("#department1").val() == "") {
+                alert("请选择要转移到的部门")
+            } else if($("#warehouse1").val() == "") {
+                alert("请选择要转移到的仓库")
+            } else if($("#warehouse1").val() == $("#warehouse0")) {
+                alert("资产已在当前仓库")
+            } else if($("#quantity").val() > {{ asset.quantity }}) {
+                alert("转移数量超出现有数量({{ asset.quantity }})")
+            } else {
+                var data = {
+                    id0: $("#id0").val(),
+                    department0: $("#department0").val(),
+                    department1: $("#department1").val(),
+                    warehouse0: $("#warehouse0").val(),
+                    warehouse1: $("#warehouse1").val(),
+                    quantity: $("#quantity").val()
+                };
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'personal-transfer' %}",
+                    data: data,
+                    cache: false,
+                    success: function (msg) {
+                        if (msg.status == 'success') {
+                            layer.alert('已提交申请', {icon: 1}, function (index) {
+                                parent.layer.closeAll(); //关闭所有弹窗
+                            });
+                        } else if (msg.status == 'fail') {
+                            layer.alert(msg.asset_form_errors, {icon: 5});
+                        }
+                    }
+                });
+            }
+        });
+
+        /*点取消刷新新页面*/
+        $("#btnCancel").click(function () {
+            window.location.reload();
+
+        });
+        function a_ajax() {
+            department_id = $("#department1").val();
+            if (department_id) {
+                var data = {
+                    "department_id" : department_id
+                };
+                $.ajax({
+                    type: "get",
+                    url: "{% url 'adm-ajax' %}",
+                    data: data,
+                    success: function (ret) {
+                        $("#warehouse1").html(ret.warehouse_list);
+                    }
+                })
+            } else {
+                $("#warehouse1").html("<option></option>");
+            }
+        }
+
+        // select2
+        $(function () {
+            //Initialize Select2 Elements
+            $(".select2").select2();
+        });
+    </script>
+
+{% endblock %}

@@ -14,10 +14,6 @@ class Migration(migrations.Migration):
 
     operations = [
 
-        migrations.RemoveField(
-            model_name='businessapply',
-            name='t_title',
-        ),
 
         migrations.AddField(
             model_name='businessapply',

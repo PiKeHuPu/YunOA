@@ -1,0 +1,266 @@
+{% extends "base-left.html" %}
+{% load staticfiles %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugins/datatables/jquery.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+    <!-- iCheck for checkboxes and radio inputs -->
+{% endblock %}
+
+{% block content %}
+
+    <!-- Content Header (Page header) -->
+
+    <section class="content-header margin-bottom">
+        <ol class="breadcrumb">
+            <li><a href=""><i class="fa fa-dashboard"></i>办公平台</a></li>
+            <li class="active"><a href="{{ menu.parent.parent.url }}">资产管理</a></li>
+            <li class="active"><a href="{{ menu.url }}">领用记录</a></li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div id="devlist">
+            <div class="box box-primary" id="liebiao">
+                <div class="box-header">
+                    <form class="form-inline" id="queryForm">
+
+
+                        <div class="form-group searchArea margin-r-5 margin-top-5">
+                            <label>资产编号：</label>
+                            <input type="text" name="asset_number" class="form-control inputText" id="asset_number">
+                        </div>
+
+                        <div class="form-group searchArea margin-r-5 margin-top-5">
+                            <label>所在仓库：</label>
+                            <select class="form-control inputText select2" name="asset_warehouse"  id="asset_warehouse">
+                                <option></option>
+                                {% for warehouse in warehouse_list %}
+                                    <option value={{ warehouse.id }}>{{ warehouse.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="form-group searchArea margin-r-5 margin-top-5">
+                            <label>资产名称：</label>
+                            <input type="text" name="asset_name" class="form-control inputText" id="asset_name">
+                        </div>
+                        <button type="button" id="btnAssetSearch" class="btn btn-default">
+                            <i class="glyphicon glyphicon-search"></i>查询
+                        </button>
+                    </form>
+                </div>
+                <div class="box-body">
+                    <table id="dtbList" class="display" cellspacing="0" width="100%">
+                        <thead>
+                        <tr valign="middle">
+                            <th>资产编号</th>
+                            <th>仓库</th>
+                            <th>名称</th>
+                            <th>型号</th>
+                            <th>数量</th>
+                            <th>领取人</th>
+                            <th>领取时间</th>
+                            <th>预计归还日期</th>
+                            <th>用途</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <br> <br>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- /.content -->
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables/dataTables.const.js' %}"></script>
+    <script src="{% static 'plugins/datatables/moment.min.js' %}"></script>
+    <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+    <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+    <!-- iCheck 1.0.1 -->
+    <script type="text/javascript">
+        $(function () {
+            $('#ASSET-MANAGE').addClass('active');
+            $('#ASSET-USER-FLOW-VIEW').addClass('active');
+        });
+    </script>
+
+    <script type="text/javascript">
+        var oDataTable = null;
+        $(function () {
+            oDataTable = initTable();
+
+            function initTable() {
+                var oTable = $('#dtbList').DataTable($.extend(true, {"scrollx":true},
+                    DATATABLES_CONSTANT.DATA_TABLES.DEFAULT_OPTION,
+                    {
+                        ajax: {
+                            "url": "{% url 'adm-asset:asset-use-flow-list' %}",
+                            "data": function (d) {
+                                d.asset_number = $("#asset_number").val();
+                                d.asset_warehouse = $("#asset_warehouse").val();
+                                d.asset_name = $("#asset_name").val();
+                            }
+                        },
+
+                        columns: [
+                            {
+                                data: "asset__number"
+                            },
+                            {
+                                data: "asset__warehouse__name",
+                            },
+                            {
+                                data: "asset__name",
+                            },
+                            {
+                                data: "asset__type"
+                            },
+                            {
+                                data: "quantity",
+                            },
+                            {
+                                data: "proposer__name",
+                                width: "6%"
+                            },
+                            {
+                                data: "create_time",
+                                width: "9%",
+                                render: function (data, type, full, meta) {
+                                    return moment(data).format("YYYY-MM-DD HH:mm");
+                                }
+                            },
+                            {
+                                data: "return_date",
+                                width: "10%",
+                                render: function (data, type, row, meta) {
+                                    if (data){
+                                        return data;
+                                    } else {
+                                        return "未设置";
+                                    }
+                                }
+                            },
+                            {
+                                data: "purpose"
+                            },
+                            {
+                                data: "status",
+                                width: "7%",
+                                render: function (data, type, row, meta) {
+                                    var ret;
+                                    if (row.use_status == "0") {
+                                        if (data == "0" || data == "1") {
+                                            ret = "审批中"
+                                        } else if (data == "2" && row.type == "1") {
+                                            ret = "未转移"
+                                        } else if (data == "2" && row.type == "0") {
+                                            ret = "未领用"
+                                        } else if (data == "3") {
+                                            ret = "审批未通过"
+                                        }
+                                    } else if (row.use_status == "1") {
+                                        ret = "未归还"
+                                    } else if (row.use_status == "2") {
+                                        ret = "已归还"
+                                    } else if (row.use_status == "3") {
+                                        ret = "无需归还"
+                                    } else if (row.use_status == "4") {
+                                        ret = "已转移"
+                                    }
+                                    return ret;
+                                }
+                            },
+                            {
+                                data: "id",
+                                width: "7%",
+                                render: function (data, type, row, meta) {
+                                    var ret = "<button title='查看详情' onclick='detail(" + data + ")'><i class='glyphicon glyphicon-list-alt'></i></button>";
+                                    if (row.status == "2" && row.use_status == "0" && row.type == "1") {
+                                        ret = ret + "<button title='转移' onclick='receive(" + data + ")'><i class='glyphicon glyphicon-transfer'></i></button>";
+                                    }
+                                    else if (row.status == "2" && row.use_status == "0") {
+                                        ret = ret + "<button title='领用' onclick='receive(" + data + ")'><i class='glyphicon glyphicon-open'></i></button>";
+                                    }
+                                    if (row.status == "2" && row.use_status == "1") {
+                                        ret = ret + "<button title='归还' onclick='give_back(" + data + ")'><i class='glyphicon glyphicon-save'></i></button>";
+                                    }
+                                    return ret
+                                }
+                            }
+                        ],
+                    }));
+                return oTable;
+            }
+            //刷新页面GET查询请求
+            $("#btnAssetSearch").click(function () {
+                oDataTable.ajax.reload();
+            });
+
+
+            //select选择后刷新页面GET请求
+            $("#select").change(function () {
+                //alert($("#select").val())
+                oDataTable.ajax.reload();
+            });
+        });
+
+        function give_back(id) {
+           layer.open({
+                type: 2,
+                title: '归还',
+                shadeClose: false,
+                maxmin: true,
+                area: ['800px', '580px'],
+                content: "{% url 'personal-asset-use-back' %}" + '?id=' + id,
+                end: function () {
+                    //oDataTable.ajax.reload();
+                    window.location.reload();
+
+                }
+            })
+        }
+        function detail(id) {
+            layer.open({
+                type: 2,
+                title: "申请详情",
+                content: "{% url 'personal-apply-detail' %}?id=" + id,
+                area: ["1000px", "550px"]
+            })
+        }
+        function receive(id) {
+            var con = confirm("确定进行此操作吗？");
+            if (con) {
+                $.ajax({
+                    url: "{% url 'adm-useflow' %}",
+                    type: "post",
+                    data: {"id": id},
+                    success: function (ret) {
+                        if (ret.success) {
+                            alert("操作成功");
+                            window.location.reload();
+                        } else {
+                            alert("操作失败，请稍后再试")
+                        }
+                    }
+                })
+            }
+        }
+    </script>
+    <script>
+        $(function () {
+            //Initialize Select2 Elements
+            $(".select2").select2();
+        });
+    </script>
+{% endblock %}
