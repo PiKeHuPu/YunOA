@@ -294,80 +294,20 @@
 <script src="/static/dist/js/glo-mess.js"></script>
 <script src="/static/js/plugins/layer/layer.js"></script>
 <script src="/static/plugins/bootstrap-treeview/bootstrap-treeview.js"></script>
-{#<script type="text/javascript">#}
-{#    $(function () {#}
-{#        $('#PERSONAL-WORKORDER').addClass('active');#}
-{#        $('#{{ menu.code }}').addClass('active');#}
-{##}
-{#    });#}
-{##}
-{#    var oDataTable = null;#}
-{#    $(function () {#}
-{#        oDataTable = initTable();#}
-{##}
-{#        function initTable() {#}
-{#            var oTable = $('#dtbList').DataTable($.extend(true, {"scrollx": true},#}
-{#                DATATABLES_CONSTANT.DATA_TABLES.DEFAULT_OPTION,#}
-{#                {#}
-{#                    ajax: {#}
-{#                        "url": "{% url 'adm-equipment:list' %}",#}
-{#                        "data": function (d) {#}
-{#                            d.customer = "{{ work_order.customer_id }}";#}
-{#                        }#}
-{#                    },#}
-{#                    columns: [#}
-{#                        {#}
-{#                            data: "id",#}
-{#                            width: "5%",#}
-{#                        },#}
-{#                        {#}
-{#                            data: "number",#}
-{#                            width: "10%",#}
-{#                        },#}
-{##}
-{##}
-{#                        {#}
-{#                            data: "equipment_type__name",#}
-{#                        },#}
-{#                        {#}
-{#                            data: "equipment_model",#}
-{#                        },#}
-{#                        {#}
-{#                            data: "buy_date",#}
-{#                        },#}
-{#                        {#}
-{#                            data: "warranty_date",#}
-{#                        },#}
-{##}
-{#                        {#}
-{#                            data: "id",#}
-                            {#width : "10%",#}
-{#                            bSortable: "false",#}
-{#                            render: function (data, type, row, meta) {#}
-{#                                var ret = "<button title='编辑' onclick='doEquipmentUpdate("#}
-{#                                    + data + ")'><i class='glyphicon glyphicon-pencil'></i></button>";#}
-{#                                return ret;#}
-{#                            }#}
-{#                        }],#}
-{#                }));#}
-{#            return oTable;#}
-{#        }#}
-{##}
-{##}
-{#    });#}
-{##}
-{#    function openFile() {#}
-{#        layer.open({#}
-{#                type: 2,#}
-{#                title: "{{ work_order.number }}",#}
-{#                shadeClose: false,#}
-{#                maxmin: true,#}
-{#                area: ['640px', '480px'],#}
-{#                content: ["{{ MEDIA_URL }}{{ work_order.file_content }}"],#}
-{#                end: function () {#}
-{#                }#}
-{#            });#}
-{#    }#}
-{##}
-{#</script>#}
+<script type="text/javascript">
+    function openFile() {
+        layer.open({
+                type: 2,
+                title: "{{ work_order.number }}",
+                shadeClose: false,
+                maxmin: true,
+                area: ['640px', '480px'],
+                content: ["{{ MEDIA_URL }}{{ work_order.file_content }}"],
+                end: function () {
+                }
+            });
+    }
+
+</script>
+
 </html>
