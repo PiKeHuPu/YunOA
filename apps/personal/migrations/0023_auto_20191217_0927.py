@@ -12,5 +12,9 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-
+        migrations.AlterField(
+            model_name='businessapply',
+            name='t_title',
+            field=models.CharField(max_length=100, verbose_name='申请标题'),
+        ),
     ]
