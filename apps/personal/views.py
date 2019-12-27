@@ -103,7 +103,7 @@ class PersonalView(LoginRequiredMixin, View):
             cost = 0
             li = WorkOrder.objects.filter(feeid=x)
             for y in li:
-                cost += int(y.cost)
+                cost += float(y.cost)
             allcost.append(cost)
         perdata = []
         for x in range(len(allcost)):
@@ -142,7 +142,7 @@ class PersonalView(LoginRequiredMixin, View):
                     cost = 0
                     li = WorkOrder.objects.filter(feeid=x)
                     for y in li:
-                        cost += int(y.cost)
+                        cost += float(y.cost)
                     paraallcost.append(cost)
                 for x in range(len(paraallcost)):
                     dic = {}
