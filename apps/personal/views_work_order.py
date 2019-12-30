@@ -102,6 +102,7 @@ def apply(work_order, next_user_id):
                        next_user_id=next_user_id,
                        all_fee=work_order.cost,
                        file_content=work_order.file_content,
+                       feeid_id=work_order.feeid_id,
                        )
     if work_order.type == '1':  # 出差
         ap.transport = work_order.transport
@@ -910,6 +911,7 @@ class ApplyCostView(LoginRequiredMixin, View):
         ret['type'] = type0
         ret['type_list'] = type_list
         ret['status_list'] = status_list
+        print(ret)
         return render(request, 'personal/workorder/apply.html', ret)
 
 
@@ -1075,9 +1077,10 @@ class ApDetailView(LoginRequiredMixin, View):
         users = User.objects.values('name', 'department__title', 'id')
         admin_user_list = []
         if request.GET.get('id'):
-            print(request.GET['id'])
+            #print(request.GET['id'])
             ap = get_object_or_404(BusinessApply, workorder_id=request.GET['id'])
             work_order = ap.workorder
+
             work_order_log = work_order.workorderlog_set.filter(type='1').order_by('create_time')
             ret['ap'] = ap
             people = ap.people
@@ -1137,13 +1140,13 @@ class ApDetailView(LoginRequiredMixin, View):
                 adm_list = Structure.objects.values("adm_list").get(id=structure_id)["adm_list"].split(",")
             except:
                 adm_list = []
-            print(user_list)
+
             if (request.user.id in user_list) or (str(request.user.id) in adm_list):
                 ret['work_order'] = work_order
                 ret['work_order_log'] = work_order_log
             else:
                 ret['ban'] = 'ban'
-
+        print(ret)
         return render(request, 'personal/workorder/apply_app_detail.html', ret)
 
 
