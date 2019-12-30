@@ -10,4 +10,4 @@ Desktop.ini
 *.egg
 *.egg-info
 media/
-/migrations/
+migrations/
