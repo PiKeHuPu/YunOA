@@ -35,10 +35,22 @@ class StructureListView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        fields = ['id', 'title', 'type', 'parent__title', 'adm_list', 'administrator__name', 'approver__name']
+        fields = ['id', 'title', 'type', 'parent__title', 'adm_list', 'approver__name']
         ret = dict(data=list(Structure.objects.values(*fields)))
         # print(ret)
         for data in ret["data"]:
+            department = Structure.objects.get(id=data["id"])
+            administrators = department.userprofile_set.filter(is_dep_administrator=True)
+            administrators_str = ""
+            for i in range(len(administrators)):
+                if i == 3:
+                    administrators_str += "..."
+                    break
+                administrators_str += administrators[i].name
+                if i != len(administrators) - 1 and i != 2:
+                    administrators_str += ","
+            data["asset_adm_list"] = administrators_str
+
             try:
                 adm_id = data["adm_list"].split(",")
             except:
@@ -166,30 +178,42 @@ class StructureAssetAdmView(LoginRequiredMixin, View):
         ret = dict()
         id0 = request.GET.get("id")
         department = Structure.objects.get(id=id0)
-        users = department.userprofile_set.filter(is_active='1')
+        added_users = department.userprofile_set.filter(is_dep_administrator=True)
         approver = User.objects.filter(is_active='1')
+        users = department.userprofile_set.filter(is_active="1")
+        un_add_users = set(users).difference(added_users)
         ret['department'] = department
-        ret['users'] = users
+        ret['added_users'] = added_users
+        ret['un_add_users'] = un_add_users
         ret['approver'] = approver
         return render(request, "adm/layer/department.html", ret)
 
     def post(self, request):
         ret = dict()
+        id_list = None
         id0 = request.POST.get("id0")
-        administrator = request.POST.get('operator')
         approver_id = request.POST.get('approver')
         department = Structure.objects.get(id=id0)
-        department.administrator_id = administrator
+        role = Role.objects.get(title="能力：仓库管理")
+        dep_users = department.userprofile_set.filter(is_dep_administrator=True)
+        for d in dep_users:
+            role.userprofile_set.remove(d)
+
+        if 'to' in request.POST and request.POST['to']:
+            # print(request.POST.getlist('to', []))
+            id_list = request.POST.getlist('to', [])
+            users = User.objects.filter(id__in=id_list)
+            for u in users:
+                role.userprofile_set.add(u)
+
+        department.userprofile_set.all().update(is_dep_administrator=False)
+        if id_list:
+            department.userprofile_set.filter(id__in=id_list).update(is_dep_administrator=True)
         department.approver_id = approver_id
         if request.POST.get('admin') == 'on':
             department.super_adm = True
         else:
             department.super_adm = False
         department.save()
-
-        if administrator:
-            role = Role.objects.get(title="仓库管理")
-            user = User.objects.get(id=administrator)
-            role.userprofile_set.add(user)
         ret['result'] = True
         return HttpResponse(json.dumps(ret), content_type='application/json')
