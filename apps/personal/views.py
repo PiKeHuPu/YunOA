@@ -91,7 +91,7 @@ class PersonalView(LoginRequiredMixin, View):
         #个人报表
         feeid = []
         manid = UserProfile.objects.filter(name=request.user)[0].id
-        exist = WorkOrder.objects.filter(cretor_id=manid)
+        exist = WorkOrder.objects.filter(Q(cretor_id=manid), ~Q(status=3))
         if len(exist) == 0:
             ret.update({
                 'status': '请提交工单在使用'
@@ -139,7 +139,7 @@ class PersonalView(LoginRequiredMixin, View):
             start_time = request.POST.get("start_time")
             end_time = request.POST.get("end_time")
             manid = UserProfile.objects.filter(name=request.user)[0].id
-            exist = WorkOrder.objects.filter(cretor_id=manid)
+            exist = WorkOrder.objects.filter(Q(cretor_id=manid), ~Q(status=3))
             if len(exist) == 0:
                 ret['status'] = 'fail0'
                 ret['errors_info'] = '请提交工单使用'
