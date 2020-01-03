@@ -100,7 +100,6 @@ class PersonalView(LoginRequiredMixin, View):
             for x in exist:
                 if x.feeid_id not in feeid and x.feeid_id !=None:
                     feeid.append(x.feeid_id)
-
             if len(feeid) == 0:
                 ret['status'] = '你的工单里还没有使用费用类型的工单'
             else:
@@ -126,7 +125,6 @@ class PersonalView(LoginRequiredMixin, View):
                     'feetype': feetype,
                     'perdata': perdata
                 })
-
         return render(request, 'personal/personal_index.html', ret)
 
     def post(self, request):
