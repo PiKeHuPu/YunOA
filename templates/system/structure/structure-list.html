@@ -124,7 +124,7 @@ $(function() {
                                     data : "adm_list",
                                 },
                                 {
-                                    data : "administrator__name"
+                                    data : "asset_adm_list"
                                 },
                                 {
                                     data : "approver__name"
@@ -302,7 +302,7 @@ function doAddAdm(id){
 
 // 修改物资管理员
 function doSetAdm(id){
-    layer.open({
+    var index = layer.open({
         type: 2,
         title: '修改物资管理员与审批人',
         maxmin: 'true',
@@ -311,7 +311,8 @@ function doSetAdm(id){
         end: function () {
             window.location.reload();
         }
-    })
+    });
+    layer.full(index)
 }
 
 </script>

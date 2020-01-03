@@ -33,16 +33,13 @@ def department_admin(user_id):
     :param user_id:
     :return:
     """
-    departments = Structure.objects.filter(administrator_id=user_id)
-    if departments:
-        for department in departments:
-            if department.super_adm:
-                department_list = Structure.objects.all()
-                break
+    user = User.objects.get(id=user_id)
+    department_list = []
+    if user.is_dep_administrator:
+        if user.department.super_adm:
+            department_list = Structure.objects.all()
         else:
-            department_list = departments
-    else:
-        department_list = []
+            department_list.append(user.department)
     return department_list
 
 
@@ -308,8 +305,12 @@ class AssetCreateView(LoginRequiredMixin, View):
             asset.remark = request.POST.get("remark")
             if request.POST.get("no_approve") == "on":
                 asset.is_no_approve = True
+            else:
+                asset.is_no_approve = False
             if request.POST.get("no_return") == "on":
                 asset.is_no_return = True
+            else:
+                asset.is_no_return = False
             asset.save()
             if id0 == "":
                 asset_edit_flow = AssetEditFlow()
