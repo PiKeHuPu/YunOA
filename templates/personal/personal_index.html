@@ -241,32 +241,45 @@
                     <i class="glyphicon glyphicon-search"></i>查询
                 </button>
             </form>
-            <div><p style="padding-left: 20px"> (PS:如果下方没有出现饼图，请检查自己的工单是否有费用类型）</p></div>
+            <div style="margin-top: 15px">
+                <button type="button" id="lastMonth" class="btn btn-primary" style="margin-left: 10px">
+                    上月
+                </button>
+                <button type="button" id="lastThree" class="btn btn-primary" style="margin-left: 10px">
+                    前三月
+                </button>
+                <button type="button" id="firstSeason" class="btn btn-primary" style="margin-left: 10px">
+                    一季度
+                </button>
+                <button type="button" id="secondSeason" class="btn btn-primary" style="margin-left: 10px">
+                    二季度
+                </button>
+                <button type="button" id="thirdSeason" class="btn btn-primary" style="margin-left: 10px">
+                    三季度
+                </button>
+                <button type="button" id="fourthSeason" class="btn btn-primary" style="margin-left: 10px">
+                    四季度
+                </button>
+                <button type="button" id="fourthSeason" class="btn btn-primary" style="margin-left: 10px">
+                    年度
+                </button>
+            </div>
+            <div style="margin-top: 15px"><p style="padding-left: 20px"> (PS:如果下方没有出现饼图，请检查自己的工单是否有费用类型）</p></div>
         </div>
 
         <div id="content" >
-            <select name="status" id="tabs" class="selector">
-            <!--<option>ALL</option>-->
-                <option>表1</option>
-                <option>表2</option>
-                <option>表3</option>
-            </select>
+
             <div id="chanpin0" class="none active">
                 <div id="main1" class="chart"></div>
                 <!--我们是共产主义接班人！！-->
             </div>
 
-            <div id="chanpin1" class="none">
-                　　
-                <div id="main2" class="chart"></div>
-            </div>
-
-            <div id="chanpin2" class="none">
-                　　
-                <div id="main3" class="chart"></div>
-            </div>
-
         </div>
+{#        <div>#}
+{#            <div id="mainall" class="chart">#}
+{##}
+{#            </div>#}
+{#        </div>#}
 
     </div>
 {% endblock %}
@@ -275,23 +288,6 @@
     <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
     <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
     <script type="text/javascript" src="{% static 'plugins/echarts/echarts.min.js' %}"></script>
-    <script>
-        $(function () {
-            var li = $('#tabs');
-            var cc = $('#tabs option');
-            var len = cc.length;
-            li.change(function () {
-                var t = parseInt(li.get(0).selectedIndex);
-                for (var i = 0; i < len; i++) {
-                    if (t == i) {
-                        $('#chanpin' + t).show();
-                    } else {
-                        $('#chanpin' + i).hide();
-                    }
-                }
-            });
-        });
-    </script>
     <script>
         (function () {
             var myChart1 = echarts.init(document.getElementById('main1'));
@@ -328,63 +324,7 @@
                 ]
             };
             myChart1.setOption(option1);
-            var myChart2 = echarts.init(document.getElementById('main2'));
-            var option2 = {
-                xAxis: {
-                    type: 'category',
-                    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-                },
-                yAxis: {
-                    type: 'value'
-                },
-                series: [{
-                    data: [120, 200, 150, 80, 70, 110, 130],
-                    type: 'bar'
-                }]
-            };
-            myChart2.setOption(option2);
-            var myChart3 = echarts.init(document.getElementById('main3'));
-            var option3 = {
-                title: {
-                    text: '某站点用户访问来源',
-                    subtext: '纯属虚构',
-                    x: 'center'
-                },
-                tooltip: {
-                    trigger: 'item',
-                    formatter: "{a} <br/>{b} : {c} ({d}%)"
-                },
-                legend: {
-                    orient: 'vertical',
-                    left: 'left',
-                    data: ['直接访问', '邮件营销', '联盟广告', '视频广告', '搜索引擎']
-                },
-                series: [
-                    {
-                        name: '访问来源',
-                        type: 'pie',
-                        radius: '55%',
-                        center: ['50%', '60%'],
-                        data: [
-                            {value: 335, name: '直接访问'},
-                            {value: 310, name: '邮件营销'},
-                            {value: 234, name: '联盟广告'},
-                            {value: 135, name: '视频广告'},
-                            {value: 1548, name: '搜索引擎'}
-                        ],
-                        itemStyle: {
-                            emphasis: {
-                                shadowBlur: 10,
-                                shadowOffsetX: 0,
-                                shadowColor: 'rgba(0, 0, 0, 0.5)'
-                            }
-                        }
-                    }
-                ]
-            };
-            myChart3.setOption(option3);
         })()
-
     </script>
     <script>
         $(".timepick").datetimepicker({
@@ -394,6 +334,119 @@
             forceParse: 0,
             minView: 2,
         });
+
+        $('#lastMonth').click(function () {
+            var lastMonth = 1;
+            retdata = {
+                lastMonth:lastMonth
+            }
+            $.ajax({
+                url: "{% url 'personal' %}",
+                type: "post",
+                data: retdata,
+                dataType: "json",
+                success: function (d) {
+                        if (d.status == 'fail0') {
+                            layer.alert(d.errors_info, {icon: 1})
+                        } else if (d.status == 'fail1') {
+                            layer.alert(d.errors_info, {icon: 1})
+                        }else if(d.status == 'fail2'){
+                            layer.alert(d.errors_info, {icon: 1})
+                        }
+                        else {
+                            var myChart3 = echarts.init(document.getElementById('main1'));
+                            var option3 = {
+                                title: {
+                                    text: '上月',
+                                    subtext: ' ',
+                                    x: 'center'
+                                },
+                                tooltip: {
+                                    trigger: 'item',
+                                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                                },
+                                legend: {
+                                    orient: 'vertical',
+                                    left: 'left',
+                                    data: d.lmfeetype
+                                },
+                                series: [
+                                    {
+                                        name: '访问来源',
+                                        type: 'pie',
+                                        radius: '55%',
+                                        center: ['50%', '60%'],
+                                        data: d.lmdata,
+                                        itemStyle: {
+                                            emphasis: {
+                                                shadowBlur: 10,
+                                                shadowOffsetX: 0,
+                                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                            }
+                                        }
+                                    }
+                                ]
+                            };
+                            myChart3.setOption(option3, true);
+                        }
+                    }
+            })
+        })
+
+        $('#lastThree').click(function () {
+            var lastThree = 1;
+            retdata = {
+                lastThree:lastThree
+            }
+            $.ajax({
+                url: "{% url 'personal' %}",
+                type: "post",
+                data: retdata,
+                dataType: "json",
+                success: function (d) {
+                        if (d.status == 'fail0') {
+                            layer.alert(d.errors_info, {icon: 1})
+                        } else if (d.status == 'fail1') {
+                            layer.alert(d.errors_info, {icon: 1})
+                        }else {
+                            var myChart3 = echarts.init(document.getElementById('main1'));
+                            var option3 = {
+                                title: {
+                                    text: '前三月',
+                                    subtext: ' ',
+                                    x: 'center'
+                                },
+                                tooltip: {
+                                    trigger: 'item',
+                                    formatter: "{a} <br/>{b} : {c} ({d}%)"
+                                },
+                                legend: {
+                                    orient: 'vertical',
+                                    left: 'left',
+                                    data: d.ltfeetype
+                                },
+                                series: [
+                                    {
+                                        name: '访问来源',
+                                        type: 'pie',
+                                        radius: '55%',
+                                        center: ['50%', '60%'],
+                                        data: d.ltdata,
+                                        itemStyle: {
+                                            emphasis: {
+                                                shadowBlur: 10,
+                                                shadowOffsetX: 0,
+                                                shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                            }
+                                        }
+                                    }
+                                ]
+                            };
+                            myChart3.setOption(option3, true);
+                        }
+                    }
+            })
+        })
 
         $("#btnWorkorderSearch").click(function () {
             if ($("#start_time").val() == '' && $("#end_time").val() == '') {
@@ -464,12 +517,12 @@
 
     <script type="text/javascript">
         //图表窗体自适应
-        {#$(window).resize(function () {#}
-        {#    myChart3.resize();#}
-        {##}
-        {#})
-        ;
-        #}
+        $(window).resize(function () {
+            myChart3.resize();
+
+        })
+
+
 
         function due_asset(type) {
             var index = layer.open({

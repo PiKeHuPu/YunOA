@@ -91,7 +91,7 @@ class PersonalView(LoginRequiredMixin, View):
         #个人报表
         feeid = []
         manid = UserProfile.objects.filter(name=request.user)[0].id
-        exist = WorkOrder.objects.filter(Q(cretor_id=manid), ~Q(status=3))
+        exist = WorkOrder.objects.filter(Q(cretor_id=manid), ~Q(status=3),  ~Q(status=0), ~Q(status=1))
         if len(exist) == 0:
             ret.update({
                 'status': '请提交工单在使用'
@@ -111,7 +111,7 @@ class PersonalView(LoginRequiredMixin, View):
                         feetype.append(li[0].fee_type)
                 for x in feeid:
                     cost = 0
-                    li = WorkOrder.objects.filter(feeid_id=x, cretor_id=manid)
+                    li = WorkOrder.objects.filter(Q(feeid_id=x), Q(cretor_id=manid), ~Q(status=3), ~Q(status=0), ~Q(status=1))
                     for y in li:
                         cost += float(y.cost)
                     allcost.append(cost)
@@ -125,29 +125,160 @@ class PersonalView(LoginRequiredMixin, View):
                     'feetype': feetype,
                     'perdata': perdata
                 })
+        # totalfeeid = []
+        # totalfeetype = []
+        # totalcost = []
+        # totaldata = []
+        # x = WorkOrder.objects.filter(~Q(status=3))
+        # for y in x:
+        #     if y.feeid_id not in totalfeeid and y.feeid_id != None:
+        #         totalfeeid.append(y.feeid_id)
+        # for x in totalfeeid:
+        #     li = FeeType.objects.filter(fee_id=x)
+        #     if li[0].fee_type not in totalfeetype:
+        #         totalfeetype.append(li[0].fee_type)
+        # for x in totalfeeid:
+        #     cost = 0
+        #     li = WorkOrder.objects.filter(feeid=x)
+        #     for y in li:
+        #         cost += float(y.cost)
+        #     totalcost.append(cost)
+        # for x in range(len(totalcost)):
+        #     dic = {}
+        #     dic['value'] = totalcost[x]
+        #     dic['name'] = totalfeetype[x]
+        #     totaldata.append(dic)
+        # ret.update({
+        #     'totalfeetype': totalfeetype,
+        #     'totaldata': totaldata
+        # })
         return render(request, 'personal/personal_index.html', ret)
 
     def post(self, request):
+        mon = datetime.now().month
+        year = datetime.now().year
+        manid = UserProfile.objects.filter(name=request.user)[0].id
         ret = {}
-        parafeeid = []
-        parafeetype = []
-        paraallcost = []
-        paradata = []
-        if request.POST.get("start_time") and request.POST.get("end_time"):
-            start_time = request.POST.get("start_time")
-            end_time = request.POST.get("end_time")
-            manid = UserProfile.objects.filter(name=request.user)[0].id
-            exist = WorkOrder.objects.filter(Q(cretor_id=manid), ~Q(status=3))
+
+        if request.POST.get('lastMonth'):
+            lmfeeid = []
+            lmfeetype = []
+            lmallcost = []
+            lmdata = []
+            if mon != 1:
+                mon -= 1
+            else:
+                mon = 12
+                year -= 1
+            exist = WorkOrder.objects.filter(Q(cretor_id=manid), ~Q(status=3), ~Q(status=0), ~Q(status=1))
             if len(exist) == 0:
                 ret['status'] = 'fail0'
                 ret['errors_info'] = '请提交工单使用'
             else:
-                li = WorkOrder.objects.filter(create_time__range=(start_time, end_time),cretor_id=manid)
-                for x in li:
+                li = WorkOrder.objects.filter(Q(create_time__year=year), Q(create_time__month=mon), Q(cretor_id=manid), ~Q(status=3), ~Q(status=0), ~Q(status=1))
+                if len(li) == 0:
+                    ret['status'] = 'fail1'
+                    ret['errors_info'] = '该时间段内无工单'
+                else:
+                    for x in li:
+                        if x.feeid_id not in lmfeeid and x.feeid_id != None:
+                            lmfeeid.append(x.feeid_id)
+                    if len(lmfeeid) == 0:
+                        ret['status'] = 'fail2'
+                        ret['errors_info'] = '工单内无费用类型'
+                    else:
+                        for x in lmfeeid:
+                            li = FeeType.objects.filter(fee_id=x)
+                            if li[0].fee_type not in lmfeetype:
+                                lmfeetype.append(li[0].fee_type)
+                        for x in lmfeeid:
+                            cost = 0
+                            li = WorkOrder.objects.filter(Q(create_time__year=year), Q(create_time__month=mon),Q(cretor_id=manid), ~Q(status=3), ~Q(status=0), ~Q(status=1), Q(feeid_id= x))
+                            for y in li:
+                                cost += float(y.cost)
+                            lmallcost.append(cost)
+                        for x in range(len(lmfeeid)):
+                            dic = {}
+                            dic['value'] = lmallcost[x]
+                            dic['name'] = lmfeetype[x]
+                            lmdata.append(dic)
+                        ret.update({
+                            'lmdata': lmdata,
+                            'lmfeetype': lmfeetype
+                        })
+
+        if request.POST.get('lastThree'):
+            ltfeeid = []
+            ltfeetype = []
+            ltallcost = []
+            ltdata = []
+            if mon == 3:
+                year1 = year -1
+                mon1 = 12
+                mon2 = mon -1
+            elif mon ==2:
+                year1 = year -1
+                mon1 =11
+                mon2 = mon - 1
+            elif mon == 1:
+                year1 = year -1
+                mon1 = 10
+                mon2 = 12
+            else:
+                mon1 = mon -3
+                mon2 = mon -1
+                year1 =year
+            start_t = str(year1) + '-' + str(mon1) + '-' +str(1)
+            end_t = str(year) + '-' + str(mon) + '-' + str(1)
+            exist = WorkOrder.objects.filter(Q(create_time__range=(start_t, end_t)), Q(cretor_id=manid), ~Q(status=3), ~Q(status=0), ~Q(status=1))
+            if len(exist) == 0:
+                ret['status'] = 'fail0'
+                ret['errors_info'] = '请提交工单使用'
+            else:
+                for x in exist:
+                    if x.feeid_id not in ltfeeid and x.feeid_id != None:
+                        ltfeeid.append(x.feeid_id)
+                if len(ltfeeid) == 0:
+                    ret['status'] = 'fail'
+                    ret['errors_info'] = '该时间段内没有使用费用类型'
+                else:
+                    for x in ltfeeid:
+                        li = FeeType.objects.filter(fee_id=x)
+                        if li[0].fee_type not in ltfeetype:
+                            ltfeetype.append(li[0].fee_type)
+                    for x in ltfeeid:
+                        cost = 0
+                        li = WorkOrder.objects.filter(Q(create_time__range=(start_t, end_t)), Q(feeid=x), Q(cretor_id=manid), ~Q(status=3), ~Q(status=0), ~Q(status=1))
+                        for y in li:
+                            cost += float(y.cost)
+                        ltallcost.append(cost)
+                    for x in range(len(ltfeeid)):
+                        dic ={}
+                        dic['value'] = ltallcost[x]
+                        dic['name'] = ltfeetype[x]
+                        ltdata.append(dic)
+                    ret.update({
+                        'ltfeetype':ltfeetype,
+                        'ltdata':ltdata
+                    })
+
+        if request.POST.get("start_time") and request.POST.get("end_time"):
+            parafeeid = []  # para是段落的前四个字母,表示时间段内的费用id
+            parafeetype = []
+            paraallcost = []
+            paradata = []
+            start_time = request.POST.get("start_time")
+            end_time = request.POST.get("end_time")
+            exist = WorkOrder.objects.filter(Q(create_time__range=(start_time, end_time)), Q(cretor_id=manid), ~Q(status=3), ~Q(status=0), ~Q(status=1))
+            if len(exist) == 0:
+                ret['status'] = 'fail0'
+                ret['errors_info'] = '请提交工单使用'
+            else:
+                for x in exist:
                     if x.feeid_id not in parafeeid and x.feeid_id != None:
                         parafeeid.append(x.feeid_id)
                 if len(parafeeid) == 0:
-                    ret['status'] = 'fail'
+                    ret['status'] = 'fail1'
                     ret['errors_info'] = '该时间段内没有使用费用类型'
                 else:
                     for x in parafeeid:
@@ -156,7 +287,7 @@ class PersonalView(LoginRequiredMixin, View):
                             parafeetype.append(li[0].fee_type)
                     for x in parafeeid:
                         cost = 0
-                        li = WorkOrder.objects.filter(feeid=x, cretor_id=manid)
+                        li = WorkOrder.objects.filter(Q(create_time__range=(start_time, end_time)), Q(feeid=x), Q(cretor_id=manid), ~Q(status=3), ~Q(status=0), ~Q(status=1))
                         for y in li:
                             cost += float(y.cost)
                         paraallcost.append(cost)
