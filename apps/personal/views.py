@@ -130,7 +130,7 @@ class PersonalView(LoginRequiredMixin, View):
                     'perdata': perdata
                 })
         post = UserProfile.objects.filter(name=request.user)[0].post
-        post = str("'")+ post + str("'")
+        ret['post'] = post
         totalfeeid = []
         totalfeetype = []
         totalcost = []
@@ -145,7 +145,7 @@ class PersonalView(LoginRequiredMixin, View):
                 totalfeetype.append(li[0].fee_type)
         for x in totalfeeid:
             cost = 0
-            li = WorkOrder.objects.filter(feeid=x)
+            li = WorkOrder.objects.filter(Q(feeid=x), ~Q(status=3), ~Q(status=0), ~Q(status=1))
             for y in li:
                 cost += float(y.cost)
             totalcost.append(cost)
@@ -157,7 +157,7 @@ class PersonalView(LoginRequiredMixin, View):
         ret.update({
             'totalfeetype': totalfeetype,
             'totaldata': totaldata,
-            'post': post
+
         })
         print(ret)
         return render(request, 'personal/personal_index.html', ret)
