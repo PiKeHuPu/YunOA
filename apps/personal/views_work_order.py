@@ -1008,11 +1008,15 @@ class ApplyCostUpdateView(LoginRequiredMixin, View):
             ap = get_object_or_404(BusinessApply, workorder_id=workorder_id)
         else:
             ap = BusinessApply()
+
+        check_img = ret_data.get("check_img")
+        if check_img == "1":
+            ap.file_content = ""
+
         ap.title = ret_data.get('title')
 
         feetype = ret_data.get('feetype')
         feeid = FeeType.objects.filter(fee_type=feetype)[0].fee_id
-        print(feeid, feetype)
         ap.feeid_id = feeid
         ap.type = ret_data.get('type')
         ap.status = '0'  # 等待审批

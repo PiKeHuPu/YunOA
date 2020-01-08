@@ -88,7 +88,6 @@ function fileRe() {
     file_be.seen = false;
 }
 
-
 // all_fee计算
 function allFee() {
     var all = 0;
@@ -140,9 +139,11 @@ function verify() {
 
         invoice_type = $("#invoice").val(),
         bank_account = $("#bank-account").val(),
+
         payee = $("#payee").val(),
         bank_info = $("#bank-info").val(),
-        feetype = $("#feetype").val();
+        feetype = $("#feetype").val(),
+        check_img = $("#check_img").val();
 
 
     var tem_invoice = temData(invoice_type);
@@ -223,7 +224,8 @@ function verify() {
         bank_account: bank_account,
         payee: payee,
         bank_info: bank_info,
-        feetype: feetype
+        feetype: feetype,
+        check_img: check_img,
     };
     if (ap_type == '1') {
         retData['people'] = tem_people;
@@ -241,7 +243,6 @@ function verify() {
         retData['end_time'] = end_time;
         retData['detail'] = detail;
     }
-
     return retData
 
 }
@@ -271,7 +272,7 @@ $("#btnSave").click(function () {
                 // 上传附件
                 if ($(".file-caption-name")[0]){
                     if ($(".file-caption-name")[0].title != "") {
-                    $("#file_content").fileinput("upload");
+                        $("#file_content").fileinput("upload");
                     }
                 }
                 layer.alert('报销提交成功！', {icon: 1}, function (index) {

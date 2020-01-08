@@ -87,13 +87,15 @@
                     </div>
                     <div class="form-group has-feedback">
                         <label class="col-sm-2 control-label">图片上传(请小于5M)</label>
+                        <input id="check_img" type="hidden" value="0">
                         <div class="col-sm-3">
                             <div v-show="seen" id="file_be">
                                 <button type="button" class="btn-sm btn-success" onclick="fileRe()">替换</button>
                                 <button type="button" class="btn-sm" onclick="openFile()">预览</button>
+                                <button type="button" class="btn-sm btn-danger" onclick="DelFile()">删除</button>
                             </div>
                             <div class="file-loading" v-show="seen" id="file_no">
-                                <input id="file_content" name="file_content" class="form-control" type="file"/>
+                                    <input id="file_content" name="file_content" class="form-control" type="file"/>
                             </div>
                         </div>
                     </div>
@@ -293,6 +295,13 @@
                 end: function () {
                 }
             });
+        }
+        
+        function DelFile() {
+            $("#check_img").val("1");
+            fileUP();
+            file_no.seen = true;
+            file_be.seen = false;
         }
     </script>
     <script src="{% static 'appjs/personal/apply_update.js' %}"></script>
