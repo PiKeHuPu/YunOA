@@ -277,7 +277,7 @@ class AssetCreateView(LoginRequiredMixin, View):
             number = request.POST.get("number")
             if id0:
                 asset = AssetInfo.objects.get(id=id0)
-                if AssetInfo.objects.filter(Q(number=number) & ~Q(id=id0) & Q(is_delete=False)):
+                if AssetInfo.objects.filter(Q(number=number) & ~Q(id=id0) & Q(is_delete=False) & Q(status="0")):
                     ret['asset_form_errors'] = "资产编号已存在"
                     raise AttributeError
                 asset_edit_flow = AssetEditFlow()
