@@ -11,7 +11,7 @@ from django.shortcuts import get_object_or_404
 from django.db.models import Q
 
 from bulletin.models import Bulletin
-from users.models import UserProfile
+from users.models import UserProfile, Structure
 from utils.mixin_utils import LoginRequiredMixin
 from rbac.models import Menu
 from system.models import SystemSetup
@@ -94,15 +94,19 @@ class PersonalView(LoginRequiredMixin, View):
         exist = WorkOrder.objects.filter(Q(cretor_id=manid), ~Q(status=3),  ~Q(status=0), ~Q(status=1))
         if len(exist) == 0:
             ret.update({
-                'status': '请提交工单在使用'
+                'status': 0,
+                'errors_info': '请提交工单在使用'
             })
         else:
             for x in exist:
                 if x.feeid_id not in feeid and x.feeid_id !=None:
                     feeid.append(x.feeid_id)
             if len(feeid) == 0:
-                ret['status'] = '你的工单里还没有使用费用类型的工单'
+                ret['status'] = 1
+                ret['errors_info'] = '你的工单里还没有使用费用类型的工单'
             else:
+                ret['status'] = 555
+                ret['errors_info'] = '没事了'
                 feetype = []
                 allcost = []
                 for x in feeid:
@@ -125,33 +129,37 @@ class PersonalView(LoginRequiredMixin, View):
                     'feetype': feetype,
                     'perdata': perdata
                 })
-        # totalfeeid = []
-        # totalfeetype = []
-        # totalcost = []
-        # totaldata = []
-        # x = WorkOrder.objects.filter(~Q(status=3))
-        # for y in x:
-        #     if y.feeid_id not in totalfeeid and y.feeid_id != None:
-        #         totalfeeid.append(y.feeid_id)
-        # for x in totalfeeid:
-        #     li = FeeType.objects.filter(fee_id=x)
-        #     if li[0].fee_type not in totalfeetype:
-        #         totalfeetype.append(li[0].fee_type)
-        # for x in totalfeeid:
-        #     cost = 0
-        #     li = WorkOrder.objects.filter(feeid=x)
-        #     for y in li:
-        #         cost += float(y.cost)
-        #     totalcost.append(cost)
-        # for x in range(len(totalcost)):
-        #     dic = {}
-        #     dic['value'] = totalcost[x]
-        #     dic['name'] = totalfeetype[x]
-        #     totaldata.append(dic)
-        # ret.update({
-        #     'totalfeetype': totalfeetype,
-        #     'totaldata': totaldata
-        # })
+        post = UserProfile.objects.filter(name=request.user)[0].post
+        post = str("'")+ post + str("'")
+        totalfeeid = []
+        totalfeetype = []
+        totalcost = []
+        totaldata = []
+        x = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1))
+        for y in x:
+            if y.feeid_id not in totalfeeid and y.feeid_id != None:
+                totalfeeid.append(y.feeid_id)
+        for x in totalfeeid:
+            li = FeeType.objects.filter(fee_id=x)
+            if li[0].fee_type not in totalfeetype:
+                totalfeetype.append(li[0].fee_type)
+        for x in totalfeeid:
+            cost = 0
+            li = WorkOrder.objects.filter(feeid=x)
+            for y in li:
+                cost += float(y.cost)
+            totalcost.append(cost)
+        for x in range(len(totalcost)):
+            dic = {}
+            dic['value'] = totalcost[x]
+            dic['name'] = totalfeetype[x]
+            totaldata.append(dic)
+        ret.update({
+            'totalfeetype': totalfeetype,
+            'totaldata': totaldata,
+            'post': post
+        })
+        print(ret)
         return render(request, 'personal/personal_index.html', ret)
 
     def post(self, request):
