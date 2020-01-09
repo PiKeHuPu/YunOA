@@ -129,6 +129,7 @@ class PersonalView(LoginRequiredMixin, View):
                     'feetype': feetype,
                     'perdata': perdata
                 })
+        #全体员工的报表
         post = UserProfile.objects.filter(name=request.user)[0].post
         ret['post'] = post
         totalfeeid = []
@@ -159,7 +160,6 @@ class PersonalView(LoginRequiredMixin, View):
             'totaldata': totaldata,
 
         })
-        print(ret)
         return render(request, 'personal/personal_index.html', ret)
 
     def post(self, request):
@@ -167,7 +167,46 @@ class PersonalView(LoginRequiredMixin, View):
         year = datetime.now().year
         manid = UserProfile.objects.filter(name=request.user)[0].id
         ret = {}
-
+        #生产中心
+        if request.POST.get('production'):
+            pr = request.POST.get('production')
+            prfeeid = []
+            prfeetype = []
+            prcost = []
+            prdata = []
+            exist = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=pr))
+            if len(exist) == 0:
+                ret['status'] = 'fail0'
+                ret['errors_info'] = '该部门没有工单'
+            else:
+                li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=pr), ~Q(feeid_id=None))
+                if len(li) == 0:
+                    ret['status'] = 'fail0'
+                    ret['errors_info'] = '该部门工单无费用类型'
+                else:
+                    for x in li:
+                        if x.feeid_id not in prfeeid:
+                            prfeeid.append(x.feeid_id)
+                    for x in prfeeid:
+                        ll = FeeType.objects.filter(fee_id=x)
+                        if ll[0].fee_type not in prfeetype:
+                            prfeetype.append(ll[0].fee_type)
+                    for x in prfeeid:
+                        cost = 0
+                        li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=pr), Q(feeid_id=x))
+                        for y in li:
+                            cost += float(y.cost)
+                        prcost.append(cost)
+                    for x in range(len(prfeeid)):
+                        dic = {}
+                        dic['value'] = prcost[x]
+                        dic['name'] = prfeetype[x]
+                        prdata.append(dic)
+                    ret.update({
+                        'prfeetype': prfeetype,
+                        'prdata': prdata
+                    })
+        #上月
         if request.POST.get('lastMonth'):
             lmfeeid = []
             lmfeetype = []
@@ -214,7 +253,7 @@ class PersonalView(LoginRequiredMixin, View):
                             'lmdata': lmdata,
                             'lmfeetype': lmfeetype
                         })
-
+        #前三月
         if request.POST.get('lastThree'):
             ltfeeid = []
             ltfeetype = []
@@ -269,7 +308,7 @@ class PersonalView(LoginRequiredMixin, View):
                         'ltfeetype':ltfeetype,
                         'ltdata':ltdata
                     })
-
+        #时间段搜索工单
         if request.POST.get("start_time") and request.POST.get("end_time"):
             parafeeid = []  # para是段落的前四个字母,表示时间段内的费用id
             parafeetype = []

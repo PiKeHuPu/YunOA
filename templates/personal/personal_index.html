@@ -273,6 +273,48 @@
         <div>
             <div id="allf" style="display: none">
                 <h1  style="font-family: 楷体; font-size: 30px; margin-left: 0">全公司报表</h1>
+                <div style="margin-top: 15px">
+                        <button type="button" id="production" class="btn btn-primary" style="margin-left: 10px">
+                            生产中心
+                        </button>
+                        <button type="button" id="lastThree" class="btn btn-primary" style="margin-left: 10px">
+                            大数据事业部
+                        </button>
+                        <button type="button" id="firstSeason" class="btn btn-primary" style="margin-left: 10px">
+                            人事行政中心
+                        </button>
+                        <button type="button" id="secondSeason" class="btn btn-primary" style="margin-left: 10px">
+                            营销中心
+                        </button>
+                        <button type="button" id="thirdSeason" class="btn btn-primary" style="margin-left: 10px">
+                            运维服务中心
+                        </button>
+                        <button type="button" id="fourthSeason" class="btn btn-primary" style="margin-left: 10px">
+                            证券事务中心
+                        </button>
+                        <button type="button" id="fourthSeason" class="btn btn-primary" style="margin-left: 10px">
+                            财务部
+                        </button>
+                     <br>
+                        <button type="button" id="fourthSeason" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">
+                            售后服务中心
+                        </button>
+                        <button type="button" id="fourthSeason" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">
+                            物资管理中心
+                        </button>
+                        <button type="button" id="fourthSeason" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">
+                            通信工程项目部
+                        </button>
+                        <button type="button" id="fourthSeason" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">
+                            电力工程项目部
+                        </button>
+                        <button type="button" id="fourthSeason" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">
+                            财务部
+                        </button>
+                        <button type="button" id="fourthSeason" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">
+                            财务部
+                        </button>
+                    </div>
                 <div id="allform" class="chart" >
                 </div>
             </div>
@@ -288,6 +330,7 @@
     <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
     <script type="text/javascript" src="{% static 'plugins/echarts/echarts.min.js' %}"></script>
     <script>
+    {# 个人报表#}
         (function () {
             x ={{ status|safe }}
             if (x == 0) {
@@ -337,7 +380,7 @@
     </script>
 
     <script>
-
+    {#  董事长/总经理报表  #}
         (function () {
             id = '{{ post|safe }}'
             x = '董事长'
@@ -395,6 +438,7 @@
             minView: 2,
         });
 
+        {#个人报表中的按钮功能#}
         $('#lastMonth').click(function () {
             var lastMonth = 1;
             retdata = {
@@ -572,6 +616,65 @@
                 })
             }
         });
+    </script>
+
+    <script>
+        $('#production').click(function () {
+            var production = 17;
+            retdata = {
+                production: production
+            }
+            $.ajax({
+                url: "{% url 'personal' %}",
+                type: "post",
+                data: retdata,
+                dataType: "json",
+                success: function (d) {
+                    if (d.status == 'fail0') {
+                        layer.alert(d.errors_info, {icon: 1})
+                    } else if (d.status == 'fail1') {
+                        layer.alert(d.errors_info, {icon: 1})
+                    } else if (d.status == 'fail2') {
+                        layer.alert(d.errors_info, {icon: 1})
+                    } else {
+                        var myChart3 = echarts.init(document.getElementById('main1'));
+                        var option3 = {
+                            title: {
+                                text: '上月',
+                                subtext: ' ',
+                                x: 'center'
+                            },
+                            tooltip: {
+                                trigger: 'item',
+                                formatter: "{a} <br/>{b} : {c} ({d}%)"
+                            },
+                            legend: {
+                                orient: 'vertical',
+                                left: 'left',
+                                data: d.lmfeetype
+                            },
+                            series: [
+                                {
+                                    name: '费用类型',
+                                    type: 'pie',
+                                    radius: '55%',
+                                    center: ['50%', '60%'],
+                                    data: d.lmdata,
+                                    itemStyle: {
+                                        emphasis: {
+                                            shadowBlur: 10,
+                                            shadowOffsetX: 0,
+                                            shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                        }
+                                    }
+                                }
+                            ]
+                        };
+                        myChart3.setOption(option3, true);
+                    }
+                }
+            })
+        })
     </script>
 
     <script type="text/javascript">
