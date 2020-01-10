@@ -286,6 +286,9 @@ class WorkOrderCreateView(LoginRequiredMixin, View):
         if ret_data.get('type') == '0' or advance == '1':  # 立项审批
             if ret_data.get('apply_only'):
                 work_order.is_apply_only = ret_data.get('apply_only')
+                work_order.payee = None
+                work_order.bank_account = None
+                work_order.bank_info = None
             else:
                 work_order.invoice_type = ret_data.get('invoice_type')
                 work_order.payee = ret_data.get('payee')
