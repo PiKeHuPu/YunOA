@@ -157,6 +157,20 @@ class WorkOrderView(LoginRequiredMixin, View):
         ret['status_list'] = status_list
         return render(request, 'personal/workorder/workorder.html', ret)
 
+    def post(self, request):
+        """
+        银行卡自动填写功能
+        :param request:
+        :return:
+        """
+        ret = dict()
+        info0 = request.POST.get("info0")
+        user_id = request.session.get("_auth_user_id")
+        card = WorkOrderCard.objects.filter(createman_id=user_id, payee=info0)[0]
+        ret["bank_account"] = card.bank_account
+        ret["bank_info"] = card.bank_info
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
+
 
 class WorkOrderListView(LoginRequiredMixin, View):
     """

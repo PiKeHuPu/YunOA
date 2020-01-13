@@ -106,22 +106,22 @@
                             </select>
                         </div>
 
-                        <label class="col-sm-2 control-label">银行账号</label>
+                        <label class="col-sm-2 control-label">收款方</label>
                         <div class="col-sm-3">
-                            <input class="form-control" name="bank_account" type="text" id="bank-account" value="{% if work_order.bank_account %}{{ work_order.bank_account }}{% else %}{{ request.user.bank_card }}{% endif %}" list="itemlist" autocomplete="off"/>
-                        <datalist id="itemlist">
-                            {% for acc in bank_account %}
+                            <input class="form-control" name="payee" type="text"                                   value="{% if work_order.payee %}{{ work_order.payee }}{% else %}{{ request.user.bank_user_name }}{% endif %}" placeholder="1万元以上必须对公支付" id="payee" list="itemlist1" autocomplete="off" onchange="auto_select()"/>
+                        <datalist id="itemlist1">
+                            {% for acc in payee %}
                                 <option value="{{acc}}"></option>
                             {% endfor %}
                         </datalist>
                         </div>
                     </div>
                     <div class="form-group has-feedback">
-                        <label class="col-sm-2 control-label">收款方</label>
+                        <label class="col-sm-2 control-label">银行账号</label>
                         <div class="col-sm-3">
-                            <input class="form-control" name="payee" type="text"                                   value="{% if work_order.payee %}{{ work_order.payee }}{% else %}{{ request.user.bank_user_name }}{% endif %}" placeholder="1万元以上必须对公支付" id="payee" list="itemlist1" autocomplete="off"/>
-                        <datalist id="itemlist1">
-                            {% for acc in payee %}
+                            <input class="form-control" name="bank_account" type="text" id="bank-account" value="{% if work_order.bank_account %}{{ work_order.bank_account }}{% else %}{{ request.user.bank_card }}{% endif %}" list="itemlist" autocomplete="off"/>
+                        <datalist id="itemlist">
+                            {% for acc in bank_account %}
                                 <option value="{{acc}}"></option>
                             {% endfor %}
                         </datalist>
@@ -260,6 +260,21 @@
                 end: function () {
                 }
             });
+        }
+
+        function auto_select() {
+            var info0 = $("#payee").val();
+            $.ajax({
+                url: '{% url "personal-workorder_Icrt" %}',
+                type: "post",
+                data: {"info0": info0},
+                success: function (ret) {
+                    var bank_account = ret.bank_account;
+                    var bank_info = ret.bank_info;
+                    $("#bank-account").val(bank_account);
+                    $("#bank-info").val(bank_info);
+                }
+            })
         }
 
     </script>
