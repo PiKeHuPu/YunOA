@@ -10,6 +10,7 @@
 	<form class="form-horizontal" id="addForm" method="post">
 		{% csrf_token %}
 		<input type="hidden" name='id' value="{{ vehicle.id }}" />
+		<input type="hidden" name='id0' value="{{ oilwear.id }}" />
 		<div class="box-body">
           <fieldset>
             <div class="form-group has-feedback">
@@ -17,38 +18,38 @@
                 <div class="col-sm-3">
                     <select class="form-control select2" name="license_plate" id="license_plate">
                         {% for rel in rels %}
-                        <option value={{ rel.vehicle.id }} > {{ rel.vehicle.license_plate }}&nbsp;&nbsp;{{ rel.vehicle.department }}</option>
+                        <option value={{ rel.vehicle.id }} {% if rel.vehicle.id == oilwear.vehicle_id %}selected{% endif %}> {{ rel.vehicle.license_plate }}&nbsp;&nbsp;{{ rel.vehicle.department }}</option>
                         {% endfor %}
                     </select>
                 </div>
                 <label class="col-sm-2 control-label">加油日期</label>
                 <div class="col-sm-3">
-                    <input class="form-control" name="refuel_time" id="refuel_time" type="text" autocomplete="off"/>
+                    <input class="form-control" name="refuel_time" id="refuel_time" type="text" autocomplete="off" value="{{ oilwear.refuel_time|date:"Y-m-d" }}"/>
                 </div>
                 <br><br>
                 <label class="col-sm-2 control-label">加油前公里数</label>
                 <div class="col-sm-3">
-                    <input class="form-control" name="mileage" id="mileage" type='number' step="0.01" min="0"/>
+                    <input class="form-control" name="mileage" id="mileage" type='number' step="0.01" min="0" value="{{ oilwear.mileage }}"/>
                 </div>
 
                 <label class="col-sm-2 control-label">加油量(升)</label>
                 <div class="col-sm-3">
-                    <input class="form-control" name="weight" id="weight" type='number' step="0.01" min="0"/>
+                    <input class="form-control" name="weight" id="weight" type='number' step="0.01" min="0" value="{{ oilwear.weight }}"/>
                 </div>
                 <br><br>
                 <label class="col-sm-2 control-label">油量单价(升)</label>
                 <div class="col-sm-3">
-                    <input class="form-control" name="price" id="price" type='number' step="0.01" min="0"/>
+                    <input class="form-control" name="price" id="price" type='number' step="0.01" min="0" value="{{ oilwear.price }}"/>
                 </div>
 
                 <label class="col-sm-2 control-label">金额</label>
                 <div class="col-sm-3">
-                    <input class="form-control" name="amount" id="amount" type='number' step="0.01" min="0"/>
+                    <input class="form-control" name="amount" id="amount" type='number' step="0.01" min="0" value="{{ oilwear.amount }}"/>
                 </div>
                 <br><br>
                 <label class="col-sm-2 control-label">备注</label>
                 <div class="col-sm-3">
-                    <textarea name="remark" id="remark" cols="73" rows="2" maxlength="50"></textarea>
+                    <textarea name="remark" id="remark" cols="73" rows="2" maxlength="50">{{ oilwear.remark }}</textarea>
                 </div>
             </div>
           </fieldset>
