@@ -380,7 +380,7 @@ class AssetUseHtmlView(LoginRequiredMixin, View):
         user = User.objects.get(id=user_id)
         department = user.department
         warehouses = department.assetwarehouse_set.filter(is_delete=False)
-        all_view_warehouses = AssetWarehouse.objects.filter(is_all_view=True)
+        all_view_warehouses = AssetWarehouse.objects.filter(is_all_view=True, is_delete=False)
         warehouses = warehouses | all_view_warehouses
         status_list = []
         for status in Asset.asset_status:
