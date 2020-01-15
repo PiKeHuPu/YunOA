@@ -227,6 +227,7 @@ class AssetView(LoginRequiredMixin, View):
         # 获取可管理资产的id
         asset_id_list = []
         warehouse_list = warehouse_admin(department_list)
+        ret['warehouse_list'] = warehouse_list
         for warehouse in warehouse_list:
             id_list = warehouse.assetinfo_set.filter(is_delete=False).values("id")
             asset_id_list += id_list
@@ -344,12 +345,14 @@ class AssetAjaxView(LoginRequiredMixin, View):
 
         # 获取资产列表
         fields = ['id', 'number', 'name', 'department__title', 'warehouse__name', 'quantity', 'type', 'status', 'unit',
-                  'create_time', 'due_time']
+                  'create_time', 'due_time', 'warehouse__id']
         filter = dict()
         if request.GET.get('number'):
             filter['number'] = request.GET.get('number')
         if request.GET.get('name'):
             filter['name'] = request.GET.get('name')
+        if request.GET.get("asset_warehouse"):
+            filter['warehouse_id'] = request.GET.get("asset_warehouse")
         user_id = request.session.get("_auth_user_id")
         department_list = department_admin(user_id)
 
