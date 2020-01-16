@@ -146,7 +146,7 @@ class WorkOrderLog(models.Model):
                                 verbose_name='审批人')
     structure = models.ForeignKey(Structure, related_name='workorderlog', blank=True, null=True, on_delete=models.SET_NULL,
                                   verbose_name='审批时所在部门')
-    create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+    create_time = models.DateTimeField(auto_now=True, verbose_name="创建时间")
 
     class Meta:
         verbose_name = '审批日志'

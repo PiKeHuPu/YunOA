@@ -526,25 +526,42 @@ class WorkOrderAppUpdateView(LoginRequiredMixin, View):
                 order_flow = WorkOrderFlow.objects.filter(order_type=str(ret_data.get('type')), pro_type=pro_type,
                                                           structure_id=str(ret_data.get('structure'))).first()
                 update_next_user(work_order, str(current_user_id), order_flow, '0')
-                # 记录审批log
                 if work_order.status == '2' and work_order.advance == '1' and work_order.adv_payment == '0':
                     work_order.status = '5'  # 等待付款
-                order_log = WorkOrderLog(order_id=work_order,
-                                         record_type='0',
-                                         desc=ret_data.get('desc0', ''),
-                                         creator=request.user,
-                                         structure=request.user.department
-                                         )
-                print(order_log.desc)
+                # 记录审批log
+                work_order_check = WorkOrderLog.objects.filter(order_id=work_order, type=ret_data.get('type'), creator_id=current_user_id)
+                if work_order_check:
+                    order_log = WorkOrderLog.objects.filter(order_id=work_order, type=ret_data.get('type'), creator_id=current_user_id)[0]
+                    order_log.order_id = work_order
+                    order_log.record_type = '0'
+                    order_log.desc = ret_data.get('desc0', '')
+                    order_log.creator = request.user
+                    order_log.structure = request.user.department
+                else:
+                    order_log = WorkOrderLog(order_id=work_order,
+                                             record_type='0',
+                                             desc=ret_data.get('desc0', ''),
+                                             creator=request.user,
+                                             structure=request.user.department
+                                             )
             elif ret_data.get('opinion') == 'disagree':
                 # 审批不同意， 标记结果
                 work_order.status = '3'
-                order_log = WorkOrderLog(order_id=work_order,
-                                         record_type='1',
-                                         desc=ret_data.get('desc0', ''),
-                                         creator=request.user,
-                                         structure=request.user.department
-                                         )
+                work_order_check = WorkOrderLog.objects.filter(order_id=work_order, type=ret_data.get('type'), creator_id=current_user_id)
+                if work_order_check:
+                    order_log = WorkOrderLog.objects.filter(order_id=work_order, type=ret_data.get('type'), creator_id=current_user_id)[0]
+                    order_log.order_id = work_order
+                    order_log.record_type = '1'
+                    order_log.desc = ret_data.get('desc0', '')
+                    order_log.creator = request.user
+                    order_log.structure = request.user.department
+                else:
+                    order_log = WorkOrderLog(order_id=work_order,
+                                             record_type='1',
+                                             desc=ret_data.get('desc0', ''),
+                                             creator=request.user,
+                                             structure=request.user.department
+                                             )
             order_log.save()
             work_order.save()
             res['status'] = 'success'
@@ -1263,23 +1280,41 @@ class CostAppUpdateView(LoginRequiredMixin, View):
                 #     else:
                 #         ap.status = '5'
                 # 记录审批log
-                order_log = WorkOrderLog(order_id=ap.workorder,
-                                         type='1',
-                                         record_type='0',
-                                         desc=ret_data.get('desc0', ''),
-                                         creator=request.user,
-                                         structure=request.user.department
-                                         )
+                work_order_check = WorkOrderLog.objects.filter(order_id=ap.workorder, type='1', creator_id=current_user_id)
+                if work_order_check:
+                    order_log = WorkOrderLog.objects.filter(order_id=ap.workorder, type='1', creator_id=current_user_id)[0]
+                    order_log.order_id = ap.workorder
+                    order_log.record_type = '0'
+                    order_log.desc = ret_data.get('desc0', '')
+                    order_log.creator = request.user
+                    order_log.structure = request.user.department
+                else:
+                    order_log = WorkOrderLog(order_id=ap.workorder,
+                                             type='1',
+                                             record_type='0',
+                                             desc=ret_data.get('desc0', ''),
+                                             creator=request.user,
+                                             structure=request.user.department
+                                             )
             elif ret_data.get('opinion') == 'disagree':
                 # 审批不同意， 标记结果
                 ap.status = '3'
-                order_log = WorkOrderLog(order_id=ap.workorder,
-                                         type='1',
-                                         record_type='1',
-                                         desc=ret_data.get('desc0', ''),
-                                         creator=request.user,
-                                         structure=request.user.department
-                                         )
+                work_order_check = WorkOrderLog.objects.filter(order_id=ap.workorder, type='1', creator_id=current_user_id)
+                if work_order_check:
+                    order_log = WorkOrderLog.objects.filter(order_id=ap.workorder, type='1', creator_id=current_user_id)[0]
+                    order_log.order_id = ap.workorder
+                    order_log.record_type = '1'
+                    order_log.desc = ret_data.get('desc0', '')
+                    order_log.creator = request.user
+                    order_log.structure = request.user.department
+                else:
+                    order_log = WorkOrderLog(order_id=ap.workorder,
+                                             type='1',
+                                             record_type='1',
+                                             desc=ret_data.get('desc0', ''),
+                                             creator=request.user,
+                                             structure=request.user.department
+                                             )
             order_log.save()
             ap.save()
             res['status'] = 'success'
