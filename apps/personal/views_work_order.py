@@ -421,7 +421,16 @@ class WorkOrderDetailView(LoginRequiredMixin, View):
                 adm_list = Structure.objects.values("adm_list").get(id=structure_id)["adm_list"].split(",")
             except:
                 adm_list = []
-            if (request.user.id in user_list) or (str(request.user.id) in adm_list):
+
+            fee_id = work_order.feeid_id
+            fee_type = FeeType.objects.filter(fee_id=fee_id)
+            if fee_type:
+                fee_type = FeeType.objects.filter(fee_id=fee_id)[0]
+                copy_dep = fee_type.copy_to_id
+            else:
+                copy_dep = "-1"
+
+            if (request.user.id in user_list) or (str(request.user.id) in adm_list) or (request.user.department_id == copy_dep):
                 ret['work_order'] = work_order
                 # ret['work_order_record'] = work_order_record
                 ret['work_order_log'] = work_order_log
@@ -1179,12 +1188,19 @@ class ApDetailView(LoginRequiredMixin, View):
             except:
                 adm_list = []
 
-            if (request.user.id in user_list) or (str(request.user.id) in adm_list):
+            fee_id = work_order.feeid_id
+            fee_type = FeeType.objects.filter(fee_id=fee_id)
+            if fee_type:
+                fee_type = FeeType.objects.filter(fee_id=fee_id)[0]
+                copy_dep = fee_type.copy_to_id
+            else:
+                copy_dep = "-1"
+
+            if (request.user.id in user_list) or (str(request.user.id) in adm_list) or (request.user.department_id == copy_dep):
                 ret['work_order'] = work_order
                 ret['work_order_log'] = work_order_log
             else:
                 ret['ban'] = 'ban'
-        print(ret)
         return render(request, 'personal/workorder/apply_app_detail.html', ret)
 
 
@@ -1616,4 +1632,33 @@ class APPLogListContentView(LoginRequiredMixin, View):
             ret = dict(data=list(WorkOrder.objects.filter(**filters).values(*fields).order_by('-create_time')))
         else:
             ret = dict(data=[])
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
+
+
+class CopyTo(LoginRequiredMixin, View):
+    """
+    抄送
+    """
+    def get(self, request):
+        ret = dict()
+        return render(request, "personal/workorder/workorder_copy.html", ret)
+
+    def post(self, request):
+        user_id = request.session.get("_auth_user_id")
+        user = User.objects.get(id=user_id)
+        copy = FeeType.objects.filter(copy_to_id=user.department_id)
+        copy_list = []
+        if copy:
+            for c in copy:
+                copy_list.append(c.fee_id)
+
+        fields = ['id', 'number', 'feeid_id__fee_type', 'status', 'end_time', 'cretor_id__name', 'cost', 'feeid_id', 'structure_id__title']
+        filters = dict()
+        if request.GET.get("start_time") and request.GET.get("end_time"):
+            start_time = request.GET.get("start_time")
+            end_time = request.GET.get("end_time")
+            filters['end_time__range'] = (start_time, end_time)
+        filters['status'] = "6"
+        filters['feeid_id__in'] = copy_list
+        ret = dict(data=list(WorkOrder.objects.filter(**filters).values(*fields).order_by('-end_time')))
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')

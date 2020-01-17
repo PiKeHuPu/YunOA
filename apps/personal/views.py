@@ -159,7 +159,6 @@ class PersonalView(LoginRequiredMixin, View):
             'totaldata': totaldata,
 
         })
-        print(ret)
         return render(request, 'personal/personal_index.html', ret)
 
     def post(self, request):
