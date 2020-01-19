@@ -167,6 +167,45 @@ class PersonalView(LoginRequiredMixin, View):
         year = datetime.now().year
         manid = UserProfile.objects.filter(name=request.user)[0].id
         ret = {}
+        #营销中心
+        if request.POST.get('saleCenter'):
+            sc = request.POST.get('saleCenter')
+            scfeeid = []
+            scfeetype = []
+            sccost = []
+            scdata = []
+            exist = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=sc))
+            if len(exist) == 0:
+                ret['status'] = 'fail0'
+                ret['errors_info'] = '该部门没有工单'
+            else:
+                li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=sc), ~Q(feeid_id=None))
+                if len(li) == 0:
+                    ret['status'] = 'fail0'
+                    ret['errors_info'] = '该部门工单无费用类型'
+                else:
+                    for x in li:
+                        if x.feeid_id not in scfeeid:
+                            scfeeid.append(x.feeid_id)
+                    for x in scfeeid:
+                        ll = FeeType.objects.filter(fee_id=x)
+                        if ll[0].fee_type not in scfeetype:
+                            scfeetype.append(ll[0].fee_type)
+                    for x in scfeeid:
+                        cost = 0
+                        li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=sc), Q(feeid_id=x))
+                        for y in li:
+                            cost += float(y.cost)
+                        sccost.append(cost)
+                    for x in range(len(scfeeid)):
+                        dic = {}
+                        dic['value'] = sccost[x]
+                        dic['name'] = scfeetype[x]
+                        scdata.append(dic)
+                    ret.update({
+                        'scfeetype': scfeetype,
+                        'scdata': scdata
+                    })
         #生产中心
         if request.POST.get('production'):
             pr = request.POST.get('production')
@@ -205,6 +244,128 @@ class PersonalView(LoginRequiredMixin, View):
                     ret.update({
                         'prfeetype': prfeetype,
                         'prdata': prdata
+                    })
+        #人事行政中心
+        if request.POST.get('personal'):
+            pe = request.POST.get('personal')
+            pefeeid = []
+            pefeetype = []
+            pecost = []
+            pedata = []
+            exist = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=pe))
+            if len(exist) == 0:
+                ret['status'] = 'fail0'
+                ret['errors_info'] = '该部门没有工单'
+            else:
+                li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=pe),
+                                              ~Q(feeid_id=None))
+                if len(li) == 0:
+                    ret['status'] = 'fail0'
+                    ret['errors_info'] = '该部门工单无费用类型'
+                else:
+                    for x in li:
+                        if x.feeid_id not in pefeeid:
+                            pefeeid.append(x.feeid_id)
+                    for x in pefeeid:
+                        ll = FeeType.objects.filter(fee_id=x)
+                        if ll[0].fee_type not in pefeetype:
+                            pefeetype.append(ll[0].fee_type)
+                    for x in pefeeid:
+                        cost = 0
+                        li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=pe),
+                                                      Q(feeid_id=x))
+                        for y in li:
+                            cost += float(y.cost)
+                        pecost.append(cost)
+                    for x in range(len(pefeeid)):
+                        dic = {}
+                        dic['value'] = pecost[x]
+                        dic['name'] = pefeetype[x]
+                        pedata.append(dic)
+                    ret.update({
+                        'pefeetype': pefeetype,
+                        'pedata': pedata
+                    })
+        #售后服务
+        if request.POST.get('afterSale'):
+            af = request.POST.get('afterSale')
+            affeeid = []
+            affeetype = []
+            afcost = []
+            afdata = []
+            exist = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=af))
+            if len(exist) == 0:
+                ret['status'] = 'fail0'
+                ret['errors_info'] = '该部门没有工单'
+            else:
+                li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=af),~Q(feeid_id=None))
+                if len(li) == 0:
+                    ret['status'] = 'fail0'
+                    ret['errors_info'] = '该部门工单无费用类型'
+                else:
+                    for x in li:
+                        if x.feeid_id not in affeeid:
+                            affeeid.append(x.feeid_id)
+                    for x in affeeid:
+                        ll = FeeType.objects.filter(fee_id=x)
+                        if ll[0].fee_type not in affeetype:
+                            affeetype.append(ll[0].fee_type)
+                    for x in affeeid:
+                        cost = 0
+                        li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=af),
+                                                      Q(feeid_id=x))
+                        for y in li:
+                            cost += float(y.cost)
+                        afcost.append(cost)
+                    for x in range(len(affeeid)):
+                        dic = {}
+                        dic['value'] = afcost[x]
+                        dic['name'] = affeetype[x]
+                        afdata.append(dic)
+                    ret.update({
+                        'affeetype': affeetype,
+                        'afdata': afdata
+                    })
+        #通信工程
+        # 售后服务
+        if request.POST.get('communication'):
+            co = request.POST.get('communication')
+            cofeeid = []
+            cofeetype = []
+            cocost = []
+            codata = []
+            exist = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=co))
+            if len(exist) == 0:
+                ret['status'] = 'fail0'
+                ret['errors_info'] = '该部门没有工单'
+            else:
+                li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=co),
+                                              ~Q(feeid_id=None))
+                if len(li) == 0:
+                    ret['status'] = 'fail0'
+                    ret['errors_info'] = '该部门工单无费用类型'
+                else:
+                    for x in li:
+                        if x.feeid_id not in cofeeid:
+                            cofeeid.append(x.feeid_id)
+                    for x in cofeeid:
+                        ll = FeeType.objects.filter(fee_id=x)
+                        if ll[0].fee_type not in cofeetype:
+                            cofeetype.append(ll[0].fee_type)
+                    for x in cofeeid:
+                        cost = 0
+                        li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1),Q(structure_id=co),Q(feeid_id=x))
+                        for y in li:
+                            cost += float(y.cost)
+                        cocost.append(cost)
+                    for x in range(len(cofeeid)):
+                        dic = {}
+                        dic['value'] = cocost[x]
+                        dic['name'] = cofeetype[x]
+                        codata.append(dic)
+                    ret.update({
+                        'cofeetype': cofeetype,
+                        'codata': codata
                     })
         #上月
         if request.POST.get('lastMonth'):
