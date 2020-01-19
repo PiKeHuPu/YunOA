@@ -17,7 +17,7 @@
                     </legend>
                     <div class="form-group has-feedback">
                         <input class="form-control" name="id0" id="id0" type="hidden" value="{{ asset.id }}"/>
-                        <label class="col-sm-2 control-label">资产编号</label>
+                        <label class="col-sm-2 control-label">资产编号(选填)</label>
                         <div class="col-sm-3">
                             <input class="form-control" name="number" id="number" type="text" value="{{ asset.number }}"/>
                         </div>
@@ -91,9 +91,7 @@
     <script type="text/javascript">
 
         $("#btnSave").click(function () {
-            if ($("#number").val() == "") {
-                alert("请输入资产编号")
-            } else if($("#name").val() == "") {
+            if($("#name").val() == "") {
                 alert("请输入资产名称")
             } else if($("#department").val() == "") {
                 alert("请选择所属部门")

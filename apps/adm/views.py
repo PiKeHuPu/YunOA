@@ -1,5 +1,6 @@
 import copy
 import json
+import time
 
 from django.contrib.auth import get_user_model
 from django.core import serializers
@@ -291,7 +292,10 @@ class AssetCreateView(LoginRequiredMixin, View):
                 if AssetInfo.objects.filter(Q(number=number) & Q(is_delete=False)):
                     ret['asset_form_errors'] = "资产编号已存在"
                     raise AttributeError
-            asset.number = number
+            if number:
+                asset.number = number
+            else:
+                asset.number = "AC" + str(int(time.time()))
             asset.name = request.POST.get("name")
             asset.department_id = request.POST.get("department")
             asset.warehouse_id = request.POST.get("warehouse")
