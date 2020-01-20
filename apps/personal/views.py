@@ -347,8 +347,8 @@ class PersonalView(LoginRequiredMixin, View):
                 else:
                     for x in li:
                         if x.feeid_id not in opfeeid:
-                            pefeeid.append(x.feeid_id)
-                    for x in pefeeid:
+                            opfeeid.append(x.feeid_id)
+                    for x in opfeeid:
                         ll = FeeType.objects.filter(fee_id=x)
                         if ll[0].fee_type not in opfeetype:
                             opfeetype.append(ll[0].fee_type)
@@ -359,7 +359,7 @@ class PersonalView(LoginRequiredMixin, View):
                         for y in li:
                             cost += float(y.cost)
                         opcost.append(cost)
-                    for x in range(len(pefeeid)):
+                    for x in range(len(opfeeid)):
                         dic = {}
                         dic['value'] = opcost[x]
                         dic['name'] = opfeetype[x]

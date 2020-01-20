@@ -12,15 +12,4 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.DeleteModel(
-            name='WorkOrderType',
-        ),
-        migrations.RemoveField(
-            model_name='businessapply',
-            name='t_title',
-        ),
-        migrations.RemoveField(
-            model_name='workorder',
-            name='t_title',
-        ),
     ]
