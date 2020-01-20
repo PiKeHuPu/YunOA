@@ -41,6 +41,15 @@
                     <label>资产名称：</label>
                     <input type="text" name="name" class="form-control inputText" id="name">
                 </div>
+                <div class="form-group searchArea margin-r-5 margin-top-5">
+                    <label>所在仓库：</label>
+                    <select class="form-control inputText select2" name="asset_warehouse"  id="asset_warehouse">
+                        <option></option>
+                        {% for warehouse in warehouse_list %}
+                            <option value={{ warehouse.id }}>{{ warehouse.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
                 <button type="button" id="btnAssetSearch" class="btn btn-default">
                     <i class="glyphicon glyphicon-search"></i>查询
                 </button>
@@ -103,6 +112,7 @@ $(function() {
 								"data":function ( d ) {
                                     d.number = $("#number").val();
                                     d.name = $("#name").val();
+                                    d.asset_warehouse = $("#asset_warehouse").val();
 								}
 						},
 

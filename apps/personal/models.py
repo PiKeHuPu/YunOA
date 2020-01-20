@@ -44,6 +44,7 @@ User = get_user_model()
 class FeeType(models.Model):
     fee_id = models.IntegerField(blank=True)
     fee_type = models.CharField(max_length=10, blank=True)
+    copy_to = models.ForeignKey(Structure, blank=True, null=True, on_delete=models.SET_NULL, verbose_name="审批完成后所抄送部门")
 
 
 class WorkOrder(models.Model):
@@ -100,11 +101,11 @@ class WorkOrder(models.Model):
 
 class WorkOrderCard(models.Model):
     createman = models.ForeignKey(User, related_name='cm'
-                                  ,on_delete=models.CASCADE,verbose_name='银行卡信息人')
+                                  , on_delete=models.CASCADE, verbose_name='银行卡信息人')
     payee = models.CharField(max_length=300, blank=True, null=True, verbose_name='收款方')
     bank_account = models.CharField(max_length=30, blank=True, null=True, verbose_name='银行账户')
     bank_info = models.CharField(max_length=300, blank=True, null=True, verbose_name='开户行')
-    time = models.IntegerField(max_length=10, blank=False,null=True , verbose_name='使用次数')
+    time = models.IntegerField(blank=False, null=True , verbose_name='使用次数')
 
 
 
@@ -146,7 +147,7 @@ class WorkOrderLog(models.Model):
                                 verbose_name='审批人')
     structure = models.ForeignKey(Structure, related_name='workorderlog', blank=True, null=True, on_delete=models.SET_NULL,
                                   verbose_name='审批时所在部门')
-    create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+    create_time = models.DateTimeField(auto_now=True, verbose_name="创建时间")
 
     class Meta:
         verbose_name = '审批日志'

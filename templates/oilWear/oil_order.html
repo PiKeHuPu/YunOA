@@ -57,7 +57,6 @@
                     <table id="dtbList" class="display" cellspacing="0" width="100%">
                         <thead>
                         <tr valign="middle">
-                            <th><input type="checkbox" id="checkAll"></th>
                             <th>车牌号</th>
                             <th>车型</th>
                             <th>部门</th>
@@ -68,6 +67,7 @@
                             <th>油量单价</th>
                             <th>金额</th>
                             <th>备注</th>
+                            <th>操作</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -115,7 +115,6 @@
                             }
                         },
                         columns: [
-                            DATATABLES_CONSTANT.DATA_TABLES.COLUMN.CHECKBOX,
                             {
                                 data: "vehicle_id__license_plate",
                             },
@@ -145,7 +144,14 @@
                             },
                             {
                                 data: "remark",
-                                width: "29%"
+                                width: "25%"
+                            },
+                            {
+                                data: "id",
+                                render: function (data) {
+                                    return "<button title='修改' onclick='change_log("
+                                        + data + ")'><i class='glyphicon glyphicon-wrench'></i></button>";
+                                },
                             }],
                     }));
                 return oTable;
@@ -170,8 +176,21 @@
 
             $("#btnRefresh").click(function () {
                 window.location.reload()
-            })
+            });
         });
+
+        function change_log(id) {
+            layer.open({
+                type: 2,
+                maxmin: true,
+                title: "修改油耗记录",
+                area: ["800px", "315px"],
+                content: "{% url 'oil_order_create' %}?id=" + id,
+                end: function () {
+                    window.location.reload()
+                }
+                });
+        }
 
         $(function () {
             //Initialize Select2 Elements

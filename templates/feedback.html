@@ -10,12 +10,12 @@
     <div class="box box-danger">
         <form class="form-horizontal" id="addForm" method="post">
             <input type="hidden" name='order' value="{{ work_order.id }}" id="orderId"/>
-            <div class="col-sm-8">
-                <textarea class="form-control" name="title" id="advise" style="height:150px;width: 600px; margin-left: 12px"></textarea>
+            <div class="col-sm-12">
+                <textarea class="form-control" name="title" id="advise" style="height:150px;width: 100%"></textarea>
             </div>
             <div class="box-footer ">
-                <div style="position: absolute; right: 25px; margin-top: 10px">
-                    <button type="button" id="btnSave" class="btn btn-primary" onclick="Save()">保存</button>
+                <div style="text-align: center">
+                    <button type="button" id="btnSave" class="btn btn-primary" onclick="Save()" style="margin-top: 1%">提交</button>
                 </div>
             </div>
         </form>

@@ -88,6 +88,7 @@
                             <th><input type="checkbox" id="checkAll"></th>
                             <th>申请单号</th>
                             <th>费用类型</th>
+                            <th>预览</th>
                             <th>审批类型</th>
                             <th>审批状态</th>
 {#                            <th>开始时间</th>#}
@@ -173,6 +174,18 @@
                                         } else {
                                             ret = row.title
                                         }
+                                    }
+                                    return ret;
+                                }
+                            },
+                            {
+                                data: "title",
+                                render: function (data, type, row, meta) {
+                                    var ret;
+                                    if (data.length > 6) {
+                                        ret = data.slice(0, 6) + "..."
+                                    } else {
+                                        ret = data
                                     }
                                     return ret;
                                 }

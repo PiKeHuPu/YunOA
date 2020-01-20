@@ -148,4 +148,6 @@ urlpatterns = [
     url(r'due_asset', personal_views.DueAssetView.as_view(), name="due_asset"),
     # 意见反馈
     url(r'feedback', personal_views.FeedbackView.as_view(), name="feedback"),
+    # 抄送
+    url(r'^personal/workorder_copy/$', order.CopyTo.as_view(), name="copy_to"),
 ]

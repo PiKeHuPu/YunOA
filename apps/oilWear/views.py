@@ -232,6 +232,10 @@ class OilOrderCreateView(LoginRequiredMixin, View):
         else:
             rels = Operator.objects.filter(operator_id=user_id, vehicle__is_delete=False)
         ret["rels"] = rels
+        id0 = request.GET.get("id")
+        if id0:
+            oilwear = OilWear.objects.filter(id=id0)[0]
+            ret["oilwear"] = oilwear
         return render(request, "oilWear/oil_order_create.html", ret)
 
     def post(self, request):
@@ -246,7 +250,11 @@ class OilOrderCreateView(LoginRequiredMixin, View):
             remark = request.POST.get("remark")
             vehicle_id = request.POST.get("license_plate")
 
-            oil_order = OilWear()
+            id0 = request.POST.get("id0")
+            if id0:
+                oil_order = OilWear.objects.get(id=id0)
+            else:
+                oil_order = OilWear()
             oil_order.operator_id = operator_id
             oil_order.refuel_time = refuel_time
             oil_order.mileage = mileage

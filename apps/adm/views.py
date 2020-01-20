@@ -1,5 +1,6 @@
 import copy
 import json
+import time
 
 from django.contrib.auth import get_user_model
 from django.core import serializers
@@ -227,6 +228,7 @@ class AssetView(LoginRequiredMixin, View):
         # 获取可管理资产的id
         asset_id_list = []
         warehouse_list = warehouse_admin(department_list)
+        ret['warehouse_list'] = warehouse_list
         for warehouse in warehouse_list:
             id_list = warehouse.assetinfo_set.filter(is_delete=False).values("id")
             asset_id_list += id_list
@@ -290,7 +292,10 @@ class AssetCreateView(LoginRequiredMixin, View):
                 if AssetInfo.objects.filter(Q(number=number) & Q(is_delete=False)):
                     ret['asset_form_errors'] = "资产编号已存在"
                     raise AttributeError
-            asset.number = number
+            if number:
+                asset.number = number
+            else:
+                asset.number = "AC" + str(int(time.time()))
             asset.name = request.POST.get("name")
             asset.department_id = request.POST.get("department")
             asset.warehouse_id = request.POST.get("warehouse")
@@ -344,12 +349,14 @@ class AssetAjaxView(LoginRequiredMixin, View):
 
         # 获取资产列表
         fields = ['id', 'number', 'name', 'department__title', 'warehouse__name', 'quantity', 'type', 'status', 'unit',
-                  'create_time', 'due_time']
+                  'create_time', 'due_time', 'warehouse__id']
         filter = dict()
         if request.GET.get('number'):
             filter['number'] = request.GET.get('number')
         if request.GET.get('name'):
             filter['name'] = request.GET.get('name')
+        if request.GET.get("asset_warehouse"):
+            filter['warehouse_id'] = request.GET.get("asset_warehouse")
         user_id = request.session.get("_auth_user_id")
         department_list = department_admin(user_id)
 

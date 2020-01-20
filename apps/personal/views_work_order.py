@@ -157,6 +157,20 @@ class WorkOrderView(LoginRequiredMixin, View):
         ret['status_list'] = status_list
         return render(request, 'personal/workorder/workorder.html', ret)
 
+    def post(self, request):
+        """
+        银行卡自动填写功能
+        :param request:
+        :return:
+        """
+        ret = dict()
+        info0 = request.POST.get("info0")
+        user_id = request.session.get("_auth_user_id")
+        card = WorkOrderCard.objects.filter(createman_id=user_id, payee=info0)[0]
+        ret["bank_account"] = card.bank_account
+        ret["bank_info"] = card.bank_info
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
+
 
 class WorkOrderListView(LoginRequiredMixin, View):
     """
@@ -286,6 +300,9 @@ class WorkOrderCreateView(LoginRequiredMixin, View):
         if ret_data.get('type') == '0' or advance == '1':  # 立项审批
             if ret_data.get('apply_only'):
                 work_order.is_apply_only = ret_data.get('apply_only')
+                work_order.payee = None
+                work_order.bank_account = None
+                work_order.bank_info = None
             else:
                 work_order.invoice_type = ret_data.get('invoice_type')
                 work_order.payee = ret_data.get('payee')
@@ -404,7 +421,16 @@ class WorkOrderDetailView(LoginRequiredMixin, View):
                 adm_list = Structure.objects.values("adm_list").get(id=structure_id)["adm_list"].split(",")
             except:
                 adm_list = []
-            if (request.user.id in user_list) or (str(request.user.id) in adm_list):
+
+            fee_id = work_order.feeid_id
+            fee_type = FeeType.objects.filter(fee_id=fee_id)
+            if fee_type:
+                fee_type = FeeType.objects.filter(fee_id=fee_id)[0]
+                copy_dep = fee_type.copy_to_id
+            else:
+                copy_dep = "-1"
+
+            if (request.user.id in user_list) or (str(request.user.id) in adm_list) or (request.user.department_id == copy_dep):
                 ret['work_order'] = work_order
                 # ret['work_order_record'] = work_order_record
                 ret['work_order_log'] = work_order_log
@@ -509,25 +535,42 @@ class WorkOrderAppUpdateView(LoginRequiredMixin, View):
                 order_flow = WorkOrderFlow.objects.filter(order_type=str(ret_data.get('type')), pro_type=pro_type,
                                                           structure_id=str(ret_data.get('structure'))).first()
                 update_next_user(work_order, str(current_user_id), order_flow, '0')
-                # 记录审批log
                 if work_order.status == '2' and work_order.advance == '1' and work_order.adv_payment == '0':
                     work_order.status = '5'  # 等待付款
-                order_log = WorkOrderLog(order_id=work_order,
-                                         record_type='0',
-                                         desc=ret_data.get('desc0', ''),
-                                         creator=request.user,
-                                         structure=request.user.department
-                                         )
-                print(order_log.desc)
+                # 记录审批log
+                work_order_check = WorkOrderLog.objects.filter(order_id=work_order, type=ret_data.get('type'), creator_id=current_user_id)
+                if work_order_check:
+                    order_log = WorkOrderLog.objects.filter(order_id=work_order, type=ret_data.get('type'), creator_id=current_user_id)[0]
+                    order_log.order_id = work_order
+                    order_log.record_type = '0'
+                    order_log.desc = ret_data.get('desc0', '')
+                    order_log.creator = request.user
+                    order_log.structure = request.user.department
+                else:
+                    order_log = WorkOrderLog(order_id=work_order,
+                                             record_type='0',
+                                             desc=ret_data.get('desc0', ''),
+                                             creator=request.user,
+                                             structure=request.user.department
+                                             )
             elif ret_data.get('opinion') == 'disagree':
                 # 审批不同意， 标记结果
                 work_order.status = '3'
-                order_log = WorkOrderLog(order_id=work_order,
-                                         record_type='1',
-                                         desc=ret_data.get('desc0', ''),
-                                         creator=request.user,
-                                         structure=request.user.department
-                                         )
+                work_order_check = WorkOrderLog.objects.filter(order_id=work_order, type=ret_data.get('type'), creator_id=current_user_id)
+                if work_order_check:
+                    order_log = WorkOrderLog.objects.filter(order_id=work_order, type=ret_data.get('type'), creator_id=current_user_id)[0]
+                    order_log.order_id = work_order
+                    order_log.record_type = '1'
+                    order_log.desc = ret_data.get('desc0', '')
+                    order_log.creator = request.user
+                    order_log.structure = request.user.department
+                else:
+                    order_log = WorkOrderLog(order_id=work_order,
+                                             record_type='1',
+                                             desc=ret_data.get('desc0', ''),
+                                             creator=request.user,
+                                             structure=request.user.department
+                                             )
             order_log.save()
             work_order.save()
             res['status'] = 'success'
@@ -1145,12 +1188,19 @@ class ApDetailView(LoginRequiredMixin, View):
             except:
                 adm_list = []
 
-            if (request.user.id in user_list) or (str(request.user.id) in adm_list):
+            fee_id = work_order.feeid_id
+            fee_type = FeeType.objects.filter(fee_id=fee_id)
+            if fee_type:
+                fee_type = FeeType.objects.filter(fee_id=fee_id)[0]
+                copy_dep = fee_type.copy_to_id
+            else:
+                copy_dep = "-1"
+
+            if (request.user.id in user_list) or (str(request.user.id) in adm_list) or (request.user.department_id == copy_dep):
                 ret['work_order'] = work_order
                 ret['work_order_log'] = work_order_log
             else:
                 ret['ban'] = 'ban'
-        print(ret)
         return render(request, 'personal/workorder/apply_app_detail.html', ret)
 
 
@@ -1246,23 +1296,41 @@ class CostAppUpdateView(LoginRequiredMixin, View):
                 #     else:
                 #         ap.status = '5'
                 # 记录审批log
-                order_log = WorkOrderLog(order_id=ap.workorder,
-                                         type='1',
-                                         record_type='0',
-                                         desc=ret_data.get('desc0', ''),
-                                         creator=request.user,
-                                         structure=request.user.department
-                                         )
+                work_order_check = WorkOrderLog.objects.filter(order_id=ap.workorder, type='1', creator_id=current_user_id)
+                if work_order_check:
+                    order_log = WorkOrderLog.objects.filter(order_id=ap.workorder, type='1', creator_id=current_user_id)[0]
+                    order_log.order_id = ap.workorder
+                    order_log.record_type = '0'
+                    order_log.desc = ret_data.get('desc0', '')
+                    order_log.creator = request.user
+                    order_log.structure = request.user.department
+                else:
+                    order_log = WorkOrderLog(order_id=ap.workorder,
+                                             type='1',
+                                             record_type='0',
+                                             desc=ret_data.get('desc0', ''),
+                                             creator=request.user,
+                                             structure=request.user.department
+                                             )
             elif ret_data.get('opinion') == 'disagree':
                 # 审批不同意， 标记结果
                 ap.status = '3'
-                order_log = WorkOrderLog(order_id=ap.workorder,
-                                         type='1',
-                                         record_type='1',
-                                         desc=ret_data.get('desc0', ''),
-                                         creator=request.user,
-                                         structure=request.user.department
-                                         )
+                work_order_check = WorkOrderLog.objects.filter(order_id=ap.workorder, type='1', creator_id=current_user_id)
+                if work_order_check:
+                    order_log = WorkOrderLog.objects.filter(order_id=ap.workorder, type='1', creator_id=current_user_id)[0]
+                    order_log.order_id = ap.workorder
+                    order_log.record_type = '1'
+                    order_log.desc = ret_data.get('desc0', '')
+                    order_log.creator = request.user
+                    order_log.structure = request.user.department
+                else:
+                    order_log = WorkOrderLog(order_id=ap.workorder,
+                                             type='1',
+                                             record_type='1',
+                                             desc=ret_data.get('desc0', ''),
+                                             creator=request.user,
+                                             structure=request.user.department
+                                             )
             order_log.save()
             ap.save()
             res['status'] = 'success'
@@ -1564,4 +1632,33 @@ class APPLogListContentView(LoginRequiredMixin, View):
             ret = dict(data=list(WorkOrder.objects.filter(**filters).values(*fields).order_by('-create_time')))
         else:
             ret = dict(data=[])
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
+
+
+class CopyTo(LoginRequiredMixin, View):
+    """
+    抄送
+    """
+    def get(self, request):
+        ret = dict()
+        return render(request, "personal/workorder/workorder_copy.html", ret)
+
+    def post(self, request):
+        user_id = request.session.get("_auth_user_id")
+        user = User.objects.get(id=user_id)
+        copy = FeeType.objects.filter(copy_to_id=user.department_id)
+        copy_list = []
+        if copy:
+            for c in copy:
+                copy_list.append(c.fee_id)
+
+        fields = ['id', 'number', 'feeid_id__fee_type', 'status', 'end_time', 'cretor_id__name', 'cost', 'feeid_id', 'structure_id__title']
+        filters = dict()
+        if request.GET.get("start_time") and request.GET.get("end_time"):
+            start_time = request.GET.get("start_time")
+            end_time = request.GET.get("end_time")
+            filters['end_time__range'] = (start_time, end_time)
+        filters['status'] = "6"
+        filters['feeid_id__in'] = copy_list
+        ret = dict(data=list(WorkOrder.objects.filter(**filters).values(*fields).order_by('-end_time')))
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')

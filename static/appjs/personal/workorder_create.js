@@ -66,6 +66,9 @@ function applyOnly(){
         document.getElementById("payee").readOnly="true";
         document.getElementById("bank-info").readOnly="true";
         document.getElementById("invoice-type").disabled="true";
+        document.getElementById("bank-account").value="";
+        document.getElementById("payee").value="";
+        document.getElementById("bank-info").value="";
     } else {
         document.getElementById("bank-account").readOnly=false;
         document.getElementById("payee").readOnly=false;
