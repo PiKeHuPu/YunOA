@@ -129,6 +129,7 @@ class PersonalView(LoginRequiredMixin, View):
                     'feetype': feetype,
                     'perdata': perdata
                 })
+        #全体员工的报表
         post = UserProfile.objects.filter(name=request.user)[0].post
         ret['post'] = post
         totalfeeid = []
@@ -166,7 +167,450 @@ class PersonalView(LoginRequiredMixin, View):
         year = datetime.now().year
         manid = UserProfile.objects.filter(name=request.user)[0].id
         ret = {}
+        #营销中心
+        if request.POST.get('saleCenter'):
+            sc = request.POST.get('saleCenter')
+            scfeeid = []
+            scfeetype = []
+            sccost = []
+            scdata = []
+            exist = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=sc))
+            if len(exist) == 0:
+                ret['status'] = 'fail0'
+                ret['errors_info'] = '该部门没有工单'
+            else:
+                li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=sc), ~Q(feeid_id=None))
+                if len(li) == 0:
+                    ret['status'] = 'fail0'
+                    ret['errors_info'] = '该部门工单无费用类型'
+                else:
+                    for x in li:
+                        if x.feeid_id not in scfeeid:
+                            scfeeid.append(x.feeid_id)
+                    for x in scfeeid:
+                        ll = FeeType.objects.filter(fee_id=x)
+                        if ll[0].fee_type not in scfeetype:
+                            scfeetype.append(ll[0].fee_type)
+                    for x in scfeeid:
+                        cost = 0
+                        li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=sc), Q(feeid_id=x))
+                        for y in li:
+                            cost += float(y.cost)
+                        sccost.append(cost)
+                    for x in range(len(scfeeid)):
+                        dic = {}
+                        dic['value'] = sccost[x]
+                        dic['name'] = scfeetype[x]
+                        scdata.append(dic)
+                    ret.update({
+                        'scfeetype': scfeetype,
+                        'scdata': scdata
+                    })
+        #大数据事业部
+        if request.POST.get('BigData'):
+            bg = request.POST.get('BigData')
+            bgfeeid = []
+            bgfeetype = []
+            bgcost = []
+            bgdata = []
+            exist = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=bg))
+            if len(exist) == 0:
+                ret['status'] = 'fail0'
+                ret['errors_info'] = '该部门没有工单'
+            else:
+                li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=bg), ~Q(feeid_id=None))
+                if len(li) == 0:
+                    ret['status'] = 'fail0'
+                    ret['errors_info'] = '该部门工单无费用类型'
+                else:
+                    for x in li:
+                        if x.feeid_id not in bgfeeid:
+                            bgfeeid.append(x.feeid_id)
+                    for x in bgfeeid:
+                        ll = FeeType.objects.filter(fee_id=x)
+                        if ll[0].fee_type not in bgfeetype:
+                            bgfeetype.append(ll[0].fee_type)
+                    for x in bgfeeid:
+                        cost = 0
+                        li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=bg), Q(feeid_id=x))
+                        for y in li:
+                            cost += float(y.cost)
+                        bgcost.append(cost)
+                    for x in range(len(bgfeeid)):
+                        dic = {}
+                        dic['value'] = bgcost[x]
+                        dic['name'] = bgfeetype[x]
+                        bgdata.append(dic)
+                    ret.update({
+                        'bgfeetype': bgfeetype,
+                        'bgdata': bgdata
+                    })
+        #生产中心
+        if request.POST.get('production'):
+            pr = request.POST.get('production')
+            prfeeid = []
+            prfeetype = []
+            prcost = []
+            prdata = []
+            print(pr)
+            exist = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=pr))
+            if len(exist) == 0:
+                ret['status'] = 'fail0'
+                ret['errors_info'] = '该部门没有工单'
+            else:
+                li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=pr), ~Q(feeid_id=None))
+                if len(li) == 0:
+                    ret['status'] = 'fail0'
+                    ret['errors_info'] = '该部门工单无费用类型'
+                else:
+                    for x in li:
+                        if x.feeid_id not in prfeeid:
+                            prfeeid.append(x.feeid_id)
+                    for x in prfeeid:
+                        ll = FeeType.objects.filter(fee_id=x)
+                        if ll[0].fee_type not in prfeetype:
+                            prfeetype.append(ll[0].fee_type)
+                    for x in prfeeid:
+                        cost = 0
+                        li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=pr), Q(feeid_id=x))
+                        for y in li:
+                            cost += float(y.cost)
+                        prcost.append(cost)
+                    for x in range(len(prfeeid)):
+                        dic = {}
+                        dic['value'] = prcost[x]
+                        dic['name'] = prfeetype[x]
+                        prdata.append(dic)
 
+                    ret.update({
+                        'prfeetype': prfeetype,
+                        'prdata': prdata
+                    })
+        #人事行政中心
+        if request.POST.get('personal'):
+            pe = request.POST.get('personal')
+            pefeeid = []
+            pefeetype = []
+            pecost = []
+            pedata = []
+            exist = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=pe))
+            if len(exist) == 0:
+                ret['status'] = 'fail0'
+                ret['errors_info'] = '该部门没有工单'
+            else:
+                li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=pe),
+                                              ~Q(feeid_id=None))
+                if len(li) == 0:
+                    ret['status'] = 'fail0'
+                    ret['errors_info'] = '该部门工单无费用类型'
+                else:
+                    for x in li:
+                        if x.feeid_id not in pefeeid:
+                            pefeeid.append(x.feeid_id)
+                    for x in pefeeid:
+                        ll = FeeType.objects.filter(fee_id=x)
+                        if ll[0].fee_type not in pefeetype:
+                            pefeetype.append(ll[0].fee_type)
+                    for x in pefeeid:
+                        cost = 0
+                        li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=pe),
+                                                      Q(feeid_id=x))
+                        for y in li:
+                            cost += float(y.cost)
+                        pecost.append(cost)
+                    for x in range(len(pefeeid)):
+                        dic = {}
+                        dic['value'] = pecost[x]
+                        dic['name'] = pefeetype[x]
+                        pedata.append(dic)
+                    ret.update({
+                        'pefeetype': pefeetype,
+                        'pedata': pedata
+                    })
+        #运维中心
+        if request.POST.get('ops'):
+            op = request.POST.get('ops')
+            opfeeid = []
+            opfeetype = []
+            opcost = []
+            opdata = []
+            exist = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=op))
+            if len(exist) == 0:
+                ret['status'] = 'fail0'
+                ret['errors_info'] = '该部门没有工单'
+            else:
+                li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=op),
+                                              ~Q(feeid_id=None))
+                if len(li) == 0:
+                    ret['status'] = 'fail0'
+                    ret['errors_info'] = '该部门工单无费用类型'
+                else:
+                    for x in li:
+                        if x.feeid_id not in opfeeid:
+                            opfeeid.append(x.feeid_id)
+                    for x in opfeeid:
+                        ll = FeeType.objects.filter(fee_id=x)
+                        if ll[0].fee_type not in opfeetype:
+                            opfeetype.append(ll[0].fee_type)
+                    for x in opfeeid:
+                        cost = 0
+                        li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=op),
+                                                      Q(feeid_id=x))
+                        for y in li:
+                            cost += float(y.cost)
+                        opcost.append(cost)
+                    for x in range(len(opfeeid)):
+                        dic = {}
+                        dic['value'] = opcost[x]
+                        dic['name'] = opfeetype[x]
+                        opdata.append(dic)
+                    ret.update({
+                        'opfeetype': opfeetype,
+                        'opdata': opdata
+                    })
+        #证券事务中心 Securities affairs centre
+        if request.POST.get('SAC'):
+            sa = request.POST.get('SAC')
+            safeeid = []
+            safeetype = []
+            sacost = []
+            sadata = []
+            exist = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=sa))
+            if len(exist) == 0:
+                ret['status'] = 'fail0'
+                ret['errors_info'] = '该部门没有工单'
+            else:
+                li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=sa),
+                                              ~Q(feeid_id=None))
+                if len(li) == 0:
+                    ret['status'] = 'fail0'
+                    ret['errors_info'] = '该部门工单无费用类型'
+                else:
+                    for x in li:
+                        if x.feeid_id not in safeeid:
+                            safeeid.append(x.feeid_id)
+                    for x in safeeid:
+                        ll = FeeType.objects.filter(fee_id=x)
+                        if ll[0].fee_type not in safeetype:
+                            safeetype.append(ll[0].fee_type)
+                    for x in safeeid:
+                        cost = 0
+                        li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=sa),
+                                                      Q(feeid_id=x))
+                        for y in li:
+                            cost += float(y.cost)
+                        sacost.append(cost)
+                    for x in range(len(safeeid)):
+                        dic = {}
+                        dic['value'] = sacost[x]
+                        dic['name'] = safeetype[x]
+                        sadata.append(dic)
+                    ret.update({
+                        'safeetype': safeetype,
+                        'sadata': sadata
+                    })
+        #财务部
+        if request.POST.get('finance'):
+            fi = request.POST.get('finance')
+            fifeeid = []
+            fifeetype = []
+            ficost = []
+            fidata = []
+            exist = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=fi))
+            if len(exist) == 0:
+                ret['status'] = 'fail0'
+                ret['errors_info'] = '该部门没有工单'
+            else:
+                li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=fi),
+                                              ~Q(feeid_id=None))
+                if len(li) == 0:
+                    ret['status'] = 'fail0'
+                    ret['errors_info'] = '该部门工单无费用类型'
+                else:
+                    for x in li:
+                        if x.feeid_id not in fifeeid:
+                            fifeeid.append(x.feeid_id)
+                    for x in fifeeid:
+                        ll = FeeType.objects.filter(fee_id=x)
+                        if ll[0].fee_type not in fifeetype:
+                            fifeetype.append(ll[0].fee_type)
+                    for x in fifeeid:
+                        cost = 0
+                        li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=fi),
+                                                      Q(feeid_id=x))
+                        for y in li:
+                            cost += float(y.cost)
+                        ficost.append(cost)
+                    for x in range(len(fifeeid)):
+                        dic = {}
+                        dic['value'] = ficost[x]
+                        dic['name'] = fifeetype[x]
+                        fidata.append(dic)
+                    ret.update({
+                        'fifeetype': fifeetype,
+                        'fidata': fidata
+                    })
+        #售后服务
+        if request.POST.get('afterSale'):
+            af = request.POST.get('afterSale')
+            affeeid = []
+            affeetype = []
+            afcost = []
+            afdata = []
+            exist = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=af))
+            if len(exist) == 0:
+                ret['status'] = 'fail0'
+                ret['errors_info'] = '该部门没有工单'
+            else:
+                li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=af),~Q(feeid_id=None))
+                if len(li) == 0:
+                    ret['status'] = 'fail0'
+                    ret['errors_info'] = '该部门工单无费用类型'
+                else:
+                    for x in li:
+                        if x.feeid_id not in affeeid:
+                            affeeid.append(x.feeid_id)
+                    for x in affeeid:
+                        ll = FeeType.objects.filter(fee_id=x)
+                        if ll[0].fee_type not in affeetype:
+                            affeetype.append(ll[0].fee_type)
+                    for x in affeeid:
+                        cost = 0
+                        li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=af),
+                                                      Q(feeid_id=x))
+                        for y in li:
+                            cost += float(y.cost)
+                        afcost.append(cost)
+                    for x in range(len(affeeid)):
+                        dic = {}
+                        dic['value'] = afcost[x]
+                        dic['name'] = affeetype[x]
+                        afdata.append(dic)
+                    ret.update({
+                        'affeetype': affeetype,
+                        'afdata': afdata
+                    })
+        #物资管理
+        if request.POST.get('materials'):
+            mm = request.POST.get('materials')
+            mmfeeid = []
+            mmfeetype = []
+            mmcost = []
+            mmdata = []
+            exist = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=mm))
+            if len(exist) == 0:
+                ret['status'] = 'fail0'
+                ret['errors_info'] = '该部门没有工单'
+            else:
+                li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=mm),~Q(feeid_id=None))
+                if len(li) == 0:
+                    ret['status'] = 'fail0'
+                    ret['errors_info'] = '该部门工单无费用类型'
+                else:
+                    for x in li:
+                        if x.feeid_id not in mmfeeid:
+                            mmfeeid.append(x.feeid_id)
+                    for x in mmfeeid:
+                        ll = FeeType.objects.filter(fee_id=x)
+                        if ll[0].fee_type not in mmfeetype:
+                            mmfeetype.append(ll[0].fee_type)
+                    for x in mmfeeid:
+                        cost = 0
+                        li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=mm),
+                                                      Q(feeid_id=x))
+                        for y in li:
+                            cost += float(y.cost)
+                        mmcost.append(cost)
+                    for x in range(len(mmfeeid)):
+                        dic = {}
+                        dic['value'] = mmcost[x]
+                        dic['name'] = mmfeetype[x]
+                        mmdata.append(dic)
+                    ret.update({
+                        'mmfeetype': mmfeetype,
+                        'mmdata': mmdata
+                    })
+        #通信工程
+        if request.POST.get('communication'):
+            co = request.POST.get('communication')
+            cofeeid = []
+            cofeetype = []
+            cocost = []
+            codata = []
+            exist = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=co))
+            if len(exist) == 0:
+                ret['status'] = 'fail0'
+                ret['errors_info'] = '该部门没有工单'
+            else:
+                li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=co),
+                                              ~Q(feeid_id=None))
+                if len(li) == 0:
+                    ret['status'] = 'fail0'
+                    ret['errors_info'] = '该部门工单无费用类型'
+                else:
+                    for x in li:
+                        if x.feeid_id not in cofeeid:
+                            cofeeid.append(x.feeid_id)
+                    for x in cofeeid:
+                        ll = FeeType.objects.filter(fee_id=x)
+                        if ll[0].fee_type not in cofeetype:
+                            cofeetype.append(ll[0].fee_type)
+                    for x in cofeeid:
+                        cost = 0
+                        li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1),Q(structure_id=co),Q(feeid_id=x))
+                        for y in li:
+                            cost += float(y.cost)
+                        cocost.append(cost)
+                    for x in range(len(cofeeid)):
+                        dic = {}
+                        dic['value'] = cocost[x]
+                        dic['name'] = cofeetype[x]
+                        codata.append(dic)
+                    ret.update({
+                        'cofeetype': cofeetype,
+                        'codata': codata
+                    })
+        #电力工程
+        if request.POST.get('electric'):
+            epp = request.POST.get('electric')
+            eppfeeid = []
+            eppfeetype = []
+            eppcost = []
+            eppdata = []
+            exist = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=epp))
+            if len(exist) == 0:
+                ret['status'] = 'fail0'
+                ret['errors_info'] = '该部门没有工单'
+            else:
+                li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=epp),
+                                              ~Q(feeid_id=None))
+                if len(li) == 0:
+                    ret['status'] = 'fail0'
+                    ret['errors_info'] = '该部门工单无费用类型'
+                else:
+                    for x in li:
+                        if x.feeid_id not in eppfeeid:
+                            eppfeeid.append(x.feeid_id)
+                    for x in eppfeeid:
+                        ll = FeeType.objects.filter(fee_id=x)
+                        if ll[0].fee_type not in eppfeetype:
+                            eppfeetype.append(ll[0].fee_type)
+                    for x in eppfeeid:
+                        cost = 0
+                        li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1),Q(structure_id=epp),Q(feeid_id=x))
+                        for y in li:
+                            cost += float(y.cost)
+                        eppcost.append(cost)
+                    for x in range(len(eppfeeid)):
+                        dic = {}
+                        dic['value'] = eppcost[x]
+                        dic['name'] = eppfeetype[x]
+                        eppdata.append(dic)
+                    ret.update({
+                        'eppfeetype': eppfeetype,
+                        'eppdata': eppdata
+                    })
+        #上月
         if request.POST.get('lastMonth'):
             lmfeeid = []
             lmfeetype = []
@@ -213,7 +657,7 @@ class PersonalView(LoginRequiredMixin, View):
                             'lmdata': lmdata,
                             'lmfeetype': lmfeetype
                         })
-
+        #前三月
         if request.POST.get('lastThree'):
             ltfeeid = []
             ltfeetype = []
@@ -268,7 +712,7 @@ class PersonalView(LoginRequiredMixin, View):
                         'ltfeetype':ltfeetype,
                         'ltdata':ltdata
                     })
-
+        #时间段搜索工单
         if request.POST.get("start_time") and request.POST.get("end_time"):
             parafeeid = []  # para是段落的前四个字母,表示时间段内的费用id
             parafeetype = []
