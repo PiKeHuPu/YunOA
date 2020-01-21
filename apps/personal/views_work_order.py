@@ -269,7 +269,6 @@ class WorkOrderCreateView(LoginRequiredMixin, View):
             'bank_info': bank_info,
             'payee': payee,
             'feetype': feetype
-
         })
         return render(request, 'personal/workorder/workorder_create.html', ret)
 
@@ -532,8 +531,7 @@ class WorkOrderAppUpdateView(LoginRequiredMixin, View):
                     pro_type = '0'
                 elif advance == '1':
                     pro_type = '1'
-                order_flow = WorkOrderFlow.objects.filter(order_type=str(ret_data.get('type')), pro_type=pro_type,
-                                                          structure_id=str(ret_data.get('structure'))).first()
+                order_flow = WorkOrderFlow.objects.filter(order_type=str(ret_data.get('type')), pro_type=pro_type, structure_id=str(ret_data.get('structure'))).first()
                 update_next_user(work_order, str(current_user_id), order_flow, '0')
                 if work_order.status == '2' and work_order.advance == '1' and work_order.adv_payment == '0':
                     work_order.status = '5'  # 等待付款
@@ -592,6 +590,17 @@ class WorkOrderAppUpdateView(LoginRequiredMixin, View):
                         else:
                             work_order.status = '4'  # 付款完成
                             apply(work_order, current_user_id)
+                    elif ret_data.get('opinion') == 'disagree_c':
+                        # 记录审批log
+                        order_log = WorkOrderLog(order_id=work_order,
+                                                 record_type='1',
+                                                 desc=ret_data.get('desc0', ''),
+                                                 creator=request.user,
+                                                 structure=request.user.department
+                                                 )
+                        work_order.advance = "0"
+                        work_order.status = "7"
+                        apply(work_order, current_user_id)
                     order_log.save()
                     work_order.save()
                     res['status'] = 'success'
@@ -1090,10 +1099,12 @@ class ApplyCostUpdateView(LoginRequiredMixin, View):
             days = d_time_value.days + (d_time_value.seconds / 3600 / 24)
             ap.days = round(days, 2)
         current_user_id = request.user.id
-        order_flow = WorkOrderFlow.objects.filter(order_type=ret_data.get('type'), pro_type='1',
-                                                  structure=request.user.department).first()
+        order_flow = WorkOrderFlow.objects.filter(order_type=ret_data.get('type'), pro_type='1', structure=request.user.department).first()
         update_next_user(ap, str(current_user_id), order_flow, '1')  # 更新审批人信息
         ap.save()
+        # workorder = WorkOrder.objects.get(id=workorder_id)
+        # workorder.status = "8"
+        # workorder.save()
         res['status'] = 'success'
         return HttpResponse(json.dumps(res), content_type='application/json')
 

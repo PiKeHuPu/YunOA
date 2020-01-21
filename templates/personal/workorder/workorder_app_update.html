@@ -184,8 +184,10 @@
 
                             <div class="text-center">
                                 {% if cashier == '0' %}
-                                    <button type="button" class="btn btn-primary" data-toggle="modal"
-                                            onclick="updateOpin('disagree')">不同意
+                                    <button type="button" class="btn btn-primary" data-toggle="modal" onclick="updateOpin('disagree')">不同意
+                                    </button>
+                                {% else %}
+                                    <button type="button" class="btn btn-primary" data-toggle="modal" onclick="updateOpin('disagree_c')">取消预付款
                                     </button>
                                 {% endif %}
                                 <button type="button" class="btn btn-danger" onclick="updateOpin('agree')">

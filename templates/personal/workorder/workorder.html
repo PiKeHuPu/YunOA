@@ -238,6 +238,14 @@
                                         var ret = "<button class='btn btn-success btn-xs'>报销完成</button>";
                                         return ret;
                                     }
+                                    else if (data == 7) {
+                                        var ret = "<button class='btn btn-warning btn-xs'>取消预付款</button>";
+                                        return ret;
+                                    }
+                                    else if (data == 8) {
+                                        var ret = "<button class='btn btn-info btn-xs'>报销中</button>";
+                                        return ret;
+                                    }
 
                                 }
                             },
@@ -277,7 +285,7 @@
                                         delete_btn = "<button title='删除' onclick='doDelete("
                                         + data + ")'><i class='glyphicon glyphicon-trash'></i></button>";
                                     }
-                                    else if (row.status == '2' || row.status == '4') {
+                                    else if (row.status == '2' || row.status == '4' || row.status == '7') {
                                         edit_btn = "<button title='报销' onclick='doApple("
                                         + data + ","+ row.type +" )'><i class='glyphicon glyphicon-usd'></i></button>";
 
