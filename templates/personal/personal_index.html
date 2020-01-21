@@ -294,9 +294,15 @@
                             电力工程项目部
                         </button>
 
-                    </div>
-                <div id="allform" class="chart" >
                 </div>
+
+                <div id="allform" class="chart" ></div>
+
+            </div>
+        </div>
+        <div id="partform" style="display: none">
+            <div id="departmentform" class="chart" >
+
             </div>
         </div>
 
@@ -359,6 +365,53 @@
         })()
     </script>
 
+    {#  部门负责人可以看的报表  #}
+    <script>
+        (function () {
+            x ={{ m }}
+            if (x == 1) {
+                document.getElementById("partform").style.display="";
+                var myChart1 = echarts.init(document.getElementById('departmentform'));
+                var option1 = {
+                    title: {
+                        text: '部门总花销',
+                        subtext: ' ',
+                        x: 'center'
+                    },
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: "{a} <br/>{b} : {c} ({d}%)"
+                    },
+                    legend: {
+                        orient: 'vertical',
+                        left: 'left',
+                        data: {{ defeetype|safe }},
+                    },
+                    series: [
+                        {
+                            name: '费用类型',
+                            type: 'pie',
+                            radius: '55%',
+                            center: ['50%', '60%'],
+                            data: {{ dedata|safe }},
+                            itemStyle: {
+                                emphasis: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            }
+                        }
+                    ]
+                };
+                myChart1.setOption(option1);
+            }
+            else {
+
+            }
+        })()
+    </script>
+
     <script>
     {#  董事长/总经理报表  #}
         (function () {
@@ -380,7 +433,7 @@
                     },
                     legend: {
                         orient: 'vertical',
-                        left: 'left',
+                        left: 'right',
                         data: {{ totalfeetype|safe }}
                     },
                     series: [
@@ -389,7 +442,12 @@
                             type: 'pie',
                             radius: '55%',
                             center: ['50%', '60%'],
+
                             data: {{ totaldata|safe }},
+                            label: {
+                                position: 'outer',
+                                alignTo: 'edge'
+                            },
                             itemStyle: {
                                 emphasis: {
                                     shadowBlur: 10,
@@ -407,6 +465,60 @@
 
         })()
 
+    </script>
+
+    <script>
+        {#  部门报表：根据工单管理员来定  #}
+        (function () {
+            id = '{{ post|safe }}'
+            x = '董事长'
+            y = '总经理'
+            if (id == x || id == y) {
+                document.getElementById("allf").style.display ="";
+                var myChart1 = echarts.init(document.getElementById('allform'));
+                var option1 = {
+                    title: {
+                        text: '公司总花销',
+                        subtext: ' ',
+                        x: 'center'
+                    },
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: "{a} <br/>{b} : {c} ({d}%)"
+                    },
+                    legend: {
+                        orient: 'vertical',
+                        left: 'right',
+                        data: {{ totalfeetype|safe }}
+                    },
+                    series: [
+                        {
+                            name: '费用类型',
+                            type: 'pie',
+                            radius: '55%',
+                            center: ['50%', '60%'],
+
+                            data: {{ totaldata|safe }},
+                            label: {
+                                position: 'outer',
+                                alignTo: 'edge'
+                            },
+                            itemStyle: {
+                                emphasis: {
+                                    shadowBlur: 10,
+                                    shadowOffsetX: 0,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            }
+                        }
+                    ]
+                };
+                myChart1.setOption(option1);
+            } else {
+                console.log('1')
+            }
+
+        })()
     </script>
 
     <script>

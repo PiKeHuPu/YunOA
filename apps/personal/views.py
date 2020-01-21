@@ -129,6 +129,41 @@ class PersonalView(LoginRequiredMixin, View):
                     'feetype': feetype,
                     'perdata': perdata
                 })
+
+        #部门报表
+        adm = Structure.objects.filter(adm_list=manid)[0].adm_list
+        struid = Structure.objects.filter(adm_list=manid)[0].id
+        if int(adm) == int(manid):
+            print(111)
+            defeeid = []
+            defeetype = []
+            decost = []
+            dedata = []
+            x = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=struid), ~Q(feeid_id=None))
+            for y in x:
+                if y.feeid_id not in defeeid :
+                    defeeid.append(y.feeid_id)
+            for x in defeeid:
+                li = FeeType.objects.filter(fee_id=x)
+                if li[0].fee_type not in defeetype:
+                    defeetype.append(li[0].fee_type)
+            for x in defeeid:
+                cost = 0
+                li = WorkOrder.objects.filter(Q(feeid=x), ~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=struid), ~Q(feeid_id=None))
+                for y in li:
+                    cost += float(y.cost)
+                decost.append(cost)
+            for x in range(len(decost)):
+                dic = {}
+                dic['value'] = decost[x]
+                dic['name'] = defeetype[x]
+                dedata.append(dic)
+            ret.update({
+                'm':  1,
+                'defeetype': defeetype,
+                'dedata': dedata
+            })
+            print(ret)
         #全体员工的报表
         post = UserProfile.objects.filter(name=request.user)[0].post
         ret['post'] = post
