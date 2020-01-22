@@ -15,6 +15,8 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.views.static import serve
+
+from assess.views import AssessDep, AssessDetail, CreateGoal, CreatePerGoal
 from gistandard.settings import MEDIA_ROOT
 
 import xadmin
@@ -150,4 +152,9 @@ urlpatterns = [
     url(r'feedback', personal_views.FeedbackView.as_view(), name="feedback"),
     # 抄送
     url(r'^personal/workorder_copy/$', order.CopyTo.as_view(), name="copy_to"),
+    # 考核模块
+    url(r'^personal/assess_dep/$', AssessDep.as_view(), name="assess_dep"),
+    url(r'^personal/assess_detail/$', AssessDetail.as_view(), name="assess_detail"),
+    url(r'^personal/create_goal/$', CreateGoal.as_view(), name="create_goal"),
+    url(r'^personal/create_per_goal/$', CreatePerGoal.as_view(), name="create_per_goal"),
 ]
