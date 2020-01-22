@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+</head>
+<body>
+<input type="text" value="{{ id0 }}" hidden id="id0">
+<div class="col-lg-12">
+        <span style="font-size: 17px">
+            目标考核时间：
+            <input type="text" style="width: 80px" id="year"> 年
+            <input type="text" style="width: 20px" id="month"> 月
+        </span>
+</div>
+<br>
+<div class="col-lg-12">
+        <span style="font-size: 17px">
+            部门目标详情(每条以回车换行隔开)：
+            <br>
+            <textarea name="detail" id="detail" style="width: 100%; font-size: 16px" rows="14"></textarea>
+        </span>
+</div>
+<div style="text-align: center">
+    <button type="button" class="btn btn-info" id="goal_save">提交</button>
+</div>
+</body>
+</html>
+<!-- jQuery 2.2.3 -->
+<script src="/static/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<!-- Bootstrap 3.3.6 -->
+<script src="/static/bootstrap/js/bootstrap.min.js"></script>
+<script>
+    $("#goal_save").click(function () {
+        var id0 = $("#id0").val();
+        var year = $("#year").val();
+        var month = $("#month").val();
+        var detail = $("#detail").val();
+        if (year == "") {
+            alert("请输入年")
+        } else if (month == "") {
+            alert("请输入月")
+        } else if (detail == "") {
+            alert("请输入目标详情")
+        } else {
+            var check = confirm("提交后无法修改，确认提交吗？");
+            if (check) {
+                $.ajax({
+                    url: "{% url 'create_goal' %}",
+                    type: "post",
+                    data: {
+                        "id0": id0,
+                        "year": year,
+                        "month": month,
+                        "detail": detail
+                    },
+                    success: function (ret) {
+                        if (ret.status == "1") {
+                            alert("提交成功");
+                            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                            parent.layer.close(index); //再执行关闭
+                        } else {
+                            alert("提交失败，请稍后再试")
+                        }
+                    }
+                })
+            }
+        }
+    })
+</script>
