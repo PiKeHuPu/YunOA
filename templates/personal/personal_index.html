@@ -258,7 +258,6 @@
         <div id="partform" style="display: none">
             <h1  style="font-family: 楷体; font-size: 30px; margin-left: 0">部门报表</h1>
             <div id="departmentform" class="chart" >
-
             </div>
         </div>
         <div id="allf" style="display: none">
@@ -298,7 +297,6 @@
                         <button type="button" id="electric" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">
                             电力工程项目部
                         </button>
-
                 </div>
 
                 <div id="allform" class="chart" ></div>
@@ -423,41 +421,56 @@
                 document.getElementById("allf").style.display ="";
                 var myChart1 = echarts.init(document.getElementById('allform'));
                 var option1 = {
-                    title: {
-                        text: '公司总花销',
-                        subtext: ' ',
-                        x: 'center'
-                    },
-                    tooltip: {
-                        trigger: 'item',
-                        formatter: "{a} <br/>{b} : {c} ({d}%)"
-                    },
-                    legend: {
-                        orient: 'vertical',
-                        left: 'right',
-                        data: {{ totalfeetype|safe }}
-                    },
-                    series: [
-                        {
-                            name: '费用类型',
-                            type: 'pie',
-                            radius: '55%',
-                            center: ['50%', '60%'],
 
-                            data: {{ totaldata|safe }},
-                            label: {
-                                position: 'outer',
-                                alignTo: 'edge'
-                            },
-                            itemStyle: {
-                                emphasis: {
-                                    shadowBlur: 10,
-                                    shadowOffsetX: 0,
-                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
-                                }
-                            }
-                        }
-                    ]
+                    title: {
+                text: 'ECharts 入门示例'
+            },
+            tooltip: {},
+            legend: {
+                data:['销量']
+            },
+            xAxis: {
+                data: {{ totalfeetype|safe }}
+            },
+            yAxis: {},
+            series: [{
+                name: '销量',
+                type: 'bar',
+                data: {{ totalcost|safe }}
+            }]
+                    {#title: {#}
+                    {#    text: '公司总花销',#}
+                    {#    subtext: ' ',#}
+                    {#    x: 'center'#}
+                    {#},#}
+                    {#tooltip: {#}
+                    {#    trigger: 'item',#}
+                    {#    formatter: "{a} <br/>{b} : {c} ({d}%)"#}
+                    {#},#}
+                    {#legend: {#}
+                    {#    orient: 'vertical',#}
+                    {#    left: 'left',#}
+                    {#    data: {{ totalfeetype|safe }}#}
+                    {#},#}
+                    {#series: [{#}
+                    {#        name: '费用类型',#}
+                    {#        type: 'pie',#}
+                    {#        radius: '45%',#}
+                    {#        center: ['55%', '60%'],#}
+                    {#        data: {{ totaldata|safe }},#}
+                    {#        label: {#}
+                    {#            position: 'outer',#}
+                    {#            alignTo: 'labelLine',#}
+                    {#            distanceToLabelLine: 20#}
+                    {#        },#}
+                    {#        itemStyle: {#}
+                    {#            emphasis: {#}
+                    {#                shadowBlur: 10,#}
+                    {#                shadowOffsetX: 0,#}
+                    {#                shadowColor: 'rgba(0, 0, 0, 0.5)'#}
+                    {#            }#}
+                    {#        }#}
+                    {#    }]#}
                 };
                 myChart1.setOption(option1);
             } else {
@@ -468,59 +481,7 @@
 
     </script>
 
-    <script>
-        {#  部门报表：根据工单管理员来定  #}
-        (function () {
-            id = '{{ post|safe }}'
-            x = '董事长'
-            y = '总经理'
-            if (id == x || id == y) {
-                document.getElementById("allf").style.display ="";
-                var myChart1 = echarts.init(document.getElementById('allform'));
-                var option1 = {
-                    title: {
-                        text: '公司总花销',
-                        subtext: ' ',
-                        x: 'center'
-                    },
-                    tooltip: {
-                        trigger: 'item',
-                        formatter: "{a} <br/>{b} : {c} ({d}%)"
-                    },
-                    legend: {
-                        orient: 'vertical',
-                        left: 'right',
-                        data: {{ totalfeetype|safe }}
-                    },
-                    series: [
-                        {
-                            name: '费用类型',
-                            type: 'pie',
-                            radius: '55%',
-                            center: ['50%', '60%'],
 
-                            data: {{ totaldata|safe }},
-                            label: {
-                                position: 'outer',
-                                alignTo: 'edge'
-                            },
-                            itemStyle: {
-                                emphasis: {
-                                    shadowBlur: 10,
-                                    shadowOffsetX: 0,
-                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
-                                }
-                            }
-                        }
-                    ]
-                };
-                myChart1.setOption(option1);
-            } else {
-                console.log('1')
-            }
-
-        })()
-    </script>
 
     <script>
         $(".timepick").datetimepicker({
@@ -713,643 +674,643 @@
 
     <script>
     {# 董事长报表按钮 #}
-        {# 生产中心按钮   #}
-        $('#production').click(function () {
-            var production = 17;
-            retdata = {
-                production: production
-            }
-            $.ajax({
-                url: "{% url 'personal' %}",
-                type: "post",
-                data: retdata,
-                dataType: "json",
-                success: function (d) {
-                    if (d.status == 'fail0') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else if (d.status == 'fail1') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else if (d.status == 'fail2') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else {
-                        var myChart3 = echarts.init(document.getElementById('allform'));
-                        var option3 = {
-                            title: {
-                                text: '生产中心',
-                                subtext: ' ',
-                                x: 'center'
-                            },
-                            tooltip: {
-                                trigger: 'item',
-                                formatter: "{a} <br/>{b} : {c} ({d}%)"
-                            },
-                            legend: {
-                                orient: 'vertical',
-                                left: 'left',
-                                data: d.prfeetype
-                            },
-                            series: [
-                                {
-                                    name: '费用类型',
-                                    type: 'pie',
-                                    radius: '55%',
-                                    center: ['50%', '60%'],
-                                    data: d.prdata,
-                                    itemStyle: {
-                                        emphasis: {
-                                            shadowBlur: 10,
-                                            shadowOffsetX: 0,
-                                            shadowColor: 'rgba(0, 0, 0, 0.5)'
-                                        }
+    {# 生产中心按钮   #}
+    $('#production').click(function () {
+        var production = 17;
+        retdata = {
+            production: production
+        }
+        $.ajax({
+            url: "{% url 'personal' %}",
+            type: "post",
+            data: retdata,
+            dataType: "json",
+            success: function (d) {
+                if (d.status == 'fail0') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else if (d.status == 'fail1') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else if (d.status == 'fail2') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else {
+                    var myChart3 = echarts.init(document.getElementById('allform'));
+                    var option3 = {
+                        title: {
+                            text: '生产中心',
+                            subtext: ' ',
+                            x: 'center'
+                        },
+                        tooltip: {
+                            trigger: 'item',
+                            formatter: "{a} <br/>{b} : {c} ({d}%)"
+                        },
+                        legend: {
+                            orient: 'vertical',
+                            left: 'left',
+                            data: d.prfeetype
+                        },
+                        series: [
+                            {
+                                name: '费用类型',
+                                type: 'pie',
+                                radius: '55%',
+                                center: ['50%', '60%'],
+                                data: d.prdata,
+                                itemStyle: {
+                                    emphasis: {
+                                        shadowBlur: 10,
+                                        shadowOffsetX: 0,
+                                        shadowColor: 'rgba(0, 0, 0, 0.5)'
                                     }
                                 }
-                            ]
-                        };
-                        myChart3.setOption(option3, true);
-                    }
+                            }
+                        ]
+                    };
+                    myChart3.setOption(option3, true);
                 }
-            })
+            }
         })
+    })
 
-        {#  大数据事业部  #}
-        $('#BigData').click(function () {
-            var BigData = 18;
-            retdata = {
-                BigData: BigData
-            }
-            $.ajax({
-                url: "{% url 'personal' %}",
-                type: "post",
-                data: retdata,
-                dataType: "json",
-                success: function (d) {
-                    if (d.status == 'fail0') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else if (d.status == 'fail1') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else if (d.status == 'fail2') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else {
-                        var myChart3 = echarts.init(document.getElementById('allform'));
-                        var option3 = {
-                            title: {
-                                text: '大数据',
-                                subtext: ' ',
-                                x: 'center'
-                            },
-                            tooltip: {
-                                trigger: 'item',
-                                formatter: "{a} <br/>{b} : {c} ({d}%)"
-                            },
-                            legend: {
-                                orient: 'vertical',
-                                left: 'left',
-                                data: d.bgfeetype
-                            },
-                            series: [
-                                {
-                                    name: '费用类型',
-                                    type: 'pie',
-                                    radius: '55%',
-                                    center: ['50%', '60%'],
-                                    data: d.bgdata,
-                                    itemStyle: {
-                                        emphasis: {
-                                            shadowBlur: 10,
-                                            shadowOffsetX: 0,
-                                            shadowColor: 'rgba(0, 0, 0, 0.5)'
-                                        }
+    {#  大数据事业部  #}
+    $('#BigData').click(function () {
+        var BigData = 18;
+        retdata = {
+            BigData: BigData
+        }
+        $.ajax({
+            url: "{% url 'personal' %}",
+            type: "post",
+            data: retdata,
+            dataType: "json",
+            success: function (d) {
+                if (d.status == 'fail0') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else if (d.status == 'fail1') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else if (d.status == 'fail2') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else {
+                    var myChart3 = echarts.init(document.getElementById('allform'));
+                    var option3 = {
+                        title: {
+                            text: '大数据',
+                            subtext: ' ',
+                            x: 'center'
+                        },
+                        tooltip: {
+                            trigger: 'item',
+                            formatter: "{a} <br/>{b} : {c} ({d}%)"
+                        },
+                        legend: {
+                            orient: 'vertical',
+                            left: 'left',
+                            data: d.bgfeetype
+                        },
+                        series: [
+                            {
+                                name: '费用类型',
+                                type: 'pie',
+                                radius: '55%',
+                                center: ['50%', '60%'],
+                                data: d.bgdata,
+                                itemStyle: {
+                                    emphasis: {
+                                        shadowBlur: 10,
+                                        shadowOffsetX: 0,
+                                        shadowColor: 'rgba(0, 0, 0, 0.5)'
                                     }
                                 }
-                            ]
-                        };
-                        myChart3.setOption(option3, true);
-                    }
+                            }
+                        ]
+                    };
+                    myChart3.setOption(option3, true);
                 }
-            })
+            }
         })
+    })
 
-        {#营销中心按钮#}
-        $('#saleCenter').click(function () {
-            var saleCenter = 20;
-            retdata = {
-                saleCenter: saleCenter
-            }
-            $.ajax({
-                url: "{% url 'personal' %}",
-                type: "post",
-                data: retdata,
-                dataType: "json",
-                success: function (d) {
-                    if (d.status == 'fail0') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else if (d.status == 'fail1') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else if (d.status == 'fail2') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else {
-                        var myChart3 = echarts.init(document.getElementById('allform'));
-                        var option3 = {
-                            title: {
-                                text: '营销中心',
-                                subtext: ' ',
-                                x: 'center'
-                            },
-                            tooltip: {
-                                trigger: 'item',
-                                formatter: "{a} <br/>{b} : {c} ({d}%)"
-                            },
-                            legend: {
-                                orient: 'vertical',
-                                left: 'left',
-                                data: d.scfeetype
-                            },
-                            series: [
-                                {
-                                    name: '费用类型',
-                                    type: 'pie',
-                                    radius: '55%',
-                                    center: ['50%', '60%'],
-                                    data: d.scdata,
-                                    itemStyle: {
-                                        emphasis: {
-                                            shadowBlur: 10,
-                                            shadowOffsetX: 0,
-                                            shadowColor: 'rgba(0, 0, 0, 0.5)'
-                                        }
+    {#营销中心按钮#}
+    $('#saleCenter').click(function () {
+        var saleCenter = 20;
+        retdata = {
+            saleCenter: saleCenter
+        }
+        $.ajax({
+            url: "{% url 'personal' %}",
+            type: "post",
+            data: retdata,
+            dataType: "json",
+            success: function (d) {
+                if (d.status == 'fail0') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else if (d.status == 'fail1') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else if (d.status == 'fail2') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else {
+                    var myChart3 = echarts.init(document.getElementById('allform'));
+                    var option3 = {
+                        title: {
+                            text: '营销中心',
+                            subtext: ' ',
+                            x: 'center'
+                        },
+                        tooltip: {
+                            trigger: 'item',
+                            formatter: "{a} <br/>{b} : {c} ({d}%)"
+                        },
+                        legend: {
+                            orient: 'vertical',
+                            left: 'left',
+                            data: d.scfeetype
+                        },
+                        series: [
+                            {
+                                name: '费用类型',
+                                type: 'pie',
+                                radius: '55%',
+                                center: ['50%', '60%'],
+                                data: d.scdata,
+                                itemStyle: {
+                                    emphasis: {
+                                        shadowBlur: 10,
+                                        shadowOffsetX: 0,
+                                        shadowColor: 'rgba(0, 0, 0, 0.5)'
                                     }
                                 }
-                            ]
-                        };
-                        myChart3.setOption(option3, true);
-                    }
+                            }
+                        ]
+                    };
+                    myChart3.setOption(option3, true);
                 }
-            })
+            }
         })
+    })
 
-        {# 人事行政中心 #}
-        $('#personal').click(function () {
-            var personal = 19;
-            retdata = {
-                personal: personal
-            }
-            $.ajax({
-                url: "{% url 'personal' %}",
-                type: "post",
-                data: retdata,
-                dataType: "json",
-                success: function (d) {
-                    if (d.status == 'fail0') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else if (d.status == 'fail1') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else if (d.status == 'fail2') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else {
-                        var myChart3 = echarts.init(document.getElementById('allform'));
-                        var option3 = {
-                            title: {
-                                text: '人事行政中心',
-                                subtext: ' ',
-                                x: 'center'
-                            },
-                            tooltip: {
-                                trigger: 'item',
-                                formatter: "{a} <br/>{b} : {c} ({d}%)"
-                            },
-                            legend: {
-                                orient: 'vertical',
-                                left: 'left',
-                                data: d.pefeetype
-                            },
-                            series: [
-                                {
-                                    name: '费用类型',
-                                    type: 'pie',
-                                    radius: '55%',
-                                    center: ['50%', '60%'],
-                                    data: d.pedata,
-                                    itemStyle: {
-                                        emphasis: {
-                                            shadowBlur: 10,
-                                            shadowOffsetX: 0,
-                                            shadowColor: 'rgba(0, 0, 0, 0.5)'
-                                        }
+    {# 人事行政中心 #}
+    $('#personal').click(function () {
+        var personal = 19;
+        retdata = {
+            personal: personal
+        }
+        $.ajax({
+            url: "{% url 'personal' %}",
+            type: "post",
+            data: retdata,
+            dataType: "json",
+            success: function (d) {
+                if (d.status == 'fail0') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else if (d.status == 'fail1') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else if (d.status == 'fail2') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else {
+                    var myChart3 = echarts.init(document.getElementById('allform'));
+                    var option3 = {
+                        title: {
+                            text: '人事行政中心',
+                            subtext: ' ',
+                            x: 'center'
+                        },
+                        tooltip: {
+                            trigger: 'item',
+                            formatter: "{a} <br/>{b} : {c} ({d}%)"
+                        },
+                        legend: {
+                            orient: 'vertical',
+                            left: 'left',
+                            data: d.pefeetype
+                        },
+                        series: [
+                            {
+                                name: '费用类型',
+                                type: 'pie',
+                                radius: '55%',
+                                center: ['50%', '60%'],
+                                data: d.pedata,
+                                itemStyle: {
+                                    emphasis: {
+                                        shadowBlur: 10,
+                                        shadowOffsetX: 0,
+                                        shadowColor: 'rgba(0, 0, 0, 0.5)'
                                     }
                                 }
-                            ]
-                        };
-                        myChart3.setOption(option3, true);
-                    }
+                            }
+                        ]
+                    };
+                    myChart3.setOption(option3, true);
                 }
-            })
+            }
         })
+    })
 
-        {#  运维中心  #}
-        $('#ops').click(function () {
-            var ops = 21;
-            retdata = {
-                ops: ops
-            }
-            $.ajax({
-                url: "{% url 'personal' %}",
-                type: "post",
-                data: retdata,
-                dataType: "json",
-                success: function (d) {
-                    if (d.status == 'fail0') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else if (d.status == 'fail1') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else if (d.status == 'fail2') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else {
-                        var myChart3 = echarts.init(document.getElementById('allform'));
-                        var option3 = {
-                            title: {
-                                text: '运维中心',
-                                subtext: ' ',
-                                x: 'center'
-                            },
-                            tooltip: {
-                                trigger: 'item',
-                                formatter: "{a} <br/>{b} : {c} ({d}%)"
-                            },
-                            legend: {
-                                orient: 'vertical',
-                                left: 'left',
-                                data: d.opfeetype
-                            },
-                            series: [
-                                {
-                                    name: '费用类型',
-                                    type: 'pie',
-                                    radius: '55%',
-                                    center: ['50%', '60%'],
-                                    data: d.opdata,
-                                    itemStyle: {
-                                        emphasis: {
-                                            shadowBlur: 10,
-                                            shadowOffsetX: 0,
-                                            shadowColor: 'rgba(0, 0, 0, 0.5)'
-                                        }
+    {#  运维中心  #}
+    $('#ops').click(function () {
+        var ops = 21;
+        retdata = {
+            ops: ops
+        }
+        $.ajax({
+            url: "{% url 'personal' %}",
+            type: "post",
+            data: retdata,
+            dataType: "json",
+            success: function (d) {
+                if (d.status == 'fail0') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else if (d.status == 'fail1') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else if (d.status == 'fail2') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else {
+                    var myChart3 = echarts.init(document.getElementById('allform'));
+                    var option3 = {
+                        title: {
+                            text: '运维中心',
+                            subtext: ' ',
+                            x: 'center'
+                        },
+                        tooltip: {
+                            trigger: 'item',
+                            formatter: "{a} <br/>{b} : {c} ({d}%)"
+                        },
+                        legend: {
+                            orient: 'vertical',
+                            left: 'left',
+                            data: d.opfeetype
+                        },
+                        series: [
+                            {
+                                name: '费用类型',
+                                type: 'pie',
+                                radius: '55%',
+                                center: ['50%', '60%'],
+                                data: d.opdata,
+                                itemStyle: {
+                                    emphasis: {
+                                        shadowBlur: 10,
+                                        shadowOffsetX: 0,
+                                        shadowColor: 'rgba(0, 0, 0, 0.5)'
                                     }
                                 }
-                            ]
-                        };
-                        myChart3.setOption(option3, true);
-                    }
+                            }
+                        ]
+                    };
+                    myChart3.setOption(option3, true);
                 }
-            })
+            }
         })
+    })
 
-        {#  证券事务中心  Securities affairs centre#}
-        $('#SAC').click(function () {
-            var SAC = 22;
-            retdata = {
-                SAC: SAC
-            }
-            $.ajax({
-                url: "{% url 'personal' %}",
-                type: "post",
-                data: retdata,
-                dataType: "json",
-                success: function (d) {
-                    if (d.status == 'fail0') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else if (d.status == 'fail1') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else if (d.status == 'fail2') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else {
-                        var myChart3 = echarts.init(document.getElementById('allform'));
-                        var option3 = {
-                            title: {
-                                text: '证券事务中心',
-                                subtext: ' ',
-                                x: 'center'
-                            },
-                            tooltip: {
-                                trigger: 'item',
-                                formatter: "{a} <br/>{b} : {c} ({d}%)"
-                            },
-                            legend: {
-                                orient: 'vertical',
-                                left: 'left',
-                                data: d.safeetype
-                            },
-                            series: [
-                                {
-                                    name: '费用类型',
-                                    type: 'pie',
-                                    radius: '55%',
-                                    center: ['50%', '60%'],
-                                    data: d.sadata,
-                                    itemStyle: {
-                                        emphasis: {
-                                            shadowBlur: 10,
-                                            shadowOffsetX: 0,
-                                            shadowColor: 'rgba(0, 0, 0, 0.5)'
-                                        }
+    {#  证券事务中心  Securities affairs centre#}
+    $('#SAC').click(function () {
+        var SAC = 22;
+        retdata = {
+            SAC: SAC
+        }
+        $.ajax({
+            url: "{% url 'personal' %}",
+            type: "post",
+            data: retdata,
+            dataType: "json",
+            success: function (d) {
+                if (d.status == 'fail0') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else if (d.status == 'fail1') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else if (d.status == 'fail2') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else {
+                    var myChart3 = echarts.init(document.getElementById('allform'));
+                    var option3 = {
+                        title: {
+                            text: '证券事务中心',
+                            subtext: ' ',
+                            x: 'center'
+                        },
+                        tooltip: {
+                            trigger: 'item',
+                            formatter: "{a} <br/>{b} : {c} ({d}%)"
+                        },
+                        legend: {
+                            orient: 'vertical',
+                            left: 'left',
+                            data: d.safeetype
+                        },
+                        series: [
+                            {
+                                name: '费用类型',
+                                type: 'pie',
+                                radius: '55%',
+                                center: ['50%', '60%'],
+                                data: d.sadata,
+                                itemStyle: {
+                                    emphasis: {
+                                        shadowBlur: 10,
+                                        shadowOffsetX: 0,
+                                        shadowColor: 'rgba(0, 0, 0, 0.5)'
                                     }
                                 }
-                            ]
-                        };
-                        myChart3.setOption(option3, true);
-                    }
+                            }
+                        ]
+                    };
+                    myChart3.setOption(option3, true);
                 }
-            })
+            }
         })
+    })
 
-        {#  财务部  #}
-        $('#finance').click(function () {
-            var finance = 23;
-            retdata = {
-                finance: finance
-            }
-            $.ajax({
-                url: "{% url 'personal' %}",
-                type: "post",
-                data: retdata,
-                dataType: "json",
-                success: function (d) {
-                    if (d.status == 'fail0') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else if (d.status == 'fail1') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else if (d.status == 'fail2') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else {
-                        var myChart3 = echarts.init(document.getElementById('allform'));
-                        var option3 = {
-                            title: {
-                                text: '证券事务中心',
-                                subtext: ' ',
-                                x: 'center'
-                            },
-                            tooltip: {
-                                trigger: 'item',
-                                formatter: "{a} <br/>{b} : {c} ({d}%)"
-                            },
-                            legend: {
-                                orient: 'vertical',
-                                left: 'left',
-                                data: d.fifeetype
-                            },
-                            series: [
-                                {
-                                    name: '费用类型',
-                                    type: 'pie',
-                                    radius: '55%',
-                                    center: ['50%', '60%'],
-                                    data: d.fidata,
-                                    itemStyle: {
-                                        emphasis: {
-                                            shadowBlur: 10,
-                                            shadowOffsetX: 0,
-                                            shadowColor: 'rgba(0, 0, 0, 0.5)'
-                                        }
+    {#  财务部  #}
+    $('#finance').click(function () {
+        var finance = 23;
+        retdata = {
+            finance: finance
+        }
+        $.ajax({
+            url: "{% url 'personal' %}",
+            type: "post",
+            data: retdata,
+            dataType: "json",
+            success: function (d) {
+                if (d.status == 'fail0') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else if (d.status == 'fail1') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else if (d.status == 'fail2') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else {
+                    var myChart3 = echarts.init(document.getElementById('allform'));
+                    var option3 = {
+                        title: {
+                            text: '证券事务中心',
+                            subtext: ' ',
+                            x: 'center'
+                        },
+                        tooltip: {
+                            trigger: 'item',
+                            formatter: "{a} <br/>{b} : {c} ({d}%)"
+                        },
+                        legend: {
+                            orient: 'vertical',
+                            left: 'left',
+                            data: d.fifeetype
+                        },
+                        series: [
+                            {
+                                name: '费用类型',
+                                type: 'pie',
+                                radius: '55%',
+                                center: ['50%', '60%'],
+                                data: d.fidata,
+                                itemStyle: {
+                                    emphasis: {
+                                        shadowBlur: 10,
+                                        shadowOffsetX: 0,
+                                        shadowColor: 'rgba(0, 0, 0, 0.5)'
                                     }
                                 }
-                            ]
-                        };
-                        myChart3.setOption(option3, true);
-                    }
+                            }
+                        ]
+                    };
+                    myChart3.setOption(option3, true);
                 }
-            })
+            }
         })
+    })
 
-        {# 售后服务中心afterSale #}
-        $('#afterSale').click(function () {
-            var afterSale = 24;
-            retdata = {
-                afterSale: afterSale
-            }
-            $.ajax({
-                url: "{% url 'personal' %}",
-                type: "post",
-                data: retdata,
-                dataType: "json",
-                success: function (d) {
-                    if (d.status == 'fail0') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else if (d.status == 'fail1') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else if (d.status == 'fail2') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else {
-                        var myChart3 = echarts.init(document.getElementById('allform'));
-                        var option3 = {
-                            title: {
-                                text: '售后服务中心',
-                                subtext: ' ',
-                                x: 'center'
-                            },
-                            tooltip: {
-                                trigger: 'item',
-                                formatter: "{a} <br/>{b} : {c} ({d}%)"
-                            },
-                            legend: {
-                                orient: 'vertical',
-                                left: 'left',
-                                data: d.affeetype
-                            },
-                            series: [
-                                {
-                                    name: '费用类型',
-                                    type: 'pie',
-                                    radius: '55%',
-                                    center: ['50%', '60%'],
-                                    data: d.afdata,
-                                    itemStyle: {
-                                        emphasis: {
-                                            shadowBlur: 10,
-                                            shadowOffsetX: 0,
-                                            shadowColor: 'rgba(0, 0, 0, 0.5)'
-                                        }
+    {# 售后服务中心afterSale #}
+    $('#afterSale').click(function () {
+        var afterSale = 24;
+        retdata = {
+            afterSale: afterSale
+        }
+        $.ajax({
+            url: "{% url 'personal' %}",
+            type: "post",
+            data: retdata,
+            dataType: "json",
+            success: function (d) {
+                if (d.status == 'fail0') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else if (d.status == 'fail1') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else if (d.status == 'fail2') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else {
+                    var myChart3 = echarts.init(document.getElementById('allform'));
+                    var option3 = {
+                        title: {
+                            text: '售后服务中心',
+                            subtext: ' ',
+                            x: 'center'
+                        },
+                        tooltip: {
+                            trigger: 'item',
+                            formatter: "{a} <br/>{b} : {c} ({d}%)"
+                        },
+                        legend: {
+                            orient: 'vertical',
+                            left: 'left',
+                            data: d.affeetype
+                        },
+                        series: [
+                            {
+                                name: '费用类型',
+                                type: 'pie',
+                                radius: '55%',
+                                center: ['50%', '60%'],
+                                data: d.afdata,
+                                itemStyle: {
+                                    emphasis: {
+                                        shadowBlur: 10,
+                                        shadowOffsetX: 0,
+                                        shadowColor: 'rgba(0, 0, 0, 0.5)'
                                     }
                                 }
-                            ]
-                        };
-                        myChart3.setOption(option3, true);
-                    }
+                            }
+                        ]
+                    };
+                    myChart3.setOption(option3, true);
                 }
-            })
+            }
         })
+    })
 
-        {#  物资管理   materials management#}
-        $('#materials').click(function () {
-            var materials = 25;
-            retdata = {
-                materials: materials
-            }
-            $.ajax({
-                url: "{% url 'personal' %}",
-                type: "post",
-                data: retdata,
-                dataType: "json",
-                success: function (d) {
-                    if (d.status == 'fail0') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else if (d.status == 'fail1') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else if (d.status == 'fail2') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else {
-                        var myChart3 = echarts.init(document.getElementById('allform'));
-                        var option3 = {
-                            title: {
-                                text: '售后服务中心',
-                                subtext: ' ',
-                                x: 'center'
-                            },
-                            tooltip: {
-                                trigger: 'item',
-                                formatter: "{a} <br/>{b} : {c} ({d}%)"
-                            },
-                            legend: {
-                                orient: 'vertical',
-                                left: 'left',
-                                data: d.mmfeetype
-                            },
-                            series: [
-                                {
-                                    name: '费用类型',
-                                    type: 'pie',
-                                    radius: '55%',
-                                    center: ['50%', '60%'],
-                                    data: d.mmdata,
-                                    itemStyle: {
-                                        emphasis: {
-                                            shadowBlur: 10,
-                                            shadowOffsetX: 0,
-                                            shadowColor: 'rgba(0, 0, 0, 0.5)'
-                                        }
+    {#  物资管理   materials management#}
+    $('#materials').click(function () {
+        var materials = 25;
+        retdata = {
+            materials: materials
+        }
+        $.ajax({
+            url: "{% url 'personal' %}",
+            type: "post",
+            data: retdata,
+            dataType: "json",
+            success: function (d) {
+                if (d.status == 'fail0') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else if (d.status == 'fail1') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else if (d.status == 'fail2') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else {
+                    var myChart3 = echarts.init(document.getElementById('allform'));
+                    var option3 = {
+                        title: {
+                            text: '售后服务中心',
+                            subtext: ' ',
+                            x: 'center'
+                        },
+                        tooltip: {
+                            trigger: 'item',
+                            formatter: "{a} <br/>{b} : {c} ({d}%)"
+                        },
+                        legend: {
+                            orient: 'vertical',
+                            left: 'left',
+                            data: d.mmfeetype
+                        },
+                        series: [
+                            {
+                                name: '费用类型',
+                                type: 'pie',
+                                radius: '55%',
+                                center: ['50%', '60%'],
+                                data: d.mmdata,
+                                itemStyle: {
+                                    emphasis: {
+                                        shadowBlur: 10,
+                                        shadowOffsetX: 0,
+                                        shadowColor: 'rgba(0, 0, 0, 0.5)'
                                     }
                                 }
-                            ]
-                        };
-                        myChart3.setOption(option3, true);
-                    }
+                            }
+                        ]
+                    };
+                    myChart3.setOption(option3, true);
                 }
-            })
+            }
         })
+    })
 
-        {# 通信工程communication #}
-        $('#communication').click(function () {
-            var communication = 28;
-            retdata = {
-                communication: communication
-            }
-            $.ajax({
-                url: "{% url 'personal' %}",
-                type: "post",
-                data: retdata,
-                dataType: "json",
-                success: function (d) {
-                    if (d.status == 'fail0') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else if (d.status == 'fail1') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else if (d.status == 'fail2') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else {
-                        var myChart3 = echarts.init(document.getElementById('allform'));
-                        var option3 = {
-                            title: {
-                                text: '通信工程',
-                                subtext: ' ',
-                                x: 'center'
-                            },
-                            tooltip: {
-                                trigger: 'item',
-                                formatter: "{a} <br/>{b} : {c} ({d}%)"
-                            },
-                            legend: {
-                                orient: 'vertical',
-                                left: 'left',
-                                data: d.cofeetype
-                            },
-                            series: [
-                                {
-                                    name: '费用类型',
-                                    type: 'pie',
-                                    radius: '55%',
-                                    center: ['50%', '60%'],
-                                    data: d.codata,
-                                    itemStyle: {
-                                        emphasis: {
-                                            shadowBlur: 10,
-                                            shadowOffsetX: 0,
-                                            shadowColor: 'rgba(0, 0, 0, 0.5)'
-                                        }
+    {# 通信工程communication #}
+    $('#communication').click(function () {
+        var communication = 28;
+        retdata = {
+            communication: communication
+        }
+        $.ajax({
+            url: "{% url 'personal' %}",
+            type: "post",
+            data: retdata,
+            dataType: "json",
+            success: function (d) {
+                if (d.status == 'fail0') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else if (d.status == 'fail1') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else if (d.status == 'fail2') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else {
+                    var myChart3 = echarts.init(document.getElementById('allform'));
+                    var option3 = {
+                        title: {
+                            text: '通信工程',
+                            subtext: ' ',
+                            x: 'center'
+                        },
+                        tooltip: {
+                            trigger: 'item',
+                            formatter: "{a} <br/>{b} : {c} ({d}%)"
+                        },
+                        legend: {
+                            orient: 'vertical',
+                            left: 'left',
+                            data: d.cofeetype
+                        },
+                        series: [
+                            {
+                                name: '费用类型',
+                                type: 'pie',
+                                radius: '55%',
+                                center: ['50%', '60%'],
+                                data: d.codata,
+                                itemStyle: {
+                                    emphasis: {
+                                        shadowBlur: 10,
+                                        shadowOffsetX: 0,
+                                        shadowColor: 'rgba(0, 0, 0, 0.5)'
                                     }
                                 }
-                            ]
-                        };
-                        myChart3.setOption(option3, true);
-                    }
+                            }
+                        ]
+                    };
+                    myChart3.setOption(option3, true);
                 }
-            })
+            }
         })
+    })
 
-        {#  电力工程  electric power project #}
-        $('#electric').click(function () {
-            var electric = 29;
-            retdata = {
-                electric: electric
-            }
-            $.ajax({
-                url: "{% url 'personal' %}",
-                type: "post",
-                data: retdata,
-                dataType: "json",
-                success: function (d) {
-                    if (d.status == 'fail0') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else if (d.status == 'fail1') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else if (d.status == 'fail2') {
-                        layer.alert(d.errors_info, {icon: 1})
-                    } else {
-                        var myChart3 = echarts.init(document.getElementById('allform'));
-                        var option3 = {
-                            title: {
-                                text: '通信工程',
-                                subtext: ' ',
-                                x: 'center'
-                            },
-                            tooltip: {
-                                trigger: 'item',
-                                formatter: "{a} <br/>{b} : {c} ({d}%)"
-                            },
-                            legend: {
-                                orient: 'vertical',
-                                left: 'left',
-                                data: d.eppfeetype
-                            },
-                            series: [
-                                {
-                                    name: '费用类型',
-                                    type: 'pie',
-                                    radius: '55%',
-                                    center: ['50%', '60%'],
-                                    data: d.eppdata,
-                                    itemStyle: {
-                                        emphasis: {
-                                            shadowBlur: 10,
-                                            shadowOffsetX: 0,
-                                            shadowColor: 'rgba(0, 0, 0, 0.5)'
-                                        }
+    {#  电力工程  electric power project #}
+    $('#electric').click(function () {
+        var electric = 29;
+        retdata = {
+            electric: electric
+        }
+        $.ajax({
+            url: "{% url 'personal' %}",
+            type: "post",
+            data: retdata,
+            dataType: "json",
+            success: function (d) {
+                if (d.status == 'fail0') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else if (d.status == 'fail1') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else if (d.status == 'fail2') {
+                    layer.alert(d.errors_info, {icon: 1})
+                } else {
+                    var myChart3 = echarts.init(document.getElementById('allform'));
+                    var option3 = {
+                        title: {
+                            text: '通信工程',
+                            subtext: ' ',
+                            x: 'center'
+                        },
+                        tooltip: {
+                            trigger: 'item',
+                            formatter: "{a} <br/>{b} : {c} ({d}%)"
+                        },
+                        legend: {
+                            orient: 'vertical',
+                            left: 'left',
+                            data: d.eppfeetype
+                        },
+                        series: [
+                            {
+                                name: '费用类型',
+                                type: 'pie',
+                                radius: '55%',
+                                center: ['50%', '60%'],
+                                data: d.eppdata,
+                                itemStyle: {
+                                    emphasis: {
+                                        shadowBlur: 10,
+                                        shadowOffsetX: 0,
+                                        shadowColor: 'rgba(0, 0, 0, 0.5)'
                                     }
                                 }
-                            ]
-                        };
-                        myChart3.setOption(option3, true);
-                    }
+                            }
+                        ]
+                    };
+                    myChart3.setOption(option3, true);
                 }
-            })
+            }
         })
+    })
     </script>
 
     <script type="text/javascript">
