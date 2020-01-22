@@ -50,11 +50,6 @@ class AssessDetail(LoginRequiredMixin, View):
 
         return render(request, "assess/assess-detail.html", ret)
 
-    def post(self, request):
-        ret = dict()
-        num = request.POST.get("num")
-        print(num)
-        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
 
 
 class CreateGoal(LoginRequiredMixin, View):
