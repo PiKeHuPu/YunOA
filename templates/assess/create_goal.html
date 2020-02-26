@@ -11,8 +11,14 @@
 <div class="col-lg-12">
         <span style="font-size: 17px">
             目标考核时间：
-            <input type="text" style="width: 80px" id="year"> 年
-            <input type="text" style="width: 20px" id="month"> 月
+            {% if saved_dep_goal %}
+                {{ saved_dep_goal.year }}年{{ saved_dep_goal.month }}月
+                <input type="text" value="{{ saved_dep_goal.year }}" hidden id="year">
+                <input type="text" value="{{ saved_dep_goal.month }}" hidden id="month">
+            {% else %}
+                <input type="text" style="width: 80px" id="year"> 年
+                <input type="text" style="width: 20px" id="month"> 月
+            {% endif %}
         </span>
 </div>
 <br>
@@ -20,7 +26,7 @@
         <span style="font-size: 17px">
             部门目标详情(每条以回车换行隔开)：
             <br>
-            <textarea name="detail" id="detail" style="width: 100%; font-size: 16px" rows="14"></textarea>
+            <textarea name="detail" id="detail" style="width: 100%; font-size: 16px" rows="14">{% if saved_dep_goal %}{{ saved_dep_goal.content }}{% endif %} </textarea>
         </span>
 </div>
 <div style="text-align: center">
@@ -45,28 +51,25 @@
         } else if (detail == "") {
             alert("请输入目标详情")
         } else {
-            var check = confirm("提交后无法修改，确认提交吗？");
-            if (check) {
-                $.ajax({
-                    url: "{% url 'create_goal' %}",
-                    type: "post",
-                    data: {
-                        "id0": id0,
-                        "year": year,
-                        "month": month,
-                        "detail": detail
-                    },
-                    success: function (ret) {
-                        if (ret.status == "1") {
-                            alert("提交成功");
-                            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
-                            parent.layer.close(index); //再执行关闭
-                        } else {
-                            alert("提交失败，请稍后再试")
-                        }
+            $.ajax({
+                url: "{% url 'create_goal' %}",
+                type: "post",
+                data: {
+                    "id0": id0,
+                    "year": year,
+                    "month": month,
+                    "detail": detail
+                },
+                success: function (ret) {
+                    if (ret.status == "1") {
+                        alert("提交成功");
+                        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                        parent.layer.close(index); //再执行关闭
+                    } else {
+                        alert("提交失败，请稍后再试")
                     }
-                })
-            }
+                }
+            })
         }
     })
 </script>

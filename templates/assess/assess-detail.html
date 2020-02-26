@@ -19,30 +19,23 @@
         td {
             font-size: 15px;
         }
-
+        tr:hover{
+            background-color: rgba(0,255,127,0.5);
+        }
         #per_goal td{
             text-align: center;
         }
 
         .td0 {
-            width: 3%;
+            width: 4%;
         }
         .td2 {
-            width: 15%;
+            width: 43%;
         }
 
         .td3 {
             width: 5%;
         }
-
-        .td4 {
-            width: 4%;
-        }
-
-        .td6 {
-            width: 6%;
-        }
-
         #ID {
             font-weight: bolder;
             text-align: center;
@@ -63,6 +56,10 @@
         <h1 style="text-align: center; font-weight: bolder">{{ department.title }}</h1>
         {% if assess_dep_detail %}
             <div class="col-lg-8 col-lg-offset-2" style="margin-top: 20px">
+                {% if is_adm == '1' and not finish %}<button type="button" class="btn btn-primary"
+                        onclick="edit_goal({{ department.id }}, {{ assess_dep_detail.year }}, {{ assess_dep_detail.month }})">
+                        修改部门目标
+                </button>{% endif %}
                 <table class="col-lg-12" style="margin: 0 auto; border: black 1px solid; table-layout:fixed;">
                     <tr style="border: black 1px solid; height: 30px">
                         <th style="font-size: 28px; text-align: center">{{ assess_dep_detail.year }}年{{ assess_dep_detail.month }}月部门目标</th>
@@ -75,16 +72,27 @@
                 </table>
             </div>
         {% else %}
-            <h2 style="text-align: center">暂无部门目标 {% if is_adm == '1' %}
-                <a onclick="create_goal({{ department.id }})">新建</a>{% endif %}</h2>
+            <h2 style="text-align: center">暂无部门目标 {% if is_adm == '1' %}<a onclick="create_goal({{ department.id }})">新建</a>{% endif %}</h2>
         {% endif %}
 
         {% if assess_dep_content %}
             <div class="col-lg-12" style="margin-top: 30px">
-                {% if is_mem %}
+                {% if is_mem and not finish %}
                     <button type="button" class="btn btn-primary"
                             onclick=create_per_goal({{ assess_dep_detail.id }},{{ assess_dep_detail.year }},{{ assess_dep_detail.month }})>
-                        新增个人目标
+                        填写个人目标
+                    </button>
+                    {% if was_submit == "1" %}
+                        <button type="button" class="btn btn-primary"
+                                onclick=edit_schedule({{ assess_dep_detail.id }})>
+                            填写完成情况
+                        </button>
+                    {% endif %}
+                {% endif %}
+                {% if is_adm == '1' and not finish %}
+                    <button type="button" class="btn btn-primary" style="float: right"
+                            onclick=assess_score({{ assess_dep_detail.id }})>
+                        评分
                     </button>
                 {% endif %}
                 <table class="col-lg-12" id="per_goal">
@@ -97,32 +105,53 @@
                         <th class="td3">完成度</th>
                         <th class="td3">负责人</th>
                         <th class="td2">工作描述</th>
-                        <th class="td6">目标考核分数</th>
-                        <th class="td6">能力考核分数</th>
-                        <th class="td6">态度考核分数</th>
-                        <th class="td4">总分</th>
-                        <th class="td2">备注</th>
                     </tr>
                     {% for per in per_goal %}
                         <tr>
                             <td id="ID">{{ forloop.counter }}</td>
                             <td>{{ per.content }}</td>
-                            <td></td>
+                            <td>{% if per.complete_degree and per.complete_degree != "" %}{{ per.complete_degree }}%{% endif %}</td>
                             <td>{{ per.principal.name }}</td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
+                            <td>{% if per.describe and per.describe != "" %}{{ per.describe }}{% endif %}</td>
                         </tr>
                     {% endfor %}
                 </table>
+
+            {% if score_list %}
+                    <table class="col-lg-12" style="margin: 0 auto; border: black 1px solid; table-layout:fixed;">
+                        <tr>
+                            <th>姓名</th>
+                            <th>目标考核分数</th>
+                            <th>能力考核分数</th>
+                            <th>态度考核分数</th>
+                            <th>总分</th>
+                            <th>备注</th>
+                        </tr>
+                        {% for user in score_list %}
+                            <tr>
+                                <td style="font-size: 20px; text-align: center">{{ user.principal.name }}</td>
+                                <td style="font-size: 20px; text-align: center">{{ user.goal_score }}</td>
+                                <td style="font-size: 20px; text-align: center">{{ user.capacity_score }}</td>
+                                <td style="font-size: 20px; text-align: center">{{ user.attitude_score }}</td>
+                                <td style="font-size: 20px; text-align: center">{{ user.total_score }}</td>
+                                <td style="font-size: 20px; text-align: center">{{ user.remark }}</td>
+                            </tr>
+                        {% endfor %}
+                        <tr>
+                            {% if finish %}
+                                <th colspan="6">审核状态：审核通过 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;审核人：{{ assess_dep_detail.verifier.name }}</th>
+                            {% else %}
+                                <th colspan="6">审核状态：未审核</th>
+                            {% endif %}
+                        </tr>
+                    </table>
+            {% endif %}
             </div>
         {% endif %}
 
         <div class="col-lg-12" style="text-align: center; margin-top: 20px">
             <input class="btn btn-info" type=button value="返回" onClick="javascript:history.go(-1);">
+            {% if score_done == "1" and not finish %}<input class="btn btn-success" type=button value="审核通过" onClick="check0({{ dep_goal_id }})">{% endif %}
         </div>
         <!-- Modal -->
     </section>
@@ -143,6 +172,22 @@
             $('#ASSESS-DEP').addClass('active');
         });
 
+        function check0(dep_goal_id) {
+            if(confirm("审核后目标以及评分无法修改，确认审核吗？")) {
+                $.ajax({
+                    url: "{% url 'assess_detail' %}",
+                    type: "post",
+                    data: {"dep_goal_id": dep_goal_id},
+                    success: function (ret) {
+                        if(ret.success=="1"){
+                            alert("审核成功")
+                        }
+                        window.location.reload()
+                    }
+                })
+            }
+        }
+
         function create_goal(id) {
             layer.open({
                 type: 2,
@@ -151,6 +196,20 @@
                 maxmin: true,
                 area: ['50%', '60%'],
                 content: "{% url 'create_goal' %}?id=" + id,
+                end: function () {
+                    window.location.reload()
+                }
+            });
+        }
+
+        function edit_goal(id, year, month) {
+            layer.open({
+                type: 2,
+                title: '修改部门目标',
+                shadeClose: false,
+                maxmin: true,
+                area: ['50%', '60%'],
+                content: "{% url 'create_goal' %}?id=" + id + "&year=" + year + "&month=" + month,
                 end: function () {
                     window.location.reload()
                 }
@@ -169,6 +228,34 @@
                     window.location.reload()
                 }
             });
+        }
+
+        function edit_schedule(id) {
+            layer.open({
+                type: 2,
+                title: '完成情况',
+                shadeClose: false,
+                maxmin: true,
+                area: ['50%', '60%'],
+                content: "{% url 'edit_schedule' %}?id=" + id,
+                end: function () {
+                    window.location.reload()
+                }
+            });
+        }
+        function assess_score(id) {
+            var index = layer.open({
+                type: 2,
+                title: '评分',
+                shadeClose: false,
+                maxmin: true,
+                area: ['50%', '60%'],
+                content: "{% url 'assess_score' %}?id=" + id,
+                end: function () {
+                    window.location.reload()
+                }
+            });
+            layer.full(index)
         }
 
         jQuery.fn.rowspan = function (colIdx) { //封装的一个JQuery小插件

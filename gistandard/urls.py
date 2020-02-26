@@ -16,7 +16,7 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.views.static import serve
 
-from assess.views import AssessDep, AssessDetail, CreateGoal, CreatePerGoal
+from assess.views import AssessDep, AssessDetail, CreateGoal, CreatePerGoal, EditSchedule, AssessScore0, YearMonth
 from gistandard.settings import MEDIA_ROOT
 
 import xadmin
@@ -157,4 +157,7 @@ urlpatterns = [
     url(r'^personal/assess_detail/$', AssessDetail.as_view(), name="assess_detail"),
     url(r'^personal/create_goal/$', CreateGoal.as_view(), name="create_goal"),
     url(r'^personal/create_per_goal/$', CreatePerGoal.as_view(), name="create_per_goal"),
+    url(r'^personal/edit_schedule/$', EditSchedule.as_view(), name="edit_schedule"),
+    url(r'^personal/assess_score/$', AssessScore0.as_view(), name="assess_score"),
+    url(r'^personal/year_month/$', YearMonth.as_view(), name="year_month"),
 ]

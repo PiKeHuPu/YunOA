@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+</head>
+<body>
+    <input type="text" value="{{ dep_goal_id }}" id="dep_goal_id" hidden>
+    {% for goal in per_goal %}
+        <div class="col-lg-6">
+            <span>{{ goal.content }}</span>
+        </div>
+        <div class="col-lg-1" style="margin-top: 10px">
+            <span>完成度:<input type="number" style="width: 50px" class="schedule" value="{{ goal.complete_degree }}">%</span>
+        </div>
+        <div class="col-lg-5" style="margin-top: 10px">
+            <textarea class="content" cols="100" rows="2" placeholder="工作描述">{% if goal.describe %}{{ goal.describe }}{% endif %} </textarea>
+        </div>
+        <hr>
+    {% endfor %}
+    <div style="text-align: center; margin-bottom: 20px">
+        <button type="button" class="btn btn-info" id="goal_save">提交</button>
+    </div>
+</body>
+</html>
+<!-- jQuery 2.2.3 -->
+<script src="/static/plugins/jQuery/jquery-2.2.3.min.js"></script>
+<!-- Bootstrap 3.3.6 -->
+<script src="/static/bootstrap/js/bootstrap.min.js"></script>
+<script>
+    $("#goal_save").click(function () {
+        var numArr = [];
+        var contentArr = [];
+        $('.schedule').each(function(){
+            numArr.push($(this).val());//添加至数组
+        });
+        $('.content').each(function(){
+            contentArr.push($(this).val())
+        });
+        $.ajax({
+            url: "{% url "edit_schedule" %}",
+            type: "post",
+            traditional: true,
+            data: {"numArr": numArr, "contentArr": contentArr, "dep_goal_id": $("#dep_goal_id").val()},
+            success: function (ret) {
+                if (ret.status == "1") {
+                    alert("提交成功")
+                } else {
+                    alert("提交失败，请稍后重试")
+                }
+                var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                parent.layer.close(index); //再执行关闭
+            }
+        })
+    })
+</script>

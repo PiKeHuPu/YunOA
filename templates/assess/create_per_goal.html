@@ -41,23 +41,20 @@
     $("#goal_save").click(function () {
         var id0 = $("#id0").val();
         var detail = $("#detail").val();
-        var check = confirm("提交后无法修改，确认提交吗？");
-        if(check){
-            $.ajax({
-                url: "{% url 'create_per_goal' %}",
-                type: "post",
-                data: {"id0": id0,
-                        "detail": detail},
-                success: function (ret) {
-                    if(ret.status == "1"){
-                        alert("提交成功");
-                        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
-                        parent.layer.close(index); //再执行关闭
-                    }else{
-                        alert("提交失败，请稍后再试")
-                    }
+        $.ajax({
+            url: "{% url 'create_per_goal' %}",
+            type: "post",
+            data: {"id0": id0,
+                    "detail": detail},
+            success: function (ret) {
+                if(ret.status == "1"){
+                    alert("提交成功");
+                    var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                    parent.layer.close(index); //再执行关闭
+                }else{
+                    alert("提交失败，请稍后再试")
                 }
-            })
-        }
+            }
+        })
     })
 </script>

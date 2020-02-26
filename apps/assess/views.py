@@ -8,7 +8,7 @@ from django.shortcuts import render
 # Create your views here.
 from django.views import View
 
-from assess.models import AssessDepDetail, AssessPerDetail
+from assess.models import AssessDepDetail, AssessPerDetail, AssessScore
 from users.models import Structure
 from utils.mixin_utils import LoginRequiredMixin
 
@@ -19,7 +19,7 @@ class AssessDep(LoginRequiredMixin, View):
     """
     def get(self, request):
         ret = dict()
-        department = Structure.objects.filter(~Q(id="16"))
+        department = Structure.objects.filter(~Q(id="16"), ~Q(title="董事长"), ~Q(title="总经理"), ~Q(title="副总经理"), ~Q(title="总部"), ~Q(title="电力工程"), ~Q(title="测试"),)
         ret['department'] = department
         return render(request, "assess/assess-dep.html", ret)
 
@@ -32,24 +32,59 @@ class AssessDetail(LoginRequiredMixin, View):
         # 部门目标
         ret = dict()
         department_id = request.GET.get("id")
+        year = request.GET.get("year")
+        month = request.GET.get("month")
         department = Structure.objects.get(id=department_id)
         user_id = request.session.get("_auth_user_id")
         if department.adm_list and user_id in department.adm_list:
             ret["is_adm"] = "1"
         if department.userprofile_set.filter(id=user_id):
             ret["is_mem"] = "1"
-        assess_dep_detail = AssessDepDetail.objects.filter(department_id=department_id).first()
+        assess_dep_detail = AssessDepDetail.objects.filter(department_id=department_id, year=year, month=month).first()
         if assess_dep_detail:
             assess_dep_content = assess_dep_detail.content.split("\n")
             ret['assess_dep_content'] = assess_dep_content
 
-            per_goal = AssessPerDetail.objects.filter(dep_goal_id=assess_dep_detail.id).order_by("principal_id")
+            per_goal = AssessPerDetail.objects.filter(dep_goal_id=assess_dep_detail.id).order_by("id", "principal_id")
             ret["per_goal"] = per_goal
         ret['department'] = department
         ret['assess_dep_detail'] = assess_dep_detail
 
+        # 判断当前是否存在个人目标
+        was_submit = AssessPerDetail.objects.filter(principal_id=user_id, dep_goal_id=assess_dep_detail.id)
+        if was_submit:
+            ret["was_submit"] = "1"
+
+        # 分数汇总
+        score_list = AssessScore.objects.filter(Q(dep_goal_id=assess_dep_detail.id), ~Q(total_score=None))
+        if score_list:
+            ret["score_list"] = score_list
+            score_count = AssessScore.objects.filter(Q(dep_goal_id=assess_dep_detail.id))
+            if len(score_list) == len(score_count):
+                ret["score_done"] = "1"
+                ret["dep_goal_id"] = assess_dep_detail.id
+
+        # 判断审核完成
+        if assess_dep_detail.is_done:
+            ret["finish"] = "1"
+
         return render(request, "assess/assess-detail.html", ret)
 
+    def post(self, request):
+        """
+        审核
+        :param request:
+        :return:
+        """
+        ret = dict()
+        dep_goal_id = request.POST.get("dep_goal_id")
+        user_id = request.session.get("_auth_user_id")
+        dep_goal = AssessDepDetail.objects.filter(id=dep_goal_id).first()
+        dep_goal.is_done = True
+        dep_goal.verifier_id = user_id
+        dep_goal.save()
+        ret["success"] = "1"
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
 
 
 class CreateGoal(LoginRequiredMixin, View):
@@ -60,6 +95,12 @@ class CreateGoal(LoginRequiredMixin, View):
         ret = dict()
         id0 = request.GET.get("id")
         ret["id0"] = id0
+
+        year = request.GET.get("year")
+        month = request.GET.get("month")
+        dep_goal = AssessDepDetail.objects.filter(department_id=id0, year=year, month=month).first()
+        if dep_goal:
+            ret["saved_dep_goal"] = dep_goal
         return render(request, "assess/create_goal.html", ret)
 
     def post(self, request):
@@ -68,12 +109,16 @@ class CreateGoal(LoginRequiredMixin, View):
         year = request.POST.get("year")
         month = request.POST.get("month")
         content = request.POST.get("detail")
-        assess_dep_detail = AssessDepDetail()
-        assess_dep_detail.department_id = id0
-        assess_dep_detail.year = year
-        assess_dep_detail.month = month
+        dep_goal = AssessDepDetail.objects.filter(department_id=id0, year=year, month=month).first()
+        if dep_goal:
+            assess_dep_detail = dep_goal
+        else:
+            assess_dep_detail = AssessDepDetail()
+            assess_dep_detail.department_id = id0
+            assess_dep_detail.year = year
+            assess_dep_detail.month = month
         assess_dep_detail.content = content
-        assess_dep_detail.is_done = True
+        assess_dep_detail.is_done = False
         assess_dep_detail.save()
         ret['status'] = "1"
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
@@ -111,3 +156,100 @@ class CreatePerGoal(LoginRequiredMixin, View):
 
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
 
+
+class EditSchedule(LoginRequiredMixin, View):
+    """
+    填写完成情况
+    """
+    def get(self, request):
+        ret = dict()
+        user_id = request.session.get("_auth_user_id")
+        dep_goal_id = request.GET.get("id")
+        per_goal = AssessPerDetail.objects.filter(principal_id=user_id, dep_goal_id=dep_goal_id)
+        ret["per_goal"] = per_goal
+        ret['dep_goal_id'] = dep_goal_id
+        return render(request, "assess/edit_schedule.html", ret)
+
+    def post(self, request):
+        ret = dict()
+        numArr = request.POST.getlist("numArr")
+        contentArr = request.POST.getlist("contentArr")
+        user_id = request.session.get("_auth_user_id")
+        dep_goal_id = request.POST.get("dep_goal_id")
+        per_goal = AssessPerDetail.objects.filter(principal_id=user_id, dep_goal_id=dep_goal_id)
+        for i in range(len(per_goal)):
+            per_goal[i].complete_degree = numArr[i]
+            per_goal[i].describe = contentArr[i]
+            per_goal[i].save()
+        ret["status"] = "1"
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
+
+
+class AssessScore0(LoginRequiredMixin, View):
+    """
+    评分
+    """
+    def get(self, request):
+        ret = dict()
+        dep_goal_id = request.GET.get("id")
+        ret["dep_goal_id"] = dep_goal_id
+        per_goal = AssessPerDetail.objects.filter(dep_goal_id=dep_goal_id)
+        if per_goal:
+            users = set()
+            for i in per_goal:
+                users.add(i.principal)
+            ret["users"] = users
+        else:
+            ret["is_null"] = 1
+
+        scores = AssessScore.objects.filter(dep_goal_id=dep_goal_id)
+        ret["scores"] = scores
+        return render(request, "assess/assess_score.html", ret)
+
+    def post(self, request):
+        ret = dict()
+        targetArr = request.POST.getlist("targetArr")
+        principal_id = request.POST.getlist("principal_id")
+        abilityArr = request.POST.getlist("abilityArr")
+        attitudeArr = request.POST.getlist("attitudeArr")
+        remarkArr = request.POST.getlist("remarkArr")
+        dep_goal_id = request.POST.get("dep_goal_id")
+        for i in range(len(principal_id)):
+            per_goal = AssessScore.objects.filter(dep_goal_id=dep_goal_id, principal_id=principal_id[i]).first()
+            if per_goal:
+                pass
+            else:
+                per_goal = AssessScore()
+                per_goal.dep_goal_id = dep_goal_id
+                per_goal.principal_id = principal_id[i]
+            if targetArr[i]:
+                per_goal.goal_score = float(targetArr[i])
+            if abilityArr[i]:
+                per_goal.capacity_score = float(abilityArr[i])
+            if attitudeArr[i]:
+                per_goal.attitude_score = float(attitudeArr[i])
+            if targetArr[i] and abilityArr[i] and attitudeArr[i]:
+                per_goal.total_score = format(
+                    (float(targetArr[i]) * 0.7 + float(abilityArr[i]) * 0.15 + float(attitudeArr[i]) * 0.15), ".1f")
+            per_goal.remark = remarkArr[i]
+            per_goal.save()
+        ret["status"] = "1"
+
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
+
+
+class YearMonth(LoginRequiredMixin, View):
+    """
+    选择对应年月的目标
+    """
+    def get(self, request):
+        ret = dict()
+        dep_id = request.GET.get("id")
+        dep_goal = AssessDepDetail.objects.filter(department_id=dep_id)
+        department = Structure.objects.filter(id=dep_id).first()
+        ret["dep_goal"] = dep_goal
+        ret["department"] = department
+        user_id = request.session.get("_auth_user_id")
+        if department.adm_list and user_id in department.adm_list:
+            ret["is_adm"] = "1"
+        return render(request, "assess/year_month.html", ret)
