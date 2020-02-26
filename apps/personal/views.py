@@ -237,7 +237,7 @@ class PersonalView(LoginRequiredMixin, View):
             data = []
             #返回部门人员
             depeople = []
-            depeo = UserProfile.objects.filter(Q(department_id=c), ~Q(id=manid))
+            depeo = UserProfile.objects.filter(Q(department_id=c), ~Q(id=manid), Q(is_active=1))
             for x in depeo:
                 if x.name not in depeople:
                     depeople.append(x.name)
