@@ -1,4 +1,6 @@
 from django.db import models
+
+
 from users.models import Structure
 from utils.type_constant import SPECIAL_CHOICES as sc
 
