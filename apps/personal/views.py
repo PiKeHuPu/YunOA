@@ -101,7 +101,7 @@ class PersonalView(LoginRequiredMixin, View):
         feeid = []
         manid = UserProfile.objects.filter(name=request.user)[0].id
         post = UserProfile.objects.filter(id=manid)[0].post
-        exist = WorkOrder.objects.filter( Q(cretor_id=manid), ~Q(status=3),  ~Q(status=0), ~Q(status=1))
+        exist = WorkOrder.objects.filter(Q(create_time__month=mon), Q(create_time__year=year), Q(cretor_id=manid), ~Q(status=3),  ~Q(status=0), ~Q(status=1))
         if len(exist) == 0:
             ret.update({
                 'status': 0,
@@ -125,7 +125,7 @@ class PersonalView(LoginRequiredMixin, View):
                         feetype.append(li[0].fee_type)
                 for x in feeid:
                     cost = 0
-                    li = WorkOrder.objects.filter( Q(feeid_id=x), Q(cretor_id=manid), ~Q(status=3), ~Q(status=0), ~Q(status=1))
+                    li = WorkOrder.objects.filter(Q(create_time__month=mon), Q(create_time__year=year), Q(feeid_id=x), Q(cretor_id=manid), ~Q(status=3), ~Q(status=0), ~Q(status=1))
                     for y in li:
                         cost += float(y.cost)
                     allcost.append(cost)
@@ -237,7 +237,7 @@ class PersonalView(LoginRequiredMixin, View):
             data = []
             #返回部门人员
             depeople = []
-            depeo = UserProfile.objects.filter(Q(department_id=c), ~Q(id=manid))
+            depeo = UserProfile.objects.filter(Q(department_id=c), ~Q(id=manid), Q(is_active=1))
             for x in depeo:
                 if x.name not in depeople:
                     depeople.append(x.name)
