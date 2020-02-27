@@ -13,17 +13,14 @@
 
         th {
             text-align: center;
-            font-size: 18px;
+            font-size: 20px;
         }
 
         td {
-            font-size: 15px;
+            font-size: 18px;
         }
-        tr:hover{
-            background-color: rgba(0,255,127,0.5);
-        }
-        #per_goal td{
-            text-align: center;
+        .hov:hover{
+            background-color: rgba(154, 197, 169, 0.5);
         }
 
         .td0 {
@@ -35,6 +32,9 @@
 
         .td3 {
             width: 5%;
+        }
+        .cen {
+            text-align: center;
         }
         #ID {
             font-weight: bolder;
@@ -65,7 +65,7 @@
                         <th style="font-size: 28px; text-align: center">{{ assess_dep_detail.year }}年{{ assess_dep_detail.month }}月部门目标</th>
                     </tr>
                     {% for content in assess_dep_content %}
-                        <tr style="border: black 1px solid">
+                        <tr class="hov" style="border: black 1px solid">
                             <td style="word-break:break-all; word-wrap:break-word; font-size: 16px">{{ content }}</td>
                         </tr>
                     {% endfor %}
@@ -107,11 +107,11 @@
                         <th class="td2">工作描述</th>
                     </tr>
                     {% for per in per_goal %}
-                        <tr>
+                        <tr class="hov">
                             <td id="ID">{{ forloop.counter }}</td>
                             <td>{{ per.content }}</td>
-                            <td>{% if per.complete_degree and per.complete_degree != "" %}{{ per.complete_degree }}%{% endif %}</td>
-                            <td>{{ per.principal.name }}</td>
+                            <td class = "cen">{% if per.complete_degree and per.complete_degree != "" %}{{ per.complete_degree }}%{% endif %}</td>
+                            <td class = "cen">{{ per.principal.name }}</td>
                             <td>{% if per.describe and per.describe != "" %}{{ per.describe }}{% endif %}</td>
                         </tr>
                     {% endfor %}
