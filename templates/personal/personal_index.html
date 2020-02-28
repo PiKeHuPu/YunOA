@@ -436,6 +436,9 @@
                     ]
                 };
                 myChart1.setOption(option1);
+                window.onresize = function(){
+                    myChart1.resize();
+                }
             }
         })()
     </script>
@@ -480,7 +483,8 @@
                     ]
                 };
                 myChart1.setOption(option1);
-            } else {
+                window.onresize = function(){
+                        myChart1.resize();}
 
             }
         })()
@@ -524,6 +528,9 @@
                     ]
                 };
                 myChart1.setOption(option1);
+                window.onresize = function(){
+                        myChart1.resize();}
+
             } else {
                 retdata = {
                     dep: dep
@@ -573,6 +580,9 @@
                                 ]
                             };
                             myChart3.setOption(option3, true);
+                            window.onresize = function(){
+                            myChart3.resize();}
+
                         }
                     }
                 })
@@ -641,6 +651,8 @@
                                 ]
                             };
                             myChart3.setOption(option3, true);
+                            window.onresize = function(){
+                            myChart3.resize();}
                         }
                     }
                 })
@@ -693,6 +705,8 @@
                     }]
                 };
                 myChart1.setOption(option1);
+                window.onresize = function(){
+                        myChart1.resize();}
             }
         })()
 
@@ -767,6 +781,8 @@
                                 ]
                             };
                             myChart3.setOption(option3, true);
+                            window.onresize = function(){
+                            myChart3.resize();}
                         }
                     }
                 })
@@ -835,6 +851,8 @@
                                 ]
                             };
                             myChart3.setOption(option3, true);
+                            window.onresize = function(){
+                            myChart3.resize();}
                         }
                     }
                 })
@@ -899,6 +917,8 @@
                             ]
                         };
                         myChart3.setOption(option3, true);
+                        window.onresize = function(){
+                        myChart3.resize();}
                     }
                 }
             })
@@ -958,6 +978,8 @@
                             ]
                         };
                         myChart3.setOption(option3, true);
+                        window.onresize = function(){
+                        myChart3.resize();}
                     }
                 }
             })
@@ -1017,6 +1039,8 @@
                             ]
                         };
                         myChart3.setOption(option3, true);
+                        window.onresize = function(){
+                        myChart3.resize();}
                     }
                 }
             })
@@ -1076,6 +1100,8 @@
                             ]
                         };
                         myChart3.setOption(option3, true);
+                        window.onresize = function(){
+                        myChart3.resize();}
                     }
                 }
             })
@@ -1135,6 +1161,8 @@
                             ]
                         };
                         myChart3.setOption(option3, true);
+                        window.onresize = function(){
+                        myChart3.resize();}
                     }
                 }
             })
@@ -1194,6 +1222,8 @@
                             ]
                         };
                         myChart3.setOption(option3, true);
+                        window.onresize = function(){
+                        myChart3.resize();}
                     }
                 }
             })
@@ -1253,6 +1283,8 @@
                             ]
                         };
                         myChart3.setOption(option3, true);
+                        window.onresize = function(){
+                        myChart3.resize();}
                     }
                 }
             })
@@ -1312,6 +1344,8 @@
                             ]
                         };
                         myChart3.setOption(option3, true);
+                        window.onresize = function(){
+                        myChart3.resize();}
                     }
                 }
             })
@@ -1371,6 +1405,8 @@
                             ]
                         };
                         myChart3.setOption(option3, true);
+                        window.onresize = function(){
+                        myChart3.resize();}
                     }
                 }
             })
@@ -1430,6 +1466,8 @@
                             ]
                         };
                         myChart3.setOption(option3, true);
+                        window.onresize = function(){
+                        myChart3.resize();}
                     }
                 }
             })
@@ -1489,18 +1527,21 @@
                             ]
                         };
                         myChart3.setOption(option3, true);
+                        window.onresize = function(){
+                        myChart3.resize();}
                     }
                 }
             })
         })
-    </script>
-
-    <script type="text/javascript">
-        {#//图表窗体自适应#}
+    //图表窗体自适应
         {#$(window).resize(function () {#}
         {#    myChart3.resize();#}
         {##}
         {#})#}
+
+    </script>
+
+    <script type="text/javascript">
 
 
         function due_asset(type) {
