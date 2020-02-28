@@ -1,53 +1,87 @@
 {% extends 'base-layer.html' %}
 {% load staticfiles %}
 {% block css %}
-<link rel="stylesheet" href="{%static 'plugins/select2/select2.min.css' %}">
-<!-- iCheck for checkboxes and radio inputs -->
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+    <!-- iCheck for checkboxes and radio inputs -->
 {% endblock %}
 {% block main %}
-<div class="box box-danger">
-	<form class="form-horizontal" id="addForm" method="post">
-		{% csrf_token %}
-		<div class="box-body">
-          <fieldset>
-            <legend>
-              <h4>仓库信息</h4>
-            </legend>
-            <div class="form-group has-feedback" style="overflow-x: hidden">
-                <input type="text" id="warehouse_id" name="warehouse_id" value="{{ warehouse.id }}" hidden>
+    <div class="box box-danger">
+        <form class="form-horizontal" id="addForm" method="post">
+            {% csrf_token %}
+            <div class="box-body">
+                <fieldset>
+                    <legend>
+                        <h4>仓库信息</h4>
+                    </legend>
+                    <div class="form-group has-feedback" style="overflow-x: hidden">
+                        <input type="text" id="warehouse_id" name="warehouse_id" value="{{ warehouse.id }}" hidden>
 
-                <label class="col-sm-2 control-label">仓库名称</label>
-                <div class="col-sm-3">
-                    <input class="form-control" name="warehouse" id="warehouse" type="text" value="{{ warehouse.name }}" maxlength="20"/>
-                </div>
-                <br><br>
-                <label class="col-sm-2 control-label">所属部门</label>
-                  <div class="col-sm-3">
-                    <select class="form-control select2" name="department_id" id="department_id">
-                        <option value="{{ warehouse.department_id }}">{{ warehouse.department.title }}</option>
-                        {% for department in department_list %}
-                        <option value={{ department.id }} > {{ department.title }} </option>
-                        {% endfor %}
-                  </select>
-                </div>
-                <input type="checkbox" name="is_all_view" id="is_all_view" style="zoom: 150%" {% if warehouse.is_all_view %}checked{% endif %}/>
-                <span style="font-size: 120%; font-weight: bolder">所有部门可见</span>
-                <br><br>
-                <label class="col-sm-2 control-label">备注</label>
-                <div class="col-sm-3">
-                    <input class="form-control" name="remark" id="remark" type="text" style="width:490px" value="{{ warehouse.remark }}"/>
+                        <label class="col-sm-2 control-label">仓库名称</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" name="warehouse" id="warehouse" type="text"
+                                   value="{{ warehouse.name }}" maxlength="20"/>
+                        </div>
+                        <br><br>
+                        <label class="col-sm-2 control-label">所属部门</label>
+                        <div class="col-sm-3">
+                            <select class="form-control select2" name="department_id" id="department_id">
+                                <option value="{{ warehouse.department_id }}">{{ warehouse.department.title }}</option>
+                                {% for department in department_list %}
+                                    <option value={{ department.id }}> {{ department.title }} </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <input type="checkbox" name="is_all_view" id="is_all_view" style="zoom: 150%"
+                               {% if warehouse.is_all_view %}checked{% endif %}/>
+                        <span style="font-size: 120%; font-weight: bolder">所有部门可见</span>
+                        <br><br>
+                        <label class="col-sm-2 control-label">备注</label>
+                        <div class="col-sm-3">
+                            <input class="form-control" name="remark" id="remark" type="text" style="width:780px"
+                                   value="{{ warehouse.remark }}"/>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="col-sm-2 control-label">物资审批人</label>
+                        <div class="col-xs-4">
+                            <label class="control-label">可选用户:</label>
+                            <select name="from" id="multiselect" class="form-control" size="18" multiple="multiple">
+                                {% for item in users %}
+                                    <option value="{{ item.id }}">{{ item.name }}({{ item.username }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-xs-2">
+                            <br><br><br><br><br><br>
+                            <button type="button" id="multiselect_rightAll" class="btn btn-block"><i
+                                    class="glyphicon glyphicon-forward"></i></button>
+                            <button type="button" id="multiselect_rightSelected" class="btn btn-block"><i
+                                    class="glyphicon glyphicon-chevron-right"></i></button>
+                            <button type="button" id="multiselect_leftSelected" class="btn btn-block"><i
+                                    class="glyphicon glyphicon-chevron-left"></i></button>
+                            <button type="button" id="multiselect_leftAll" class="btn btn-block"><i
+                                    class="glyphicon glyphicon-backward"></i></button>
+                        </div>
+                        <div class="col-xs-4">
+                            <label class="control-label">已绑定用户:</label>
+                            <select name="to" id="multiselect_to" class="form-control" size="18" multiple="multiple">
+                                {% for item in added_users %}
+                                    <option value="{{ item.id }}" >{{ item.name }}({{ item.username }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+
+            <div class="box-footer ">
+                <div class="row span7 text-center ">
+                    <button type="button" id="btnCancel" class="btn btn-default margin-right ">重置</button>
+                    <button type="button" id="btnSave" class="btn btn-info margin-right ">保存</button>
                 </div>
             </div>
-          </fieldset>
-        </div>
-
-		<div class="box-footer ">
-			<div class="row span7 text-center ">
-              <button type="button" id="btnCancel" class="btn btn-default margin-right " >重置</button>
-              <button type="button" id="btnSave" class="btn btn-info margin-right " >保存</button>
-			</div>
-		    </div>
-    	</form>
+        </form>
     </div>
 
 
@@ -55,51 +89,59 @@
 
 {% block javascripts %}
     <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
-<script type="text/javascript">
+    <script src="{% static 'plugins/combo-select/jquery.combo.select.js' %}"></script>
+    <script src="{% static 'plugins/select/multiselect.min.js' %}"></script>
+    <script type="text/javascript">
 
-	$("#btnSave").click(function(){
-        if($("#warehouse").val()=="")
-        {
-            alert("请填写仓库名称")
-        } else if ($("#department_id").val()=="") {
-            alert("请选择所属部门")
-        } else{
-           var data = {"name": $("#warehouse").val(),
-                        "department_id": $("#department_id").val(),
-                        "is_all_view": $("#is_all_view").is(':checked'),
-                        "remark": $('#remark').val(),
-                        "id": $('#warehouse_id').val()
-           };
-           console.log(data);
-           $.ajax({
-               type: $("#addForm").attr('method'),
-               url : "{% url 'adm-warehouse-create' %}",
-               data : data,
-               cache : false,
-               success : function(msg) {
-                   if (msg.result){
-                       layer.alert('保存成功！', {icon: 1},function(index){
-                           parent.layer.closeAll(); //关闭所有弹窗
-                       });
-                   }else{
-                       layer.alert('保存失败', {icon: 5});
-                       //$('errorMessage').html(msg.message)
-                   }
-               }
-           });
-        }
-	});
+        $("#btnSave").click(function () {
+            if ($("#warehouse").val() == "") {
+                alert("请填写仓库名称")
+            } else if ($("#department_id").val() == "") {
+                alert("请选择所属部门")
+            } else {
+                $('#multiselect_to option').prop('selected', true);
+                var data = $("#addForm").serialize();
+                console.log(data);
+                $.ajax({
+                    type: $("#addForm").attr('method'),
+                    url: "{% url 'adm-warehouse-create' %}",
+                    data: data,
+                    cache: false,
+                    success: function (msg) {
+                        if (msg.result) {
+                            layer.alert('保存成功！', {icon: 1}, function (index) {
+                                parent.layer.closeAll(); //关闭所有弹窗
+                            });
+                        } else {
+                            layer.alert('保存失败', {icon: 5});
+                            //$('errorMessage').html(msg.message)
+                        }
+                    }
+                });
+            }
+        });
 
 
-	/*点取消刷新新页面*/
-    $("#btnCancel").click(function () {
-	    window.location.reload();
+        /*点取消刷新新页面*/
+        $("#btnCancel").click(function () {
+            window.location.reload();
+        });
+
+    $(function () {
+        //Initialize Select2 Elements
+        $(".select2").select2();
+
+        //初始化多选列表
+	    $('#multiselect').multiselect({
+            search: {
+                left: '<input type="text" class="form-control" placeholder="Search..." />',
+                right: '<input type="text" class="form-control" placeholder="Search..." />',
+            },
+            fireSearch: function(value) {
+                return value.length > 1;
+            }
+        });
     });
 
-  $(function () {
-    //Initialize Select2 Elements
-    $(".select2").select2();
-  });
-
-</script>
+    </script>
 {% endblock %}

@@ -1,6 +1,7 @@
 import copy
 import json
 import time
+from datetime import datetime
 
 from django.contrib.auth import get_user_model
 from django.core import serializers
@@ -152,8 +153,12 @@ class WarehouseView(LoginRequiredMixin, View):
 
         department_list = department_admin(user_id)
         warehouse_list = warehouse_admin(department_list)
-
         ret['warehouse_list'] = warehouse_list
+        list1 = []
+        for i in warehouse_list:
+            user = i.verifier.all()
+            list1.append(user)
+        ret['user_list'] = list1
         return render(request, "adm/layer/warehouse.html", ret)
 
 
@@ -163,20 +168,30 @@ class WarehouseCreateView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
+        global warehouse
         ret = dict()
         id = request.GET.get("id")
         if id:
             warehouse = AssetWarehouse.objects.get(id=id)
             ret["warehouse"] = warehouse
+            k = "1"
+        else:
+            k = "0"
         user_id = request.session.get("_auth_user_id")
         department_list = department_admin(user_id)
         ret["department_list"] = department_list
+
+        if k == "1":
+            added_users = warehouse.verifier.all()
+            ret["added_users"] = added_users
+        users = User.objects.filter(is_active="1")
+        ret["users"] = users
         return render(request, "adm/layer/warehouse_create.html", ret)
 
     def post(self, request):
         ret = dict()
-        id = request.POST.get("id")
-        name = request.POST.get("name")
+        id = request.POST.get("warehouse_id")
+        name = request.POST.get("warehouse")
         department_id = request.POST.get("department_id")
         remark = request.POST.get("remark")
         is_all_view = request.POST.get("is_all_view")
@@ -187,9 +202,22 @@ class WarehouseCreateView(LoginRequiredMixin, View):
                 warehouse = AssetWarehouse()
             warehouse.name = name
             warehouse.department_id = department_id
-            warehouse.is_all_view = is_all_view.startswith('t')
+            if is_all_view == "on":
+                warehouse.is_all_view = True
+            else:
+                warehouse.is_all_view = False
             warehouse.remark = remark
             warehouse.save()
+
+            wh_ver = warehouse.verifier.all()
+            warehouse.verifier.remove(*wh_ver)
+
+            if 'to' in request.POST and request.POST['to']:
+                # print(request.POST.getlist('to', []))
+                id_list = request.POST.getlist('to', [])
+                add_users = User.objects.filter(id__in=id_list)
+                warehouse.verifier.add(*add_users)
+
             ret["result"] = True
         else:
             ret["result"] = False
@@ -411,7 +439,9 @@ class AssetUseFlowView(LoginRequiredMixin, View):
                     asset.warehouse_id = asset_order.transfer_warehouse_id
                     asset.save()
 
-                    use_asset = AssetInfo.objects.filter(name=asset_order.asset.name, user_id=asset_order.proposer_id, quantity__lte=asset_order.quantity, warehouse=asset_order.asset.warehouse)[0]
+                    use_asset = AssetInfo.objects.filter(name=asset_order.asset.name, user_id=asset_order.proposer_id,
+                                                         quantity__lte=asset_order.quantity,
+                                                         warehouse=asset_order.asset.warehouse)[0]
                     use_asset.delete()
                 else:
                     asset_order.use_status = "1"
@@ -434,6 +464,31 @@ class AssetApplyView(LoginRequiredMixin, View):
         ret['asset_order_list'] = asset_order_list
 
         return render(request, 'adm/layer/asset_order.html', ret)
+
+    def post(self, request):
+        """
+        取消领用ajax
+        :param request:
+        :return:
+        """
+        ret = dict()
+        id0 = request.POST.get("id")
+        user_id = request.session.get("_auth_user_id")
+        asset_log = AssetApprove.objects.filter(id=id0).first()
+        asset_log.use_status = "5"
+        asset = asset_log.asset
+        asset.quantity += asset_log.quantity
+        asset.save()
+        asset_log.return_quantity = asset_log.quantity
+        asset_log.return_operator_id = user_id
+        asset_log.t_return_date = datetime.today()
+        asset_log.save()
+        use_asset = AssetInfo.objects.filter(name=asset_log.asset.name, user_id=asset_log.proposer_id,
+                                             quantity__lte=asset_log.quantity,
+                                             warehouse=asset_log.asset.warehouse).first()
+        use_asset.delete()
+        ret["success"] = "1"
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
 
 
 class AssetApproveresultView(LoginRequiredMixin, View):
@@ -461,17 +516,21 @@ class AssetApproveresultView(LoginRequiredMixin, View):
 
         asset_approve = AssetApproveDetail.objects.get(id=id)
         asset_approve.is_pass = ps
+        asset_approve.status = "2"
         asset_approve.remark = content
         asset_approve.save()
 
         asset_order = asset_approve.asset_order
+        # 当审批未通过时取消未审批人的审批
         if ps == "0":
             asset_order.status = "3"
             asset_order.save()
             asset_approve = AssetApproveDetail.objects.filter(asset_order=asset_order, is_pass=None)
             for approve in asset_approve:
                 approve.delete()
-            use_asset = AssetInfo.objects.filter(name=asset_order.asset.name, user_id=asset_order.proposer_id, quantity__lte=asset_order.quantity,warehouse=asset_order.asset.warehouse)[0]
+            use_asset = AssetInfo.objects.filter(name=asset_order.asset.name, user_id=asset_order.proposer_id,
+                                                 quantity__lte=asset_order.quantity,
+                                                 warehouse=asset_order.asset.warehouse)[0]
             asset = asset_order.asset
             asset.quantity += int(use_asset.quantity)
             if asset.is_delete:
@@ -493,6 +552,12 @@ class AssetApproveresultView(LoginRequiredMixin, View):
                 else:
                     asset_order.status = "2"
             asset_order.save()
+            # 下一个审批人开始审批
+            for a in asset_approve_list:
+                if a.status == "0":
+                    a.status = "1"
+                    a.save()
+                    break
         ret["success"] = True
 
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
@@ -506,7 +571,7 @@ class AssetApproveView(LoginRequiredMixin, View):
     def get(self, request):
         ret = dict()
         user_id = request.session.get("_auth_user_id")
-        approve_list = AssetApproveDetail.objects.filter(approver_id=user_id, is_pass=None)
+        approve_list = AssetApproveDetail.objects.filter(approver_id=user_id, is_pass=None, status="1")
         ret['approve_list'] = approve_list
         return render(request, "adm/layer/asset_approve.html", ret)
 
@@ -519,7 +584,8 @@ class AssetApproveHistoryView(LoginRequiredMixin, View):
     def get(self, request):
         ret = dict()
         user_id = request.session.get("_auth_user_id")
-        asset_approve_history_list = AssetApproveDetail.objects.filter(~Q(is_pass=None) & Q(approver_id=user_id)).order_by("-create_time")
+        asset_approve_history_list = AssetApproveDetail.objects.filter(
+            ~Q(is_pass=None) & Q(approver_id=user_id)).order_by("-create_time")
         ret['asset_approve_history_list'] = asset_approve_history_list
         return render(request, "adm/layer/asset_approve_history.html", ret)
 
@@ -544,6 +610,7 @@ class AssetTransferView(LoginRequiredMixin, View):
     """
     资产转移
     """
+
     def get(self, request):
         ret = dict()
         asset_id = request.GET.get("id")
@@ -556,15 +623,13 @@ class AssetTransferView(LoginRequiredMixin, View):
 
     def post(self, request):
         ret = dict()
+        user_id = request.session.get('_auth_user_id')
         asset_id = request.POST.get("id0")
         asset = AssetInfo.objects.get(id=asset_id)
-        depatment0 = asset.department
-        depatment1 = Structure.objects.get(id=int(request.POST.get("department1")))
+        department0 = asset.department
+        warehouse0 = asset.warehouse
+        department1 = Structure.objects.get(id=int(request.POST.get("department1")))
         warehouse1 = AssetWarehouse.objects.get(id=int(request.POST.get("warehouse1")))
-        administrator0 = depatment0.administrator
-        approver0 = depatment0.approver
-        administrator1 = depatment1.administrator
-        approver1 = depatment1.approver
 
         # 创建相应的在用物资
         use_quantity = request.POST.get('quantity')
@@ -581,49 +646,46 @@ class AssetTransferView(LoginRequiredMixin, View):
         use_asset.user_id = request.session.get('_auth_user_id')
         use_asset.is_delete = False
         use_asset.save()
-        user_id = request.session.get('_auth_user_id')
 
         # 创建记录单
         asset_order = AssetApprove()
         asset_order.proposer_id = user_id
         asset_order.asset_id = asset_id
         asset_order.quantity = use_quantity
-        asset_order.purpose = "将" + use_quantity + asset.unit + " '" + asset.name + "' 由 '" + asset.department.title + " - " + asset.warehouse.name + "' 仓库转移至 '" + depatment1.title + " - " + warehouse1.name + "' 仓库"
+        asset_order.purpose = "将" + use_quantity + asset.unit + " '" + asset.name + "' 由 '" + asset.department.title + " - " + asset.warehouse.name + "' 仓库转移至 '" + department1.title + " - " + warehouse1.name + "' 仓库"
         asset_order.return_date = request.POST.get('use_time')
         asset_order.status = '0'
         asset_order.use_status = '0'
         asset_order.type = "1"
-        asset_order.transfer_department = depatment1
+        asset_order.transfer_department = department1
         asset_order.transfer_warehouse = warehouse1
         asset_order.save()
 
         # 添加审批
-        if administrator0.id:
-            if int(user_id) != int(administrator0.id):
-                approve = AssetApproveDetail()
-                approve.approver_id = administrator0.id
-                approve.asset_order_id = asset_order.id
-                approve.save()
-
-        if approver0.id:
-            if int(user_id) != int(approver0.id):
-                approve = AssetApproveDetail()
-                approve.approver_id = approver0.id
-                approve.asset_order_id = asset_order.id
-                approve.save()
-
-        if administrator1.id:
-            if int(user_id) != int(administrator1.id):
-                approve = AssetApproveDetail()
-                approve.approver_id = administrator1.id
-                approve.asset_order_id = asset_order.id
-                approve.save()
-
-        if approver1.id:
-            if int(user_id) != int(approver1.id):
-                approve = AssetApproveDetail()
-                approve.approver_id = approver1.id
-                approve.asset_order_id = asset_order.id
-                approve.save()
+        approver_list = department1.adm_list.split(",")
+        for i in range(len(approver_list)):
+            approver_list[i] = int(approver_list[i])
+        verifier_list = warehouse0.verifier.all()
+        if verifier_list:
+            for i in verifier_list:
+                approver_list.append(int(i.id))
+        approver_list2 = []
+        for i in approver_list:
+            if i not in approver_list2:
+                approver_list2.append(i)
+        if int(user_id) in approver_list2:
+            approver_list2.remove(int(user_id))
+        for id0 in approver_list2:
+            approve = AssetApproveDetail()
+            approve.approver_id = int(id0)
+            if id0 == approver_list2[0]:
+                approve.status = "1"
+            approve.asset_order_id = asset_order.id
+            approve.save()
+        if AssetApproveDetail.objects.filter(asset_order=asset_order):
+            pass
+        else:
+            asset_order.status = "2"
+            asset_order.save()
         ret['status'] = "success"
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")

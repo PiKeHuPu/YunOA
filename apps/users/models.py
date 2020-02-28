@@ -17,7 +17,7 @@ class UserProfile(AbstractUser):
     mobile = models.CharField(max_length=11, default="", verbose_name="电话")
     email = models.EmailField(max_length=100, verbose_name="邮箱")
     image = models.ImageField(upload_to="image/%Y/%m", default="image/default.jpg", max_length=100, null=True, blank=True)
-    department = models.ForeignKey("Structure", null=True, blank=True, verbose_name="部门", on_delete=models.CASCADE)
+    department = models.ForeignKey("Structure", null=True, blank=True, verbose_name="部门")
     is_dep_administrator = models.BooleanField(default=False, verbose_name="是否是部门物资管理员")
     post = models.CharField(max_length=50, null=True, blank=True, verbose_name="职位")
     superior = models.ForeignKey("self", null=True, blank=True, verbose_name="上级主管")
@@ -45,9 +45,8 @@ class Structure(models.Model):
     title = models.CharField(max_length=60, verbose_name="名称")
     type = models.CharField(max_length=20, choices=type_choices, default="department", verbose_name="类型")
     parent = models.ForeignKey("self", null=True, blank=True, verbose_name="父类架构")
-    adm_list = models.CharField(max_length=50, null=True, blank=True, verbose_name="部门工单管理员")
+    adm_list = models.CharField(max_length=50, null=True, blank=True, verbose_name="部门负责人")
     administrator = models.ForeignKey(UserProfile, blank=True, null=True, related_name='asset_admin', on_delete=models.SET_NULL, verbose_name="部门资产管理员")
-    approver = models.ForeignKey(UserProfile, blank=True, null=True, related_name='asset_approver', on_delete=models.SET_NULL, verbose_name="部门资产审批人")
     super_adm = models.BooleanField(default=False, verbose_name="是否有全部部门管理权限")
 
     class Meta:

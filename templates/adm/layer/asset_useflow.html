@@ -177,6 +177,8 @@
                                         ret = "无需归还"
                                     } else if (row.use_status == "4") {
                                         ret = "已转移"
+                                    } else if (row.use_status == "5") {
+                                        ret = "已取消"
                                     }
                                     return ret;
                                 }
@@ -191,6 +193,7 @@
                                     }
                                     else if (row.status == "2" && row.use_status == "0") {
                                         ret = ret + "<button title='领用' onclick='receive(" + data + ")'><i class='glyphicon glyphicon-open'></i></button>";
+                                        ret = ret + "<button title='取消领用' onclick='cancle(" + data + ")'><i class=\"fa fa-close\"></i></button>";
                                     }
                                     if (row.status == "2" && row.use_status == "1") {
                                         ret = ret + "<button title='归还' onclick='give_back(" + data + ")'><i class='glyphicon glyphicon-save'></i></button>";
@@ -243,6 +246,25 @@
             if (con) {
                 $.ajax({
                     url: "{% url 'adm-useflow' %}",
+                    type: "post",
+                    data: {"id": id},
+                    success: function (ret) {
+                        if (ret.success) {
+                            alert("操作成功");
+                            window.location.reload();
+                        } else {
+                            alert("操作失败，请稍后再试")
+                        }
+                    }
+                })
+            }
+        }
+
+        function cancle(id) {
+            var con = confirm("确定取消领用吗？");
+            if (con) {
+                $.ajax({
+                    url: "{% url 'personal-apply' %}",
                     type: "post",
                     data: {"id": id},
                     success: function (ret) {

@@ -232,6 +232,7 @@ class AssetWarehouse(models.Model):
     remark = models.TextField(blank=True, null=True, verbose_name="备注")
     is_delete = models.BooleanField(default=False, verbose_name="是否删除")
     is_all_view = models.BooleanField(default=False, verbose_name="是否所有人可见")
+    verifier = models.ManyToManyField(User, blank=True, null=True, verbose_name="物资审批人")
 
 
 class AssetInfo(models.Model):
@@ -284,7 +285,7 @@ class AssetApprove(models.Model):
     return_date = models.DateField(null=True, blank=True, verbose_name="预计归还时间")
     status = models.CharField(max_length=10, verbose_name="状态")  # '0': 未审批  '1': 审批中  '2': 审批通过  '3': 审批未通过
     use_status = models.CharField(max_length=10, verbose_name="使用状态")
-    # '0': 未领用  '1': 未归还  '2': 已归还  '3': 无需归还  '4': 已转移
+    # '0': 未领用  '1': 未归还  '2': 已归还  '3': 无需归还  '4': 已转移  '5': 已取消
     type = models.CharField(max_length=10, verbose_name="类型")  # '0': 物资领用  '1': 资产转移
     create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
     t_return_date = models.DateField(null=True, blank=True, verbose_name="归还日期")
@@ -296,8 +297,9 @@ class AssetApprove(models.Model):
 
 class AssetApproveDetail(models.Model):
     """
-    物资
+    物资审批
     """
+    status = models.CharField(max_length=4, default="0", verbose_name="审批状态")  # "0": 等待审批  “1”：审批中  “2”：审批完成
     approver = models.ForeignKey(User, on_delete=models.DO_NOTHING, verbose_name="审批人")
     asset_order = models.ForeignKey(AssetApprove, on_delete=models.DO_NOTHING, verbose_name="物资申请")
     is_pass = models.CharField(max_length=10, blank=True, null=True, verbose_name="是否通过")  # "0": 不通过  "1": 通过

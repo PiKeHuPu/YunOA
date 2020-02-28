@@ -211,11 +211,13 @@ class AssetUseFlowListView(LoginRequiredMixin, View):
     """
     领取资产信息获取list
     """
+
     def get(self, request):
         user_id = request.session.get("_auth_user_id")
         department_list = department_admin(user_id)
         warehouse_list = warehouse_admin(department_list)
-        fields = ['id', 'asset__number', "asset__warehouse__id", 'asset__warehouse__name', 'asset__name', 'asset__type', 'quantity', 'proposer__name', 'create_time', 'return_date', 'purpose', 'use_status', 'status', 'type']
+        fields = ['id', 'asset__number', "asset__warehouse__id", 'asset__warehouse__name', 'asset__name', 'asset__type',
+                  'quantity', 'proposer__name', 'create_time', 'return_date', 'purpose', 'use_status', 'status', 'type']
         filters = dict()
         if request.GET.get('asset_number'):
             filters['asset__number'] = request.GET['asset_number']
@@ -437,34 +439,35 @@ class AssetUseInfoView(LoginRequiredMixin, View):
         asset_order.type = "0"
         asset_order.save()
 
+        # 创建审批流程
         if asset.is_no_approve:
             pass
         else:
-            # if asset.department.administrator_id:
-            #     if int(user_id) != int(asset.department.administrator_id):
-            #         approve = AssetApproveDetail()
-            #         approve.approver_id = asset.department.administrator_id
-            #         approve.asset_order_id = asset_order.id
-            #         approve.save()
-            #
-            # if asset.department.approver_id:
-            #     if int(user_id) != int(asset.department.approver_id):
-            #         approve = AssetApproveDetail()
-            #         approve.approver_id = asset.department.approver_id
-            #         approve.asset_order_id = asset_order.id
-            #         approve.save()
-            department = asset.department
-            approver_set = set()
-            approver = department.userprofile_set.filter(is_dep_administrator=True)
-            for a in approver:
-                approver_set.add(int(a.id))
-            if asset.department.approver_id:
-                approver_set.add(int(asset.department.approver_id))
-            if int(user_id) in approver_set:
-                approver_set.remove(int(user_id))
-            for id0 in approver_set:
+            user = User.objects.filter(id=user_id).first()
+            department = user.department
+            approver_list = department.adm_list.split(",")
+            # approver_set = set()
+            # if approver_list:
+            #     for a in approver_list:
+            #         approver_set.add(int(a))
+            for i in range(len(approver_list)):
+                approver_list[i] = int(approver_list[i])
+            warehouse = asset.warehouse
+            verifier_list = warehouse.verifier.all()
+            if verifier_list:
+                for i in verifier_list:
+                    approver_list.append(int(i.id))
+            approver_list2 = []
+            for i in approver_list:
+                if i not in approver_list2:
+                    approver_list2.append(i)
+            if int(user_id) in approver_list2:
+                approver_list2.remove(int(user_id))
+            for id0 in approver_list2:
                 approve = AssetApproveDetail()
                 approve.approver_id = int(id0)
+                if id0 == approver_list2[0]:
+                    approve.status = "1"
                 approve.asset_order_id = asset_order.id
                 approve.save()
         if AssetApproveDetail.objects.filter(asset_order=asset_order):
@@ -508,11 +511,15 @@ class AssetBackView(LoginRequiredMixin, View):
             asset.quantity += int(back_count)
             asset.save()
 
-            use_asset = AssetInfo.objects.filter(name=asset_order.asset.name, user_id=asset_order.proposer_id, quantity__lte=asset_order.quantity, warehouse=asset_order.asset.warehouse)[0]
+            use_asset = AssetInfo.objects.filter(name=asset_order.asset.name, user_id=asset_order.proposer_id,
+                                                 quantity__lte=asset_order.quantity,
+                                                 warehouse=asset_order.asset.warehouse)[0]
             use_asset.delete()
             asset_order.save()
         elif int(back_count) < int(asset_order.quantity) - int(asset_order.return_quantity):
-            use_asset = AssetInfo.objects.filter(name=asset_order.asset.name, user_id=asset_order.proposer_id, quantity__lte=asset_order.quantity, warehouse=asset_order.asset.warehouse)[0]
+            use_asset = AssetInfo.objects.filter(name=asset_order.asset.name, user_id=asset_order.proposer_id,
+                                                 quantity__lte=asset_order.quantity,
+                                                 warehouse=asset_order.asset.warehouse)[0]
             use_asset.quantity -= int(back_count)
             use_asset.save()
 

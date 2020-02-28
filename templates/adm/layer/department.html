@@ -2,146 +2,139 @@
 {% load staticfiles %}
 
 {% block css %}
-<link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
-<link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
 {% endblock %}
 
 {% block main %}
-<div class="box box-danger">
-	<form class="form-horizontal" id="addForm" method="post">
-		{% csrf_token %}
-		<input type="hidden" name='id0' id="id0" value="{{ department.id }}" />
-		<div class="box-body">
-          <fieldset>
-            <div class="form-group has-feedback">
-{#               <label class="col-sm-2 control-label">物资管理员</label>#}
-{#                  <div class="col-sm-3">#}
-{#                    <select class="form-control select2" name="operator" id="operator">#}
-{#                        <option></option>#}
-{#                        {% for user in users %}#}
-{#                        <option value={{ user.id }} {% if department.administrator_id == user.id %}selected{% endif %}> {{ user.name }} </option>#}
-{#                        {% endfor %}#}
-{#                  </select>#}
-{#                </div>#}
-        <div class="box-body">
-			<div>
-                <div class="col-xs-3">
-                    <label class="control-label" style="margin-left: 150px">物资管理员</label>
-                    <div style="margin-left: 150px">
-                        <input name="admin" id="admin" type="checkbox" style="zoom: 150%" {% if department.super_adm %}checked{% endif %}/>
-                        <label style="font-size: 17px; font-weight: bolder">所有部门管理权限</label>
+    <div class="box box-danger">
+        <form class="form-horizontal" id="addForm" method="post">
+            {% csrf_token %}
+            <input type="hidden" name='id0' id="id0" value="{{ department.id }}"/>
+            <div class="box-body">
+                <fieldset>
+                    <div class="form-group has-feedback">
+                        {#               <label class="col-sm-2 control-label">物资管理员</label>#}
+                        {#                  <div class="col-sm-3">#}
+                        {#                    <select class="form-control select2" name="operator" id="operator">#}
+                        {#                        <option></option>#}
+                        {#                        {% for user in users %}#}
+                        {#                        <option value={{ user.id }} {% if department.administrator_id == user.id %}selected{% endif %}> {{ user.name }} </option>#}
+                        {#                        {% endfor %}#}
+                        {#                  </select>#}
+                        {#                </div>#}
+                        <div class="box-body">
+                            <div>
+                                <div class="col-xs-3">
+                                    <label class="control-label" style="margin-left: 150px">物资管理员</label>
+                                    <div style="margin-left: 150px">
+                                        <input name="admin" id="admin" type="checkbox" style="zoom: 150%"
+                                               {% if department.super_adm %}checked{% endif %}/>
+                                        <label style="font-size: 17px; font-weight: bolder">所有部门管理权限</label>
+                                    </div>
+                                </div>
+                                <div class="col-xs-4">
+                                    <label class="control-label">可选用户:</label>
+                                    <select name="from" id="multiselect" class="form-control" size="18"
+                                            multiple="multiple">
+                                        {% for item in un_add_users %}
+                                            <option value="{{ item.id }}">{{ item.name }}({{ item.username }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-xs-1">
+                                    <br><br><br><br><br><br>
+                                    <button type="button" id="multiselect_rightAll" class="btn btn-block"><i
+                                            class="glyphicon glyphicon-forward"></i></button>
+                                    <button type="button" id="multiselect_rightSelected" class="btn btn-block"><i
+                                            class="glyphicon glyphicon-chevron-right"></i></button>
+                                    <button type="button" id="multiselect_leftSelected" class="btn btn-block"><i
+                                            class="glyphicon glyphicon-chevron-left"></i></button>
+                                    <button type="button" id="multiselect_leftAll" class="btn btn-block"><i
+                                            class="glyphicon glyphicon-backward"></i></button>
+                                </div>
+                                <div class="col-xs-4">
+                                    <label class="control-label">已绑定用户:</label>
+                                    <select name="to" id="multiselect_to" class="form-control" size="18"
+                                            multiple="multiple">
+                                        {% for item in added_users %}
+                                            <option value="{{ item.id }}">{{ item.name }}({{ item.username }})</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="col-xs-12 margin-top-5">
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-				<div class="col-xs-4">
-					<label class="control-label">可选用户:</label>
-					<select name="from" id="multiselect" class="form-control" size="18" multiple="multiple">
-						{% for item in un_add_users %}
-							<option value="{{ item.id }}" >{{ item.name }}({{ item.username }})</option>
-						{% endfor %}
-					</select>
-				</div>
-				<div class="col-xs-1">
-					<br><br><br><br><br><br>
-					<button type="button" id="multiselect_rightAll" class="btn btn-block"><i class="glyphicon glyphicon-forward"></i></button>
-					<button type="button" id="multiselect_rightSelected" class="btn btn-block"><i class="glyphicon glyphicon-chevron-right"></i></button>
-					<button type="button" id="multiselect_leftSelected" class="btn btn-block"><i class="glyphicon glyphicon-chevron-left"></i></button>
-					<button type="button" id="multiselect_leftAll" class="btn btn-block"><i class="glyphicon glyphicon-backward"></i></button>
-				</div>
-				<div class="col-xs-4">
-					<label class="control-label">已绑定用户:</label>
-					<select name="to" id="multiselect_to" class="form-control" size="18" multiple="multiple">
-						{% for item in added_users %}
-							<option value="{{ item.id }}" >{{ item.name }}({{ item.username }})</option>
-						{% endfor %}
-					</select>
-				</div>
-			</div>
-            <div>
-                <div class="col-xs-12 margin-top-5">
-                </div>
-			</div>
-		</div>
-{#                <div class="col-sm-3">#}
-{#                    <input name="admin" id="admin" type="checkbox" style="zoom: 150%" {% if department.super_adm %}checked{% endif %}/>#}
-{#                    <label style="font-size: 17px; font-weight: bolder">所有部门管理权限</label>#}
-{#                </div>#}
+                </fieldset>
+
             </div>
-              <br>
-              <label class="col-sm-2 control-label">物资审批人</label>
-                  <div class="col-sm-3">
-                    <select class="form-control select2" name="approver" id="approver">
-                        <option></option>
-                        {% for user in approver %}
-                        <option value={{ user.id }} {% if department.approver_id == user.id %}selected{% endif %}> {{ user.name }} </option>
-                        {% endfor %}
-                  </select>
+            <div class="box-footer ">
+                <div class="row span7 text-center ">
+                    <button type="button" id="btnCancel" class="btn btn-default margin-right ">重置</button>
+                    <button type="button" id="btnSave" class="btn btn-info margin-right ">保存</button>
                 </div>
-          </fieldset>
+            </div>
 
-		</div>
-		<div class="box-footer ">
-			<div class="row span7 text-center ">
-              <button type="button" id="btnCancel" class="btn btn-default margin-right " >重置</button>
-              <button type="button" id="btnSave" class="btn btn-info margin-right " >保存</button>
-			</div>
-		</div>
-
-	</form>
-</div>
+        </form>
+    </div>
 
 {% endblock %}
 
 {% block javascripts %}
-<script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
-<script src="{% static 'plugins/combo-select/jquery.combo.select.js' %}"></script>
-<script src="{% static 'plugins/select/multiselect.min.js' %}"></script>
-<script type="text/javascript">
+    <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+    <script src="{% static 'plugins/combo-select/jquery.combo.select.js' %}"></script>
+    <script src="{% static 'plugins/select/multiselect.min.js' %}"></script>
+    <script type="text/javascript">
 
-	$("#btnSave").click(function(){
-	    $('#multiselect_to option').prop('selected', true);
-		var data = $("#addForm").serialize();
-		$.ajax({
-			type: $("#addForm").attr('method'),
-			url : "{% url 'adm-department' %}",
-			data : data,
-			cache: false,
-			success : function(msg) {
-				if (msg.result){
-					layer.alert('数据保存成功！', {icon: 1},function(index){
-					    parent.layer.closeAll(); //关闭所有弹窗
-                    });
-				}else{
-					layer.alert('数据保存失败', {icon: 5});
-                    //$('errorMessage').html(msg.message)
-				}
-				return ;
-			}
-		});
-	});
-
-
-	/*点取消刷新新页面*/
-    $("#btnCancel").click(function () {
-	    window.location.reload();
-
-    });
-    // select2
-    $(function () {
-        //Initialize Select2 Elements
-        $(".select2").select2();
-
-        //初始化多选列表
-	    $('#multiselect').multiselect({
-            search: {
-                left: '<input type="text" class="form-control" placeholder="Search..." />',
-                right: '<input type="text" class="form-control" placeholder="Search..." />',
-            },
-            fireSearch: function(value) {
-                return value.length > 1;
-            }
+        $("#btnSave").click(function () {
+            $('#multiselect_to option').prop('selected', true);
+            var data = $("#addForm").serialize();
+            $.ajax({
+                type: $("#addForm").attr('method'),
+                url: "{% url 'adm-department' %}",
+                data: data,
+                cache: false,
+                success: function (msg) {
+                    if (msg.result) {
+                        layer.alert('数据保存成功！', {icon: 1}, function (index) {
+                            parent.layer.closeAll(); //关闭所有弹窗
+                        });
+                    } else {
+                        layer.alert('数据保存失败', {icon: 5});
+                        //$('errorMessage').html(msg.message)
+                    }
+                    return;
+                }
+            });
         });
-    });
 
-</script>
+
+        /*点取消刷新新页面*/
+        $("#btnCancel").click(function () {
+            window.location.reload();
+
+        });
+        // select2
+        $(function () {
+            //Initialize Select2 Elements
+            $(".select2").select2();
+
+            //初始化多选列表
+            $('#multiselect').multiselect({
+                search: {
+                    left: '<input type="text" class="form-control" placeholder="Search..." />',
+                    right: '<input type="text" class="form-control" placeholder="Search..." />',
+                },
+                fireSearch: function (value) {
+                    return value.length > 1;
+                }
+            });
+        });
+
+    </script>
 
 {% endblock %}

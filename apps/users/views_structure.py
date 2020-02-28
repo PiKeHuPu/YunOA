@@ -35,7 +35,7 @@ class StructureListView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        fields = ['id', 'title', 'type', 'parent__title', 'adm_list', 'approver__name']
+        fields = ['id', 'title', 'type', 'parent__title', 'adm_list']
         ret = dict(data=list(Structure.objects.values(*fields)))
         # print(ret)
         for data in ret["data"]:
@@ -172,27 +172,24 @@ class StructureAdmView(LoginRequiredMixin, View):
 
 class StructureAssetAdmView(LoginRequiredMixin, View):
     """
-    设置物资管理员与审批人
+    设置物资管理员
     """
     def get(self, request):
         ret = dict()
         id0 = request.GET.get("id")
         department = Structure.objects.get(id=id0)
         added_users = department.userprofile_set.filter(is_dep_administrator=True)
-        approver = User.objects.filter(is_active='1')
         users = department.userprofile_set.filter(is_active="1")
         un_add_users = set(users).difference(added_users)
         ret['department'] = department
         ret['added_users'] = added_users
         ret['un_add_users'] = un_add_users
-        ret['approver'] = approver
         return render(request, "adm/layer/department.html", ret)
 
     def post(self, request):
         ret = dict()
         id_list = None
         id0 = request.POST.get("id0")
-        approver_id = request.POST.get('approver')
         department = Structure.objects.get(id=id0)
         role = Role.objects.get(title="能力：仓库管理")
         dep_users = department.userprofile_set.filter(is_dep_administrator=True)
@@ -209,7 +206,6 @@ class StructureAssetAdmView(LoginRequiredMixin, View):
         department.userprofile_set.all().update(is_dep_administrator=False)
         if id_list:
             department.userprofile_set.filter(id__in=id_list).update(is_dep_administrator=True)
-        department.approver_id = approver_id
         if request.POST.get('admin') == 'on':
             department.super_adm = True
         else:
