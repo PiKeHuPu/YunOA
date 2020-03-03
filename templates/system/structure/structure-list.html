@@ -50,6 +50,7 @@
                         <th>名称</th>
                         <th>类别</th>
                         <th>所属</th>
+                        <th>分管副总</th>
                         <th>部门负责人</th>
                         <th>物资管理员</th>
                         <th>操作</th>
@@ -120,6 +121,9 @@ $(function() {
 									data : "parent__title",
 								},
                                 {
+                                    data : "vice_manager__name",
+                                },
+                                {
                                     data : "adm_list",
                                 },
                                 {
@@ -133,7 +137,7 @@ $(function() {
 										var ret="";
 										var ret="<button title='详情-编辑' onclick='doUpdate("+ data + ")'><i class='glyphicon glyphicon-pencil'></i></button>";
 										ret=ret+"<button title='关联用户' onclick='doAddUser("+ data + ")'><i class='glyphicon glyphicon-user'></i></button>";
-										 ret=ret+"<button title='修改部门负责人' onclick='doAddAdm("+ data + ")'><i class='fa fa-user-plus'></i></button>";
+										 ret=ret+"<button title='修改部门负责人与分管副总' onclick='doAddAdm("+ data + ")'><i class='fa fa-user-plus'></i></button>";
 										 ret=ret+"<button title='修改物资管理员' onclick='doSetAdm("+ data + ")'><i class='fa fa-user-plus'></i></button>";
 										 ret=ret+"<button title='删除' onclick='doDelete("+ data + ")'><i class='glyphicon glyphicon-trash'></i></button>";
 										return ret;
@@ -282,13 +286,13 @@ function doAddUser(id){
 	});
 }
 
-// 修改工单管理员
+
 function doAddAdm(id){
     layer.open({
         type: 2,
-        title: '修改部门负责人',
+        title: '修改部门负责人与分管副总',
         maxmin: 'true',
-        area: [ '800px', '600px' ],
+        area: [ '800px', '700px' ],
         content: ['{% url "system-basic:structure-add_adm" %}' + '?id=' + id, 'no'],
         end: function () {
             window.location.reload();

@@ -17,7 +17,6 @@ from rbac.models import Menu, Role
 from system.models import SystemSetup
 
 
-
 class StructureView(LoginRequiredMixin, View):
     """
     组织架构管理
@@ -35,7 +34,7 @@ class StructureListView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        fields = ['id', 'title', 'type', 'parent__title', 'adm_list']
+        fields = ['id', 'title', 'type', 'parent__title', 'adm_list', "vice_manager__name"]
         ret = dict(data=list(Structure.objects.values(*fields)))
         # print(ret)
         for data in ret["data"]:
@@ -135,8 +134,9 @@ class Structure2UserView(LoginRequiredMixin, View):
 
 class StructureAdmView(LoginRequiredMixin, View):
     """
-    组织架构添加工单管理员
+    组织架构添加部门负责人和分管副总
     """
+
     def get(self, request):
         if 'id' in request.GET and request.GET['id']:
             structure = get_object_or_404(Structure, pk=int(request.GET.get('id')))
@@ -147,24 +147,28 @@ class StructureAdmView(LoginRequiredMixin, View):
             added_adms = User.objects.filter(id__in=adm_list)
             all_adms = User.objects.exclude(username='admin')
             un_add_adms = set(all_adms).difference(added_adms)
-            ret = dict(structure=structure, added_users=added_adms, un_add_users=list(un_add_adms))
-        return render(request, 'system/structure/structure-adm.html', ret)
 
+            vice_managers = User.objects.filter(is_active="1")
+            ret = dict(structure=structure, added_users=added_adms, un_add_users=list(un_add_adms),
+                       vice_managers=vice_managers)
+        else:
+            ret = dict()
+        return render(request, 'system/structure/structure-adm.html', ret)
 
     def post(self, request):
         res = dict(result=False)
         id_list = None
         structure = get_object_or_404(Structure, pk=int(request.POST.get('id')))
         if 'to' in request.POST and request.POST['to']:
-            # print(request.POST.getlist('to', []))
             id_list = request.POST.getlist('to', [])
         if id_list:
-            # for user in User.objects.filter(id__in=id_list):
-            #     structure.userprofile_set.add(user)
             adm_list = ",".join(id_list)
             structure.adm_list = adm_list
         else:
             structure.adm_list = None
+
+        vice_manager = request.POST.get("vice_manager")
+        structure.vice_manager_id = vice_manager
         structure.save()
         res['result'] = True
         return HttpResponse(json.dumps(res), content_type='application/json')
@@ -174,6 +178,7 @@ class StructureAssetAdmView(LoginRequiredMixin, View):
     """
     设置物资管理员
     """
+
     def get(self, request):
         ret = dict()
         id0 = request.GET.get("id")

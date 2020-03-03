@@ -48,6 +48,7 @@ class Structure(models.Model):
     adm_list = models.CharField(max_length=50, null=True, blank=True, verbose_name="部门负责人")
     administrator = models.ForeignKey(UserProfile, blank=True, null=True, related_name='asset_admin', on_delete=models.SET_NULL, verbose_name="部门资产管理员")
     super_adm = models.BooleanField(default=False, verbose_name="是否有全部部门管理权限")
+    vice_manager = models.ForeignKey(UserProfile, blank=True, null=True, verbose_name="分管副总")
 
     class Meta:
         verbose_name = "组织架构"
