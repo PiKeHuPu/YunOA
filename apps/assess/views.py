@@ -138,13 +138,20 @@ class CreatePerGoal(LoginRequiredMixin, View):
         ret["dep_goal"] = dep_goal
         dep_goal_list = dep_goal.content.split("\n")
         ret["dep_goal_list"] = dep_goal_list
+
+        department = dep_goal.department
+        users = department.userprofile_set.filter(is_active="1")
+        ret["users"] = users
         return render(request, "assess/create_per_goal.html", ret)
 
     def post(self, request):
         ret = dict()
         goal_id = request.POST.get("id0")
         detail = request.POST.get("detail")
-        user_id = request.session.get("_auth_user_id")
+        user_id = request.POST.get("user_id")
+        per_goals = AssessPerDetail.objects.filter(dep_goal_id=goal_id, principal_id=user_id)
+        if per_goals:
+            per_goals.delete()
         detail_list = detail.split("\n")
         for d in detail_list:
             per_goal = AssessPerDetail()
