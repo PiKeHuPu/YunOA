@@ -91,6 +91,7 @@
     <script type="text/javascript">
 
         $("#btnSave").click(function () {
+            $(this).attr("disabled", "disabled");
             var useCount = $("#use_count").val();
             var title = $("#asset_title").val();
             var use_time = $("#use_time").val();

@@ -262,6 +262,7 @@ class AssetInfo(models.Model):
     remark = models.TextField(max_length=500, verbose_name="备注信息")
     is_no_return = models.BooleanField(default=False, verbose_name="无需归还")
     is_no_approve = models.BooleanField(default=False, verbose_name="无需审批")
+    is_vice_approve = models.BooleanField(default=False, verbose_name="分管副总审批")
 
 
 class AssetEditFlow(models.Model):

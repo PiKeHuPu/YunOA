@@ -446,12 +446,11 @@ class AssetUseInfoView(LoginRequiredMixin, View):
             user = User.objects.filter(id=user_id).first()
             department = user.department
             approver_list = department.adm_list.split(",")
-            # approver_set = set()
-            # if approver_list:
-            #     for a in approver_list:
-            #         approver_set.add(int(a))
             for i in range(len(approver_list)):
                 approver_list[i] = int(approver_list[i])
+            if asset.is_vice_approve:
+                vice_manager_id = department.vice_manager_id
+                approver_list.append(int(vice_manager_id))
             warehouse = asset.warehouse
             verifier_list = warehouse.verifier.all()
             if verifier_list:

@@ -19,20 +19,26 @@
                         <input class="form-control" name="id0" id="id0" type="hidden" value="{{ asset.id }}"/>
                         <label class="col-sm-2 control-label">资产编号(选填)</label>
                         <div class="col-sm-3">
-                            <input class="form-control" name="number" id="number" type="text" value="{{ asset.number }}"/>
+                            <input class="form-control" name="number" id="number" type="text"
+                                   value="{{ asset.number }}"/>
                         </div>
 
                         <label class="col-sm-2 control-label">资产名称</label>
                         <div class="col-sm-3">
                             <input class="form-control" name="name" id="name" type="text" value="{{ asset.name }}"/>
-                            <input type="checkbox" name="no_return" id="no_return" {% if asset.is_no_return %}checked{% endif %}>无需归还
-                            <input type="checkbox" name="no_approve" id="no_approve" {% if asset.is_no_approve %}checked{% endif %}>无需审批
+                            <input type="checkbox" name="no_return" id="no_return"
+                                   {% if asset.is_no_return %}checked{% endif %}>无需归还
+                            <input type="checkbox" name="no_approve" id="no_approve"
+                                   {% if asset.is_no_approve %}checked{% endif %}>无需审批
+                            <input type="checkbox" name="vice_approve" id="vice_approve"
+                                   {% if asset.is_vice_approve %}checked{% endif %}>分管副总审批
                         </div>
                     </div>
                     <div class="form-group has-feedback">
                         <label class="col-sm-2 control-label">所属部门</label>
                         <div class="col-sm-3">
-                            <select class="form-control select2" style="width:100%;" name="department" id="department" onchange="a_ajax()">
+                            <select class="form-control select2" style="width:100%;" name="department" id="department"
+                                    onchange="a_ajax()">
                                 <option></option>
                                 {% for department in department_list %}
                                     <option value="{{ department.id }}">{{ department.title }}</option>
@@ -41,14 +47,16 @@
                         </div>
                         <label class="col-sm-2 control-label">所属仓库</label>
                         <div class="col-sm-3">
-                            <select class="form-control select2" style="width:100%;" name="warehouse" id="warehouse" disabled >
+                            <select class="form-control select2" style="width:100%;" name="warehouse" id="warehouse"
+                                    disabled>
                             </select>
                         </div>
                     </div>
                     <div class="form-group has-feedback">
                         <label class="col-sm-2 control-label">数量</label>
                         <div class="col-sm-3">
-                            <input class="form-control" name="quantity" id="quantity" type="number" min="0" step="1" value="{{ asset.quantity }}"/>
+                            <input class="form-control" name="quantity" id="quantity" type="number" min="0" step="1"
+                                   value="{{ asset.quantity }}"/>
                         </div>
                         <label class="col-sm-2 control-label">单位</label>
                         <div class="col-sm-3">
@@ -62,13 +70,17 @@
                         </div>
                         <label class="col-sm-2 control-label">到期时间(选填)</label>
                         <div class="col-sm-3">
-                        <input type="text" class="form-control pull-right form_datetime" name="due_time" id="due_time" value="{% if asset.due_time %}{{ asset.due_time }}{% else %}{% endif %}" autocomplete="off"/>
+                            <input type="text" class="form-control pull-right form_datetime" name="due_time"
+                                   id="due_time"
+                                   value="{% if asset.due_time %}{{ asset.due_time }}{% else %}{% endif %}"
+                                   autocomplete="off"/>
                         </div>
                     </div>
                     <div class="form-group has-feedback">
                         <label class="col-sm-2 control-label">备注信息(选填)</label>
                         <div class="col-sm-8">
-                            <textarea class="form-control" name="remark" id="remark" rows="5" >{{ asset.remark }}</textarea>
+                            <textarea class="form-control" name="remark" id="remark"
+                                      rows="5">{{ asset.remark }}</textarea>
                         </div>
                     </div>
                 </fieldset>
@@ -91,18 +103,20 @@
     <script type="text/javascript">
 
         $("#btnSave").click(function () {
-            if($("#name").val() == "") {
+            if ($("#name").val() == "") {
                 alert("请输入资产名称")
-            } else if($("#department").val() == "") {
+            } else if ($("#department").val() == "") {
                 alert("请选择所属部门")
-            } else if($("#warehouse").val() == "") {
+            } else if ($("#warehouse").val() == "") {
                 alert("请选择所属仓库")
-            } else if($("#quantity").val() == "") {
+            } else if ($("#quantity").val() == "") {
                 alert("请输入数量")
-            } else if($("#unit").val() == "") {
+            } else if ($("#unit").val() == "") {
                 alert("请输入单位")
-            } else if($("#type").val() == "") {
+            } else if ($("#type").val() == "") {
                 alert("请输入型号")
+            } else if ($("#no_approve").is(":checked") && $("#vice_approve").is(":checked")) {
+                alert("无需审批与分管副总审批冲突")
             } else {
                 var data = $("#addForm").serialize();
                 {#data.add({"no_approve": $("#no_approve").is(":checked"),#}
@@ -151,7 +165,7 @@
             department_id = $("#department").val();
             if (department_id) {
                 var data = {
-                    "department_id" : department_id
+                    "department_id": department_id
                 };
                 $.ajax({
                     type: "get",
