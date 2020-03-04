@@ -149,8 +149,9 @@ class StructureAdmView(LoginRequiredMixin, View):
             un_add_adms = set(all_adms).difference(added_adms)
 
             vice_managers = User.objects.filter(is_active="1")
+            is_vice_id = structure.vice_manager_id
             ret = dict(structure=structure, added_users=added_adms, un_add_users=list(un_add_adms),
-                       vice_managers=vice_managers)
+                       vice_managers=vice_managers, is_vice_id=is_vice_id)
         else:
             ret = dict()
         return render(request, 'system/structure/structure-adm.html', ret)

@@ -50,7 +50,8 @@
                         <select style="width: 100px; margin-top: 30px" name="vice_manager" id="vice_manager">
                             <option value=""></option>
                             {% for manager in vice_managers %}
-                                <option value="{{ manager.id }}">{{ manager.name }}</option>
+                                <option value="{{ manager.id }}"
+                                        {% if manager.id == is_vice_id %}selected{% endif %}>{{ manager.name }}</option>
                             {% endfor %}
                         </select>
                     </div>

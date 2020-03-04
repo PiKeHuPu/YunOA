@@ -151,7 +151,7 @@
 
         <div class="col-lg-12" style="text-align: center; margin-top: 20px">
             <input class="btn btn-info" type=button value="返回" onClick="javascript:history.go(-1);">
-            {% if score_done == "1" and not finish %}<input class="btn btn-success" type=button value="审核通过" onClick="check0({{ dep_goal_id }})">{% endif %}
+            {% if score_done == "1" and not finish and is_vice == "1" %}<input class="btn btn-success" type=button value="审核通过" onClick="check0({{ dep_goal_id }})">{% endif %}
         </div>
         <!-- Modal -->
     </section>

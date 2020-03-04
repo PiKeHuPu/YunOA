@@ -36,10 +36,12 @@ class AssessDetail(LoginRequiredMixin, View):
         month = request.GET.get("month")
         department = Structure.objects.get(id=department_id)
         user_id = request.session.get("_auth_user_id")
-        if department.adm_list and user_id in department.adm_list:
+        if (department.adm_list and user_id in department.adm_list) or department.vice_manager_id == int(user_id):
             ret["is_adm"] = "1"
         if department.userprofile_set.filter(id=user_id):
             ret["is_mem"] = "1"
+        if department.vice_manager_id == int(user_id):
+            ret["is_vice"] = "1"
         assess_dep_detail = AssessDepDetail.objects.filter(department_id=department_id, year=year, month=month).first()
         if assess_dep_detail:
             assess_dep_content = assess_dep_detail.content.split("\n")
