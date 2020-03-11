@@ -119,8 +119,6 @@
                 alert("无需审批与分管副总审批冲突")
             } else {
                 var data = $("#addForm").serialize();
-                {#data.add({"no_approve": $("#no_approve").is(":checked"),#}
-                {#          "no_return": $("#no_return").is(":checked")});#}
                 $.ajax({
                     type: $("#addForm").attr('method'),
                     url: "{% url 'adm-n-create' %}",
