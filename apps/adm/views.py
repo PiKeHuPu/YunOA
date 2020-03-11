@@ -1,9 +1,11 @@
 import copy
 import json
+import os
 import time
 from datetime import datetime
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Q
@@ -13,7 +15,7 @@ from django.views.generic.base import View
 
 from adm import migrate_asset
 from adm.migrate_asset import migrate_asset_flow, create_no_back
-from adm.models import AssetWarehouse, AssetInfo, AssetEditFlow, AssetApprove, AssetApproveDetail
+from adm.models import AssetWarehouse, AssetInfo, AssetEditFlow, AssetApprove, AssetApproveDetail, FileManage
 from users.models import Structure
 from utils.mixin_utils import LoginRequiredMixin
 from rbac.models import Menu, Role
@@ -305,33 +307,50 @@ class AssetCreateView(LoginRequiredMixin, View):
             user_id = request.session.get("_auth_user_id")
             id0 = request.POST.get("id0")
             number = request.POST.get("number")
+            name = request.POST.get("name")
+            unit = request.POST.get("unit")
+            type0 = request.POST.get("type")
+            department_id = request.POST.get("department")
+            warehouse_id = request.POST.get("warehouse")
+            quantity = request.POST.get("quantity")
+
             if id0:
                 asset = AssetInfo.objects.get(id=id0)
-                if AssetInfo.objects.filter(Q(number=number) & ~Q(id=id0) & Q(is_delete=False) & Q(status="0")):
+                if AssetInfo.objects.filter(
+                        Q(number=number) & ~Q(id=id0) & Q(is_delete=False) & Q(status="0") & ~Q(name=name)):
                     ret['asset_form_errors'] = "资产编号已存在"
                     raise AttributeError
+                asset.quantity = quantity
                 asset_edit_flow = AssetEditFlow()
                 asset_edit_flow.asset_id = asset.id
                 asset_edit_flow.operator_id = user_id
                 asset_edit_flow.content = '修改'
                 asset_edit_flow.save()
             else:
-                asset = AssetInfo()
-                if AssetInfo.objects.filter(Q(number=number) & Q(is_delete=False)):
+                if AssetInfo.objects.filter(Q(number=number) & Q(is_delete=False) & ~Q(name=name)):
                     ret['asset_form_errors'] = "资产编号已存在"
                     raise AttributeError
+                print("66666666666666666")
+                added_adm = AssetInfo.objects.filter(
+                    Q(number=number) & Q(name=name) & Q(status="0") & Q(unit=unit) & Q(
+                        type=type0) & Q(department_id=department_id) & Q(warehouse_id=warehouse_id)).first()
+                print("222222222222233333333")
+                if added_adm:
+                    asset = added_adm
+                    asset.quantity += int(quantity)
+                else:
+                    asset = AssetInfo()
+                    asset.quantity = int(quantity)
             if number:
                 asset.number = number
             else:
                 asset.number = "AC" + str(int(time.time()))
-            asset.name = request.POST.get("name")
-            asset.department_id = request.POST.get("department")
-            asset.warehouse_id = request.POST.get("warehouse")
-            asset.quantity = request.POST.get("quantity")
+            asset.name = name
+            asset.department_id = department_id
+            asset.warehouse_id = warehouse_id
             asset.operator_id = user_id
             if request.POST.get("due_time") and request.POST.get("due_time") != "None":
                 due_time = switch_date_str(request.POST.get("due_time"))
-                print(due_time)
                 asset.due_time = due_time
             asset.unit = request.POST.get("unit")
             asset.type = request.POST.get("type")
@@ -692,4 +711,57 @@ class AssetTransferView(LoginRequiredMixin, View):
             asset_order.status = "2"
             asset_order.save()
         ret['status'] = "success"
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
+
+
+class FileUpload(View, LoginRequiredMixin):
+    """
+    档案上传
+    """
+
+    def get(self, request):
+        ret = dict()
+        return render(request, "adm/files/file_upload.html", ret)
+
+    def post(self, request):
+        file_list = request.FILES.getlist("file0", None)
+        password = request.POST.get("password", None)
+        user_id = request.session.get("_auth_user_id")
+        if not file_list:
+            return HttpResponse("没有上传文件")
+        for file0 in file_list:
+            file_manage = FileManage()
+            file_manage.name = file0.name
+            file_manage.content = file0
+            file_manage.uploader_id = user_id
+            if password:
+                file_manage.password = make_password(password)
+            file_manage.save()
+        return HttpResponse("上传成功")
+
+
+class FileList(View, LoginRequiredMixin):
+    """
+    文件列表
+    """
+
+    def get(self, request):
+        ret = dict()
+
+        return render(request, "adm/files/file_list.html", ret)
+
+    def post(self, request):
+        # 获取资产列表
+        fields = ['id', 'name', 'upload_time', 'password']
+        # filter = dict()
+        # if request.GET.get('number'):
+        #     filter['number'] = request.GET.get('number')
+        # if request.GET.get('name'):
+        #     filter['name'] = request.GET.get('name')
+        # if request.GET.get("asset_warehouse"):
+        #     filter['warehouse_id'] = request.GET.get("asset_warehouse")
+        # user_id = request.session.get("_auth_user_id")
+        # department_list = department_admin(user_id)
+
+        ret = dict(data=list(FileManage.objects.values(*fields).all()))
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
