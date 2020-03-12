@@ -68,13 +68,14 @@ class PersonalView(LoginRequiredMixin, View):
         # 物资到期提醒
         three_months = today + timedelta(days=100)
         structure = request.user.department    # 用户所在部门
-        # if structure.administrator_id == current_user_id:
-        #     asset = AssetInfo.objects.filter(Q(department=structure), Q(due_time__range=(today, three_months)))
-        #     ret['asset'] = asset
-        #     ret['asset_num'] = len(asset)
-        #     gone_asset = AssetInfo.objects.filter(Q(department=structure), Q(due_time__lt=today))
-        #     ret['gone_asset'] = gone_asset
-        #     ret['gone_asset_num'] = len(gone_asset)
+        user = request.user
+        if user.is_dep_administrator:
+            asset = AssetInfo.objects.filter(Q(department=structure), Q(due_time__range=(today, three_months)))
+            ret['asset'] = asset
+            ret['asset_num'] = len(asset)
+            gone_asset = AssetInfo.objects.filter(Q(department=structure), Q(due_time__lt=today))
+            ret['gone_asset'] = gone_asset
+            ret['gone_asset_num'] = len(gone_asset)
 
         # 公告相关
         bulletin = Bulletin.objects.filter(status='1')
