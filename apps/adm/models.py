@@ -314,9 +314,11 @@ class FileManage(models.Model):
     """
     name = models.CharField(max_length=50, verbose_name="档案名称")
     content = models.FileField(upload_to="file_manage/", verbose_name="档案内容")
-    password = models.CharField(max_length=150, verbose_name="密码")
-    uploader = models.ForeignKey(User, verbose_name="上传人")
+    uploader = models.ForeignKey(User, related_name="uploader", verbose_name="上传人")
     upload_time = models.DateTimeField(auto_now_add=True, verbose_name="上传时间")
+    is_delete = models.BooleanField(default=False, verbose_name="是否删除")
+    delete_time = models.DateTimeField(blank=True, null=True, verbose_name="删除时间")
+    deleter = models.ForeignKey(User, blank=True, null=True, related_name="deleter", verbose_name="删除人")
 
 
 

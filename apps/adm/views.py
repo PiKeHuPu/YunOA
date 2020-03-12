@@ -9,17 +9,18 @@ from django.contrib.auth.hashers import make_password
 from django.core import serializers
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Q
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse, Http404, FileResponse
 from django.shortcuts import render
+from django.utils.encoding import escape_uri_path
 from django.views.generic.base import View
 
 from adm import migrate_asset
 from adm.migrate_asset import migrate_asset_flow, create_no_back
 from adm.models import AssetWarehouse, AssetInfo, AssetEditFlow, AssetApprove, AssetApproveDetail, FileManage
 from users.models import Structure
-from utils.mixin_utils import LoginRequiredMixin
 from rbac.models import Menu, Role
 from system.models import SystemSetup
+from utils.mixin_utils import LoginRequiredMixin
 
 User = get_user_model()
 
@@ -714,7 +715,7 @@ class AssetTransferView(LoginRequiredMixin, View):
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
 
 
-class FileUpload(View, LoginRequiredMixin):
+class FileUpload(LoginRequiredMixin, View):
     """
     档案上传
     """
@@ -725,7 +726,6 @@ class FileUpload(View, LoginRequiredMixin):
 
     def post(self, request):
         file_list = request.FILES.getlist("file0", None)
-        password = request.POST.get("password", None)
         user_id = request.session.get("_auth_user_id")
         if not file_list:
             return HttpResponse("没有上传文件")
@@ -734,17 +734,14 @@ class FileUpload(View, LoginRequiredMixin):
             file_manage.name = file0.name
             file_manage.content = file0
             file_manage.uploader_id = user_id
-            if password:
-                file_manage.password = make_password(password)
             file_manage.save()
         return HttpResponse("上传成功")
 
 
-class FileList(View, LoginRequiredMixin):
+class FileList(LoginRequiredMixin, View):
     """
     文件列表
     """
-
     def get(self, request):
         ret = dict()
 
@@ -752,7 +749,7 @@ class FileList(View, LoginRequiredMixin):
 
     def post(self, request):
         # 获取资产列表
-        fields = ['id', 'name', 'upload_time', 'password']
+        fields = ['id', 'name', 'upload_time', 'content']
         # filter = dict()
         # if request.GET.get('number'):
         #     filter['number'] = request.GET.get('number')
@@ -763,5 +760,49 @@ class FileList(View, LoginRequiredMixin):
         # user_id = request.session.get("_auth_user_id")
         # department_list = department_admin(user_id)
 
-        ret = dict(data=list(FileManage.objects.values(*fields).all()))
+        ret = dict(data=list(FileManage.objects.values(*fields).filter(is_delete=False)))
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
+
+
+class FileRename(LoginRequiredMixin, View):
+    """
+    文件重命名
+    """
+    def get(self, request):
+        ret = dict()
+        id0 = request.GET.get("id")
+        file = FileManage.objects.filter(id=id0).first()
+        file_name = file.name.rsplit(".", 1)[0]
+        ret["file0"] = file
+        ret["file_name"] = file_name
+        return render(request, "adm/files/file_rename.html", ret)
+
+    def post(self, request):
+        ret = dict()
+        id0 = request.POST.get("id")
+        name = request.POST.get("name0")
+        file = FileManage.objects.filter(id=id0).first()
+        file.name = name
+        file.save()
+        ret["status"] = "success"
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
+
+
+class FileDelete(LoginRequiredMixin, View):
+    """
+    文件删除(伪删除)
+    """
+    def post(self, request):
+        ret = dict()
+        user_id = request.session.get("_auth_user_id")
+        id0 = request.POST.get("id")
+        file = FileManage.objects.filter(id=id0).first()
+        if file:
+            file.deleter_id = user_id
+            file.is_delete = True
+            file.delete_time = datetime.now()
+            file.save()
+            ret["result"] = True
+        else:
+            ret["result"] = False
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")

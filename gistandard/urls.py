@@ -31,7 +31,7 @@ from system.views import SystemView
 from adm.views import AdmView, WarehouseView, \
     WarehouseCreateView, WarehouseDeleteView, AssetView, AssetCreateView, AssetAjaxView, AssetUseFlowView, \
     AssetApplyView, AssetApproveView, AssetApproveresultView, AssetApproveHistoryView, AssetOrderDetailView, \
-    AssetTransferView
+    AssetTransferView, FileUpload, FileList, FileRename, FileDelete
 from oilWear.views import OilOrderCreateView
 from personal import views as personal_views
 from personal import views_work_order as order
@@ -165,4 +165,9 @@ urlpatterns = [
     url(r'^personal/edit_schedule/$', EditSchedule.as_view(), name="edit_schedule"),
     url(r'^personal/assess_score/$', AssessScore0.as_view(), name="assess_score"),
     url(r'^personal/year_month/$', YearMonth.as_view(), name="year_month"),
+    # 档案管理
+    url(r'^adm/file_upload/$', FileUpload.as_view(), name="file_upload"),
+    url(r'^adm/file_list/$', FileList.as_view(), name="file_list"),
+    url(r'^adm/file_rename/$', FileRename.as_view(), name="file_rename"),
+    url(r'^adm/file_delete/$', FileDelete.as_view(), name="file_delete"),
 ]
