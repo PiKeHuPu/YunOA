@@ -1,0 +1,149 @@
+{% extends 'base-layer.html' %}
+{% load staticfiles %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-datetimepicker.min.css' %}">
+    <!-- iCheck for checkboxes and radio inputs -->
+    <style>
+        table {
+            min-width: 100%;
+        }
+
+        th, td {
+            min-width: 50%;
+            max-width: 50%;
+            text-align: center;
+        }
+    </style>
+{% endblock %}
+{% block main %}
+    <div class="box box-danger">
+        <form class="form-horizontal" id="addForm" method="post">
+            {% csrf_token %}
+            <div class="box-body">
+                <fieldset>
+                    <div class="form-group has-feedback">
+                        <input type="hidden" name='id' value="{{ worklog.id }}"/>
+                        <label class="col-sm-2 control-label">工作内容</label>
+                        <div class="col-sm-10">
+                            <textarea name="worklog" id="worklog" cols="73" rows="3"
+                                      maxlength="50" readonly style="width: 80%">{{ worklog.worklog }}</textarea>
+                        </div>
+                        <br><br>
+                        <label class="col-sm-2 control-label">完成状态</label>
+                        <div class="col-sm-10">
+                            <select name="status" id="status">
+                                <option value="222" {% if worklog.status == 222 %} selected {% endif %}></option>
+                                <option value="1" {% if worklog.status == 1 %} selected {% endif %}>是</option>
+                                <option value="0" {% if worklog.status == 0 %} selected {% endif %}>否</option>
+                                <option value="555" {% if worklog.status == 555 %} selected {% endif %}>终止</option>
+                            </select>
+                        </div>
+                        <br><br>
+                        <br><br>
+                        <label class="col-sm-2 control-label">任务进度描述</label>
+                        <div class="col-sm-10">
+                            <textarea name="task_detail" id="task_detail" cols="73" rows="3" maxlength="50" style="width: 80%"></textarea>
+                        </div>
+                    </div>
+                </fieldset>
+
+                        <!-- /.col -->
+                        <div class="col-md-12">
+                            <div class="box box-primary">
+                                <div class="box-body no-padding">
+                                    <div class="table-responsive mailbox-messages">
+                                        <table class="table" id="tbWorkList" style="table-layout: fixed;">
+                                            <tbody>
+                                            <tr>
+                                                <th>日志进度描述</th>
+                                                <th>进度描述时间</th>
+                                            </tr>
+                                            <tr>
+                                                {% for foo in logpart %}
+                                                    <tr>
+                                                        <td>
+                                                            <div style='margin: 0 auto;width:120px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;'
+                                                                 title='{{ foo.task_detail }}'>
+                                                                {{ foo.task_detail }}
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div style='margin: 0 auto;width:120px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;'
+                                                                 title='{{ foo.change_time }}'>
+                                                                {{ foo.change_time }}
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                            </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <!-- /.box-body -->
+                            </div>
+                        </div>
+                        <!-- /.col -->
+
+            </div>
+            <div class="box-footer ">
+                <div class="row span7 text-center ">
+{#                    <button type="button" id="btnCancel" class="btn btn-default margin-right ">重置</button>#}
+                    <button type="button" id="btnSave" class="btn btn-info margin-right ">保存</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
+    <script type="text/javascript">
+
+        $("#btnSave").click(function () {
+            if ($("#task_detail").val() == "") {
+                alert("请填写任务进度描述")
+            } else if ($("#status").val() == "222") {
+                alert("请选择是否完成状态")
+            }  else if ($("#status").val() == "555" && $("#reason").val() == "") {
+                alert("请填写终止原因")
+            } else {
+                var data = $("#addForm").serialize();
+                $.ajax({
+                    type: $("#addForm").attr('method'),
+                    url: "{% url 'worklog_edit' %}",
+                    data: data,
+                    cache: false,
+                    success: function (msg) {
+                        if (msg.result) {
+                            layer.alert('数据保存成功！', {icon: 1}, function (index) {
+                                parent.layer.closeAll(); //关闭所有弹窗
+                            });
+                        } else {
+                            layer.alert('数据保存失败', {icon: 5});
+                            //$('errorMessage').html(msg.message)
+                        }
+                    },
+                });
+            }
+        });
+
+
+        /*点取消刷新新页面*/
+        $("#btnCancel").click(function () {
+            window.location.reload();
+
+        });
+
+        $(function () {
+            //Initialize Select2 Elements
+            $(".select2").select2();
+        });
+
+    </script>
+
+{% endblock %}

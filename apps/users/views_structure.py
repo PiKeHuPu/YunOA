@@ -34,7 +34,7 @@ class StructureListView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        fields = ['id', 'title', 'type', 'parent__title', 'adm_list', "vice_manager__name"]
+        fields = ['id', 'title', 'type', 'parent__title', 'adm_list', "vice_manager__name", "adm_work__name"]
         ret = dict(data=list(Structure.objects.values(*fields)))
         # print(ret)
         for data in ret["data"]:
@@ -150,8 +150,10 @@ class StructureAdmView(LoginRequiredMixin, View):
 
             vice_managers = User.objects.filter(is_active="1")
             is_vice_id = structure.vice_manager_id
+            id_adm_work_id = structure.adm_work_id
             ret = dict(structure=structure, added_users=added_adms, un_add_users=list(un_add_adms),
-                       vice_managers=vice_managers, is_vice_id=is_vice_id)
+                       vice_managers=vice_managers, is_vice_id=is_vice_id, id_adm_work_id=id_adm_work_id)
+
         else:
             ret = dict()
         return render(request, 'system/structure/structure-adm.html', ret)
@@ -169,7 +171,9 @@ class StructureAdmView(LoginRequiredMixin, View):
             structure.adm_list = None
 
         vice_manager = request.POST.get("vice_manager")
+        adm_work = request.POST.get("adm_work")
         structure.vice_manager_id = vice_manager
+        structure.adm_work_id = adm_work
         structure.save()
         res['result'] = True
         return HttpResponse(json.dumps(res), content_type='application/json')

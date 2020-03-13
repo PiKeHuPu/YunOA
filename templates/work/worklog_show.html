@@ -1,0 +1,315 @@
+{% extends "base-left.html" %}
+{% load staticfiles %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugins/datatables/jquery.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+    <!-- iCheck for checkboxes and radio inputs -->
+{% endblock %}
+
+{% block content %}
+
+    <!-- Content Header (Page header) -->
+
+    <section class="content-header margin-bottom">
+        <ol class="breadcrumb">
+            <li><a href=""><i class="fa fa-dashboard"></i>办公平台</a></li>
+            <li class="active"><a href="{% url 'personal' %}">我的工作台</a></li>
+            <li class="active"><a href="#">工作日志</a></li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div id="devlist">
+            <div class="box box-primary" id="liebiao">
+                <div class="box-header">
+                    <div class="btn-group pull-left"  >
+                        <div id="hidebtn" style="display: none">
+                            <button type="button" id="btnCreate" class="btn btn-primary">
+                                <i class="glyphicon glyphicon-plus"></i>新增
+                            </button>
+                        </div>
+                    </div>
+                    <div class="btn-group pull-left">&nbsp</div>
+
+                </div>
+                <div class="box-header">
+                    <form class="form-inline" id="queryForm">
+
+                        <div class="form-group searchArea margin-r-5 margin-top-5">
+                            <label>工单状态：</label>
+                            <select class="form-control inputText select2" name="status"
+                                    id="status">
+                                <option></option>
+
+                                <option value="1">已完成</option>
+                                <option value="0">未完成</option>
+                                <option value="555">任务终止</option>
+                            </select>
+                        </div>
+                        <div class="form-group searchArea margin-r-5 margin-top-5">
+                            <label>部门选择：</label>
+                            <select class="form-control inputText select2" name="department" id="department">
+                                <option></option>
+                                {% for dep in department %}
+                                    <option value={{ dep.title }}>{{ dep.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    <div class="form-group searchArea margin-r-5 margin-top-5">
+                            <label >创建时间：</label>
+                            <input class="form-control timepick" name="start_time" id="start_time" type="text" autocomplete="off"/>
+                        </div>
+
+{#                        <div class="form-group searchArea margin-r-5 margin-top-5">#}
+{#                            <label >结束日期：</label>#}
+{#                            <input class="form-control timepick" name="end_time" id="end_time" type="text" autocomplete="off"/>#}
+{#                        </div>#}
+                        <button type="button" id="btnWorkorderSearch" class="btn btn-default">
+                            <i class="glyphicon glyphicon-search"></i>查询
+                        </button>
+                    </form>
+                </div>
+                <div class="box-body">
+                    <table id="dtbList" class="display" cellspacing="0" width="100%">
+                        <thead>
+                        <tr valign="middle">
+                            <th>工作内容</th>
+                            <th>是否完成</th>
+                            <th>未完成(终止)原因</th>
+                            <th>部门</th>
+                            <th>创建日期</th>
+
+                            <th>日志操作</th>
+
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <br> <br>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- /.content -->
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables/dataTables.const.js' %}"></script>
+    <script src="{% static 'plugins/datatables/moment.min.js' %}"></script>
+    <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+    <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
+    <!-- iCheck 1.0.1 -->
+    <script type="text/javascript">
+        $(function () {
+            $('#WORK-LOG').addClass('active');
+            $('#WORK-LOG-SHOW').addClass('active');
+
+        });
+        $(function () {
+            x = {{ m }}
+            if (x == 1) {
+                document.getElementById("partform").style.display = "";
+            }
+        })()
+        $(".timepick").datetimepicker({
+            format: 'yyyy-mm-dd',
+            language: 'zh',
+            autoclose: 1,
+            forceParse: 0,
+            minView: 2,
+        });
+    </script>
+
+    <script type="text/javascript">
+        var oDataTable = null;
+
+        function check_detail(id) {
+            var div = layer.open({
+                type: 2,
+                title: '日志详情',
+                shadeClose: false,
+                maxmin: true,
+                area: ['50%', '80%'],
+                content: ["{% url 'worklog_detail' %}" + '?id=' + id],
+                end: function () {
+                    //oDataTable.ajax.reload();
+                    window.location.reload();
+
+                }
+            });
+            {#layer.full(div)#}
+        }
+
+        function editlog(id) {
+            var div = layer.open({
+                type: 2,
+                title: '编辑日志',
+                shadeClose: false,
+                maxmin: true,
+                area: ['60%', '80%'],
+                content: ["{% url 'worklog_edit' %}" + '?id=' + id],
+                end: function () {
+                    //oDataTable.ajax.reload();
+                    window.location.reload();
+
+                }
+            });
+            {#layer.full(div)#}
+        }
+
+
+
+
+        $(function () {
+            oDataTable = initTable();
+            function initTable() {
+                var oTable = $('#dtbList').DataTable(
+                    $.extend(true, {"scrollX": true},
+                    DATATABLES_CONSTANT.DATA_TABLES.DEFAULT_OPTION,
+                    {
+                        ajax: {
+                            type: "post",
+                            url: "{% url "worklog_show" %}",
+                            data: function (d) {
+                                d.status = $("#status").val();
+                                d.department = $("#department").val();
+                                d.start_time = $("#start_time").val();
+
+                            }
+                        },
+                        columns: [
+                            {
+                                data: "worklog",
+                                render: function (data, type, row, meta) {
+                                    var ret;
+                                    if (data.length > 20) {
+                                        ret = data.slice(0, 20) + "..."
+                                    } else {
+                                        ret = data
+                                    }
+                                    return ret;
+                                }
+                            },
+                            {
+                                data: "status",
+                                render: function (data, type, row, meta) {
+                                    if (data ==1) {
+                                        var ret = "<button class='btn btn-info btn-xs'>已完成</button>";
+                                        return ret;
+                                    }
+                                    else if (data == 0) {
+                                        var ret = "<button class='btn btn-danger btn-xs'>未完成</button>";
+                                        return ret;
+                                    }
+                                    else if (data == 555){
+                                        var ret = "<button class='btn btn-danger btn-xs'>任务终止</button>";
+                                        return ret;
+                                    }
+
+                                }
+                            },
+                            {
+                                data: "reason",
+                                render: function (data, type, row, meta) {
+                                    var ret;
+                                    if (data.length > 20) {
+                                        ret = data.slice(0, 20) + "..."
+                                    } else {
+                                        ret = data
+                                    }
+                                    return ret;
+                                }
+                            },
+                            {
+                                data: "depart_id__title",
+                            },
+                            {
+                                data: "create_time",
+                                render: function (data, type, full, meta) {
+                                    return moment(data).format("YYYY-MM-DD HH:mm");
+                                }
+                            },
+
+                            {
+                                data: "id",
+                                render: function (data, type, row, meta) {
+                                    var check_btn = "",write_btn = "";
+                                    if (row.plan_status == true && row.status == 1) {
+                                        check_btn = "<button title='查看日志详情' onclick='check_detail("
+                                        + data + ")'><i class='glyphicon glyphicon-list-alt'></i></button>";
+                                    }else if(row.plan_status == true && row.status == 0)
+                                    {
+                                        check_btn = "<button title='查看日志详情' onclick='check_detail("
+                                        + data + ")'><i class='glyphicon glyphicon-list-alt'></i></button>";
+                                        write_btn = "<button title='编辑日志' onclick='editlog ("
+                                        + data + ")'><i class='glyphicon glyphicon-wrench'></i></button>";
+                                    }else if(row.plan_status == true && row.status == 555){
+                                        check_btn = "<button title='查看日志详情' onclick='check_detail("
+                                        + data + ")'><i class='glyphicon glyphicon-list-alt'></i></button>";
+                                    }else if(row.plan_status == false && row.status == 1){
+
+                                    }else if(row.plan_status == false && row.status == 0){
+                                        write_btn = "<button title='编辑日志' onclick='editlog ("
+                                        + data + ")'><i class='glyphicon glyphicon-wrench'></i></button>";
+                                    }else if(row.plan_status == false && row.status == 555){
+
+                                    }
+
+                                    ret = check_btn + write_btn;
+                                    return ret;
+                                },
+                            }],
+                    }));
+                return oTable;
+            }
+
+            $("#btnSearch").click(function () {
+                oDataTable.ajax.reload();
+            });
+
+            $("#btnWorkorderSearch").click(function () {
+                if($("#start_time").val()>$("#end_time").val()){
+                    alert('起始时间不能晚于结束时间')
+                }else{
+                    oDataTable.ajax.reload()
+                }
+            });
+
+            $("#btnCreate").click(function () {
+                layer.open({
+                    type: 2,
+                    maxmin: true,
+                    title: "填写工作日志",
+                    area: ["60%", "40%"],
+                    content: "{% url 'worklog_create' %}",
+                    end: function () {
+                        window.location.reload()
+                    }
+                    });
+
+            });
+
+
+
+
+
+            $("#btnRefresh").click(function () {
+                window.location.reload()
+            });
+        });
+
+
+
+        $(function () {
+            //Initialize Select2 Elements
+            $(".select2").select2();
+        });
+    </script>
+{% endblock %}
