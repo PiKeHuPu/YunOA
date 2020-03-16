@@ -48,6 +48,9 @@
                             <button type="button" id="btnChangePWD" onclick="doChangepasswd()" class="btn btn-danger">
                                 修改密码
                             </button>
+                            <button type="button" id="btnChangeStatement" onclick="doChangeStatement()" class="btn btn-info">
+                                修改岗位职责
+                            </button>
                         </div>
                     </div>
                     <!-- /.box-body -->
@@ -313,6 +316,18 @@
                 maxmin: true,
                 area: ['800px', '300px'],
                 content: "{% url 'personal-passwordchange' %}",
+            });
+        }
+
+        // 修改个人岗位职责
+        function doChangeStatement() {
+            layer.open({
+            type: 2,
+            title: '修改个人岗位职责',
+            shadeClose: false,
+            maxmin: true,
+            area: ['800px', '500px'],
+            content: "{% url 'create_statement' %}",
             });
         }
 

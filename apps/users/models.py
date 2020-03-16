@@ -27,6 +27,8 @@ class UserProfile(AbstractUser):
     bank_card = models.CharField(max_length=35, default="", verbose_name="银行卡")
     bank_name = models.CharField(max_length=10, default="", verbose_name="银行名字")
     bank_user_name = models.CharField(max_length=10, default="", verbose_name="银行卡用户名")
+    # 个人岗位职责
+    personal_statement = models.TextField(default=None, blank=True, null=True, verbose_name="个人岗位职责")
 
     class Meta:
         verbose_name = "用户信息"
