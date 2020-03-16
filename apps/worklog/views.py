@@ -12,7 +12,7 @@ from django.shortcuts import render
 from django.views import View
 
 from users.models import UserProfile, Structure
-from .models import Worklog, WorklogPart
+from .models import Worklog, WorklogPart, User
 
 
 class WorkLog_Show(LoginRequiredMixin, View):
@@ -21,10 +21,6 @@ class WorkLog_Show(LoginRequiredMixin, View):
         department = Structure.objects.all()
         ret['department'] = department
         id = request.session.get("_auth_user_id")
-        dep = UserProfile.objects.filter(id=id)[0].department_id
-        creman_id = Structure.objects.filter(id=dep)[0].adm_work_id
-        if id == creman_id:
-            ret['m'] = 1
         return render(request, 'work/worklog_show.html', ret)
 
     def post(self,request):
@@ -87,20 +83,25 @@ class WorkLog_Create(LoginRequiredMixin, View):
         reason = request.POST.get("reason")
         creman = request.session.get("_auth_user_id")
         depart_id = UserProfile.objects.filter(id=creman)[0].department_id
+        adm_work_list = Structure.objects.filter(id = depart_id)[0].adm_work
+        adm_work_id = adm_work_list.split(",")
+        if creman in adm_work_id:
 
-        worklg = Worklog()
-        if status == 0:
-            worklg.reason = ''
-        else:
+            worklg = Worklog()
+            # if status == 0:
+            #     worklg.reason = ''
+            # else:
+            #     worklg.reason = reason
+
             worklg.reason = reason
-
-        worklg.worklog = worklog
-        worklg.status = status
-        worklg.cre_man_id = creman
-        worklg.depart_id = depart_id
-        worklg.save()
-        res["result"] = True
-
+            worklg.worklog = worklog
+            worklg.status = status
+            worklg.cre_man_id = creman
+            worklg.depart_id = depart_id
+            worklg.save()
+            res["result"] = True
+        else:
+            res["result"] = False
         return HttpResponse(json.dumps(res), content_type='application/json')
 
 class WorkLog_Edit(LoginRequiredMixin,View):
@@ -126,37 +127,43 @@ class WorkLog_Edit(LoginRequiredMixin,View):
         #creman = request.session.get("_auth_user_id")
         #depart_id = UserProfile.objects.filter(id=creman)[0].department_id
         worklog = Worklog.objects.filter(id=id)[0]
-        if str(sta) == str(worklog.status) and int(worklog.cre_man_id) == int(creman):
-            logpart = WorklogPart()
-            logpart.task_detail = task_detail
-            logpart.worklog_part_id = id
-            logpart.save()
-            Worklog.objects.filter(id=id).update(plan_status="1")
-            res["result"] = True
-        elif int(sta) == 1 and int(worklog.cre_man_id) == int(creman):
-            #worklog = Worklog.objects.filter(id=id)[0]
-            Worklog.objects.filter(id=id).update(status=sta)
-            Worklog.objects.filter(id=id).update(over_time=datetime.now())
-            Worklog.objects.filter(id=id).update(plan_status="1")
-            logpart = WorklogPart()
-            logpart.task_detail = task_detail
-            logpart.worklog_part_id = id
-            logpart.save()
-            res["result"] = True
-        elif int(sta) == 555 and int(worklog.cre_man_id) == int(creman):
-            # worklog = Worklog.objects.filter(id=id)[0]
-            # worklog.status = sta
-            # worklog.over_time = datetime.now()
-            # worklog.save()
-            Worklog.objects.filter(id=id).update(status=sta)
-            Worklog.objects.filter(id=id).update(over_time=datetime.now())
-            Worklog.objects.filter(id=id).update(plan_status="1")
-            logpart = WorklogPart()
-            logpart.task_detail = task_detail
-            logpart.worklog_part_id = id
-            logpart.save()
-            res["result"] = True
-
+        creman = request.session.get("_auth_user_id")
+        depart_id = UserProfile.objects.filter(id=creman)[0].department_id
+        adm_work_list = Structure.objects.filter(id=depart_id)[0].adm_work
+        adm_work_id = adm_work_list.split(",")
+        if creman in adm_work_id:
+            if str(sta) == str(worklog.status) and int(worklog.cre_man_id) == int(creman):
+                logpart = WorklogPart()
+                logpart.task_detail = task_detail
+                logpart.worklog_part_id = id
+                logpart.save()
+                Worklog.objects.filter(id=id).update(plan_status="1")
+                res["result"] = True
+            elif int(sta) == 1 and int(worklog.cre_man_id) == int(creman):
+                #worklog = Worklog.objects.filter(id=id)[0]
+                Worklog.objects.filter(id=id).update(status=sta)
+                Worklog.objects.filter(id=id).update(over_time=datetime.now())
+                Worklog.objects.filter(id=id).update(plan_status="1")
+                logpart = WorklogPart()
+                logpart.task_detail = task_detail
+                logpart.worklog_part_id = id
+                logpart.save()
+                res["result"] = True
+            elif int(sta) == 555 and int(worklog.cre_man_id) == int(creman):
+                # worklog = Worklog.objects.filter(id=id)[0]
+                # worklog.status = sta
+                # worklog.over_time = datetime.now()
+                # worklog.save()
+                Worklog.objects.filter(id=id).update(status=sta)
+                Worklog.objects.filter(id=id).update(over_time=datetime.now())
+                Worklog.objects.filter(id=id).update(plan_status="1")
+                logpart = WorklogPart()
+                logpart.task_detail = task_detail
+                logpart.worklog_part_id = id
+                logpart.save()
+                res["result"] = True
+        else:
+            res["result"] = False
         return HttpResponse(json.dumps(res), content_type='application/json')
 
 
@@ -179,3 +186,37 @@ class WorkLog_Detail(LoginRequiredMixin, View):
             'logpart': logpart
         }
         return render(request, 'work/worklog_detail.html', ret)
+
+
+class WorkLog_Set(LoginRequiredMixin, View):
+    def get(self, request):
+        if 'id' in request.GET and request.GET['id']:
+            structure = get_object_or_404(Structure, pk=int(request.GET.get('id')))
+            try:
+                adm_work = structure.adm_work.split(",")
+            except:
+                adm_work = []
+            added_adms = User.objects.filter(id__in=adm_work)
+            all_adms = User.objects.exclude(username='admin')
+            un_add_adms = set(all_adms).difference(added_adms)
+            ret = dict(structure=structure, added_users=added_adms, un_add_users=list(un_add_adms))
+
+        else:
+            ret = dict()
+        return render(request, 'work/worklog_setwrite.html', ret)
+
+    def post(self, request):
+        res = dict(result=False)
+        id_list = None
+        structure = get_object_or_404(Structure, pk=int(request.POST.get('id')))
+        if 'to' in request.POST and request.POST['to']:
+            id_list = request.POST.getlist('to', [])
+        if id_list:
+            adm_work = ",".join(id_list)
+            structure.adm_work = adm_work
+        else:
+            structure.adm_work = None
+
+        structure.save()
+        res['result'] = True
+        return HttpResponse(json.dumps(res), content_type='application/json')
