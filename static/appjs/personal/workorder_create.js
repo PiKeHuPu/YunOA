@@ -135,13 +135,13 @@ function fileUP () {
             showPreview: false,
             showUpload: false,
             uploadUrl: "/personal/workorder_rec/upload",
-            allowedFileExtensions: ['jpg', 'gif', 'png'],
+            allowedFileExtensions: ['jpg', 'gif', 'png', "pdf"],
             uploadExtraData: function (perviewId, index) {
                 var obj = workf();
                 return obj;
             },
             maxFileCount: 1,
-            maxFileSize: 5120
+            maxFileSize: 20480
         });
 }
 
