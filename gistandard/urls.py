@@ -26,7 +26,7 @@ from gistandard.settings import MEDIA_ROOT
 import xadmin
 
 from apps.users.views_user import LoginView, IndexView, LogoutView
-from personal.views import Direction,Check
+from personal.views import Direction, Check, ChangeStatement, ShowStatement
 from system.views import SystemView
 from adm.views import AdmView, WarehouseView, \
     WarehouseCreateView, WarehouseDeleteView, AssetView, AssetCreateView, AssetAjaxView, AssetUseFlowView, \
@@ -170,6 +170,9 @@ urlpatterns = [
     url(r'^adm/file_list/$', FileList.as_view(), name="file_list"),
     url(r'^adm/file_rename/$', FileRename.as_view(), name="file_rename"),
     url(r'^adm/file_delete/$', FileDelete.as_view(), name="file_delete"),
+    # 修改岗位职责
+    url(r'^personal/create_statement', ChangeStatement.as_view(), name='create_statement'),
+    url(r'^personal/show_statement', ShowStatement.as_view(), name='show_statement'),
     #工作日志
     url(r'^personal/work/worklog/', WorkLog_Show.as_view(), name="worklog_show"),
     url(r'^personal/work/create/', WorkLog_Create.as_view(), name="worklog_create"),

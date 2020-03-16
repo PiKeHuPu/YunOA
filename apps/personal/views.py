@@ -633,6 +633,40 @@ class UserInfoView(LoginRequiredMixin, View):
         return HttpResponse(json.dumps(ret), content_type='application/json')
 
 
+class ChangeStatement(LoginRequiredMixin, View):
+    """
+    修改岗位职责
+    """
+    def get(self, request):
+        ret = dict()
+        user_id = request.session.get("_auth_user_id")
+        user = User.objects.filter(id=user_id).first()
+        ret["user"] = user
+        return render(request, "personal/userinfo/create_statement.html", ret)
+
+    def post(self, request):
+        ret = dict()
+        personal_statement = request.POST.get("detail")
+        user_id = request.session.get("_auth_user_id")
+        user = User.objects.filter(id=user_id).first()
+        user.personal_statement = personal_statement
+        user.save()
+        ret["status"] = "1"
+        return HttpResponse(json.dumps(ret), content_type='application/json')
+
+
+class ShowStatement(LoginRequiredMixin, View):
+    """
+    展示个人职责
+    """
+    def get(self, request):
+        ret = dict()
+        id0 = request.GET.get("id")
+        user = User.objects.get(id=id0)
+        ret["user"] = user
+        return render(request, "personal/phonebook/show_statement.html", ret)
+
+
 class UploadImageView(LoginRequiredMixin, View):
     """
     个人中心：上传头像
@@ -679,8 +713,11 @@ class PasswdChangeView(LoginRequiredMixin, View):
 
 
 class PhoneBookView(LoginRequiredMixin, View):
+    """
+    个人中心
+    """
     def get(self, request):
-        fields = ['name', 'mobile', 'email', 'post', 'department__title', 'image']
+        fields = ['id', 'name', 'mobile', 'email', 'post', 'department__title', 'image', 'personal_statement']
         ret = dict(linkmans=list(User.objects.exclude(username='admin').filter(is_active=1).values(*fields)))
         return render(request, 'personal/phonebook/phonebook.html', ret)
 
