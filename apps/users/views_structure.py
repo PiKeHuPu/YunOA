@@ -34,9 +34,9 @@ class StructureListView(LoginRequiredMixin, View):
     """
 
     def get(self, request):
-        fields = ['id', 'title', 'type', 'parent__title', 'adm_list', "vice_manager__name", "adm_work__name"]
+        fields = ['id', 'title', 'type', 'parent__title', 'adm_list', "vice_manager__name", "adm_work"]
         ret = dict(data=list(Structure.objects.values(*fields)))
-        # print(ret)
+        #print(ret)
         for data in ret["data"]:
             department = Structure.objects.get(id=data["id"])
             administrators = department.userprofile_set.filter(is_dep_administrator=True)
@@ -54,9 +54,18 @@ class StructureListView(LoginRequiredMixin, View):
                 adm_id = data["adm_list"].split(",")
             except:
                 adm_id = []
+            try:
+                adm_work_id = data["adm_work"].split(",")
+            except:
+                adm_work_id = []
             adm_name = User.objects.values("name").filter(id__in=adm_id)
             adm_list = ",".join([n["name"] for n in adm_name])
+            #print(adm_list)
             data["adm_list"] = adm_list
+
+            adm_work_name = User.objects.values("name").filter(id__in=adm_work_id)
+            admwork_list = ",".join([n["name"] for n in adm_work_name])
+            data["adm_work"] = admwork_list
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
 
 
@@ -150,9 +159,9 @@ class StructureAdmView(LoginRequiredMixin, View):
 
             vice_managers = User.objects.filter(is_active="1")
             is_vice_id = structure.vice_manager_id
-            id_adm_work_id = structure.adm_work_id
+
             ret = dict(structure=structure, added_users=added_adms, un_add_users=list(un_add_adms),
-                       vice_managers=vice_managers, is_vice_id=is_vice_id, id_adm_work_id=id_adm_work_id)
+                       vice_managers=vice_managers, is_vice_id=is_vice_id, )
 
         else:
             ret = dict()
@@ -171,9 +180,7 @@ class StructureAdmView(LoginRequiredMixin, View):
             structure.adm_list = None
 
         vice_manager = request.POST.get("vice_manager")
-        adm_work = request.POST.get("adm_work")
         structure.vice_manager_id = vice_manager
-        structure.adm_work_id = adm_work
         structure.save()
         res['result'] = True
         return HttpResponse(json.dumps(res), content_type='application/json')

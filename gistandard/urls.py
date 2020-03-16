@@ -39,7 +39,7 @@ from adm.views_asset import AssetUseHtmlView, AssetUseInfoView, AssetBackView
 from bulletin import views as bulletin_views
 from oilWear import views as oilWear_views
 from users.views_structure import StructureAssetAdmView
-from worklog.views import WorkLog_Show, WorkLog_Create, WorkLog_Detail, WorkLog_Edit
+from worklog.views import WorkLog_Show, WorkLog_Create, WorkLog_Detail, WorkLog_Edit, WorkLog_Set
 
 urlpatterns = [
     url(r'^xadmin/', xadmin.site.urls),
@@ -175,4 +175,5 @@ urlpatterns = [
     url(r'^personal/work/create/', WorkLog_Create.as_view(), name="worklog_create"),
     url(r'^personal/work/detail/', WorkLog_Detail.as_view(), name="worklog_detail"),
     url(r'^personal/work/edit/',WorkLog_Edit.as_view(),name="worklog_edit"),
+    url(r'^worklog/set/$', WorkLog_Set.as_view(), name="worklog_set"),
 ]

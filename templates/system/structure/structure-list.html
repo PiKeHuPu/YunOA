@@ -130,7 +130,7 @@ $(function() {
                                 {
                                     data : "asset_adm_list"
                                 },{
-                                    data : "adm_work__name"
+                                    data : "adm_work"
                                 },
 								{
 									data : "id",
@@ -142,6 +142,7 @@ $(function() {
 										ret=ret+"<button title='关联用户' onclick='doAddUser("+ data + ")'><i class='glyphicon glyphicon-user'></i></button>";
 										 ret=ret+"<button title='修改部门负责人与分管副总' onclick='doAddAdm("+ data + ")'><i class='fa fa-user-plus'></i></button>";
 										 ret=ret+"<button title='修改物资管理员' onclick='doSetAdm("+ data + ")'><i class='fa fa-user-plus'></i></button>";
+										 ret=ret+"<button title='修改日志填写员' onclick='doAddWorkAdm("+ data + ")'><i class='fa fa-user-plus'></i></button>";
 										 ret=ret+"<button title='删除' onclick='doDelete("+ data + ")'><i class='glyphicon glyphicon-trash'></i></button>";
 										return ret;
 									}
@@ -297,6 +298,19 @@ function doAddAdm(id){
         maxmin: 'true',
         area: [ '800px', '700px' ],
         content: ['{% url "system-basic:structure-add_adm" %}' + '?id=' + id, 'no'],
+        end: function () {
+            window.location.reload();
+        }
+    })
+}
+{#日志填写人员 #}
+function doAddWorkAdm(id){
+    layer.open({
+        type: 2,
+        title: '修改日志填写员',
+        maxmin: 'true',
+        area: [ '800px', '700px' ],
+        content: ['{% url "worklog_set" %}' + '?id=' + id, 'no'],
         end: function () {
             window.location.reload();
         }
