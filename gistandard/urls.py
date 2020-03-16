@@ -39,7 +39,7 @@ from adm.views_asset import AssetUseHtmlView, AssetUseInfoView, AssetBackView
 from bulletin import views as bulletin_views
 from oilWear import views as oilWear_views
 from users.views_structure import StructureAssetAdmView
-
+from worklog.views import WorkLog_Show, WorkLog_Create, WorkLog_Detail, WorkLog_Edit
 
 urlpatterns = [
     url(r'^xadmin/', xadmin.site.urls),
@@ -173,4 +173,9 @@ urlpatterns = [
     # 修改岗位职责
     url(r'^personal/create_statement', ChangeStatement.as_view(), name='create_statement'),
     url(r'^personal/show_statement', ShowStatement.as_view(), name='show_statement'),
+    #工作日志
+    url(r'^personal/work/worklog/', WorkLog_Show.as_view(), name="worklog_show"),
+    url(r'^personal/work/create/', WorkLog_Create.as_view(), name="worklog_create"),
+    url(r'^personal/work/detail/', WorkLog_Detail.as_view(), name="worklog_detail"),
+    url(r'^personal/work/edit/',WorkLog_Edit.as_view(),name="worklog_edit"),
 ]

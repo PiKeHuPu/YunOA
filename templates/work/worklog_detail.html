@@ -1,0 +1,119 @@
+{% extends "base-layer.html" %}
+{% load staticfiles %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugins/datatables/jquery.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+    <style>
+    table{
+        min-width: 100%;
+    }
+    th,td{
+        min-width: 50%;
+        max-width: 50%;
+        text-align: center;
+    }
+    </style>
+{% endblock %}
+<div class="content-wrapper">
+
+
+    {% block main %}
+
+        <!-- Content Header (Page header) -->
+
+        <!-- Main content -->
+
+        <section class="content">
+            <div class="row" {% if ban %}hidden{% endif %}>
+                <!-- /.col -->
+                <div class="col-md-12">
+                    <div class="box box-primary">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">日志详情</h3>
+                            <div class="box-tools">
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                        class="fa fa-minus"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="box-body">
+                            <textarea class="form-control" name="cost" id="desc" type="textarea" disabled="disabled"
+                                      style="margin: 0px 10px 0px 0px; height: 200px; resize:vertical;">{{ worklog.worklog|safe }}</textarea>
+                            <br>
+                        </div>
+                        <div class="box-body no-padding">
+                            <div class="table-responsive mailbox-messages">
+                                <table class="table" id="tbWorkList" style="table-layout: fixed;">
+                                    <tbody>
+                                    <tr>
+                                        <td style="width:15%;"><strong> 创建时间</strong></td>
+                                        <td>{{ worklog.create_time  }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong> 日志状态</strong></td>
+                                        <td>
+                                            {% if status == 0 %}
+
+                                            {% endif %}
+                                            {{ worklog.status }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong> 未完成原因</strong></td>
+                                        <td>
+                                            <div style='margin: 0 auto;width:60%;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;' title='{{reason}}'>
+                                                {{ worklog.reason }}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>       </td>
+                                        <td>       </td>
+                                    </tr>
+                                    <tr>
+                                        <th>日志进度描述</th>
+                                        <th>进度描述时间</th>
+                                    </tr>
+                                    <tr>
+                                        {% for foo in logpart %}
+                                            <tr>
+                                            <td>
+                                                <div style='margin: 0 auto;width:120px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;' title='{{ foo.task_detail }}'>
+                                                    {{ foo.task_detail }}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div style='margin: 0 auto;width:120px;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;' title='{{ foo.change_time }}'>
+                                                    {{ foo.change_time }}
+                                                </div>
+                                            </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+{#                            <div class="box-footer ">#}
+{#                            </div>#}
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                </div>
+                <!-- /.col -->
+            </div>
+            <!-- /.col -->
+        <!-- /.row -->
+        </section>
+        <!-- /.content -->
+
+    {% endblock %}
+</div>
+{% block javascripts %}
+    <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables/dataTables.const.js' %}"></script>
+    <script src="{% static 'plugins/datatables/moment.min.js' %}"></script>
+    <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+
+
+{% endblock %}

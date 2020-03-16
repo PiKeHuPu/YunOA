@@ -55,6 +55,18 @@
                             {% endfor %}
                         </select>
                     </div>
+                <div class="col-xs-2">
+                        <p style="font-size: 18px; margin-left: 10px; margin-top: 30px">日志填写：</p>
+                    </div>
+                    <div class="col-xs-2">
+                        <select style="width: 100px; margin-top: 30px" name="adm_work" id="adm_work">
+                            <option value=""></option>
+                            {% for manager in vice_managers %}
+                                <option value="{{ manager.id }}"
+                                        {% if manager.id == id_adm_work_id %}selected{% endif %}>{{ manager.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                 </div>
             </div>
             <div class="box-footer">
