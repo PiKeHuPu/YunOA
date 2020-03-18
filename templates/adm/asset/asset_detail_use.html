@@ -124,10 +124,9 @@
                         layer.alert('已提交申请', {icon: 1}, function (index) {
                             parent.layer.closeAll(); //关闭所有弹窗
                         });
-                    } else if (msg.status == 'fail') {
-                        layer.alert(msg.asset_form_errors, {icon: 5});
+                    } else {
+                        layer.alert(msg.e, {icon: 5});
                     }
-                    return;
                 }
             });
         });

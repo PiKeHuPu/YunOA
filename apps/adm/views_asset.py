@@ -408,74 +408,77 @@ class AssetUseInfoView(LoginRequiredMixin, View):
 
     def post(self, request):
         res = dict()
-        # 创建相应的在用物资
-        asset_id = request.POST.get('id0')
-        use_quantity = request.POST.get('useCount')
-        asset = AssetInfo.objects.get(id=asset_id)
-        asset.quantity = int(asset.quantity) - int(use_quantity)
-        asset.save()
-        if asset.is_no_return:
-            pass
-        else:
-            use_asset = asset
-            use_asset.id = None
-            use_asset.save()
-            use_asset.quantity = int(use_quantity)
-            use_asset.create_time = asset.create_time
-            use_asset.status = '1'
-            use_asset.user_id = request.session.get('_auth_user_id')
-            use_asset.save()
+        try:
+            # 创建相应的在用物资
+            asset_id = request.POST.get('id0')
+            use_quantity = request.POST.get('useCount')
+            asset = AssetInfo.objects.get(id=asset_id)
+            asset.quantity = int(asset.quantity) - int(use_quantity)
+            asset.save()
+            if asset.is_no_return:
+                pass
+            else:
+                use_asset = asset
+                use_asset.id = None
+                use_asset.save()
+                use_asset.quantity = int(use_quantity)
+                use_asset.create_time = asset.create_time
+                use_asset.status = '1'
+                use_asset.user_id = request.session.get('_auth_user_id')
+                use_asset.save()
 
-        user_id = request.session.get('_auth_user_id')
-        asset_order = AssetApprove()
-        asset_order.proposer_id = user_id
-        asset_order.asset_id = asset_id
-        asset_order.quantity = use_quantity
-        asset_order.purpose = request.POST.get('title')
-        if request.POST.get('use_time'):
-            asset_order.return_date = request.POST.get('use_time')
-        asset_order.status = '0'
-        asset_order.use_status = '0'
-        asset_order.type = "0"
-        asset_order.save()
-
-        # 创建审批流程
-        if asset.is_no_approve:
-            pass
-        else:
-            user = User.objects.filter(id=user_id).first()
-            department = user.department
-            approver_list = department.adm_list.split(",")
-            for i in range(len(approver_list)):
-                approver_list[i] = int(approver_list[i])
-            if asset.is_vice_approve:
-                vice_manager_id = department.vice_manager_id
-                approver_list.append(int(vice_manager_id))
-            warehouse = asset.warehouse
-            verifier_list = warehouse.verifier.all()
-            if verifier_list:
-                for i in verifier_list:
-                    approver_list.append(int(i.id))
-            approver_list2 = []
-            for i in approver_list:
-                if i not in approver_list2:
-                    approver_list2.append(i)
-            if int(user_id) in approver_list2:
-                approver_list2.remove(int(user_id))
-            for id0 in approver_list2:
-                approve = AssetApproveDetail()
-                approve.approver_id = int(id0)
-                if id0 == approver_list2[0]:
-                    approve.status = "1"
-                approve.asset_order_id = asset_order.id
-                approve.save()
-        if AssetApproveDetail.objects.filter(asset_order=asset_order):
-            pass
-        else:
-            asset_order.status = "2"
+            user_id = request.session.get('_auth_user_id')
+            asset_order = AssetApprove()
+            asset_order.proposer_id = user_id
+            asset_order.asset_id = asset_id
+            asset_order.quantity = use_quantity
+            asset_order.purpose = request.POST.get('title')
+            if request.POST.get('use_time'):
+                asset_order.return_date = request.POST.get('use_time')
+            asset_order.status = '0'
+            asset_order.use_status = '0'
+            asset_order.type = "0"
             asset_order.save()
 
-        res['status'] = 'success'
+            # 创建审批流程
+            if asset.is_no_approve:
+                pass
+            else:
+                user = User.objects.filter(id=user_id).first()
+                department = user.department
+                approver_list = department.adm_list.split(",")
+                for i in range(len(approver_list)):
+                    approver_list[i] = int(approver_list[i])
+                if asset.is_vice_approve:
+                    vice_manager_id = department.vice_manager_id
+                    approver_list.append(int(vice_manager_id))
+                warehouse = asset.warehouse
+                verifier_list = warehouse.verifier.all()
+                if verifier_list:
+                    for i in verifier_list:
+                        approver_list.append(int(i.id))
+                approver_list2 = []
+                for i in approver_list:
+                    if i not in approver_list2:
+                        approver_list2.append(i)
+                if int(user_id) in approver_list2:
+                    approver_list2.remove(int(user_id))
+                for id0 in approver_list2:
+                    approve = AssetApproveDetail()
+                    approve.approver_id = int(id0)
+                    if id0 == approver_list2[0]:
+                        approve.status = "1"
+                    approve.asset_order_id = asset_order.id
+                    approve.save()
+            if AssetApproveDetail.objects.filter(asset_order=asset_order):
+                pass
+            else:
+                asset_order.status = "2"
+                asset_order.save()
+
+            res['status'] = 'success'
+        except Exception as e:
+            res['e'] = e
         return HttpResponse(json.dumps(res), content_type='application/json')
 
 
