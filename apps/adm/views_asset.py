@@ -451,7 +451,8 @@ class AssetUseInfoView(LoginRequiredMixin, View):
                     approver_list[i] = int(approver_list[i])
                 if asset.is_vice_approve:
                     vice_manager_id = department.vice_manager_id
-                    approver_list.append(int(vice_manager_id))
+                    if vice_manager_id:
+                        approver_list.append(int(vice_manager_id))
                 warehouse = asset.warehouse
                 verifier_list = warehouse.verifier.all()
                 if verifier_list:
