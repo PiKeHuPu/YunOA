@@ -308,6 +308,13 @@ class AssetApproveDetail(models.Model):
     create_time = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
 
 
+class FileType(models.Model):
+    """
+    文件类型
+    """
+    name = models.CharField(max_length=30, verbose_name="文件类型名称")
+
+
 class FileManage(models.Model):
     """
     档案管理
@@ -319,6 +326,7 @@ class FileManage(models.Model):
     is_delete = models.BooleanField(default=False, verbose_name="是否删除")
     delete_time = models.DateTimeField(blank=True, null=True, verbose_name="删除时间")
     deleter = models.ForeignKey(User, blank=True, null=True, related_name="deleter", verbose_name="删除人")
+    type = models.ForeignKey(FileType, blank=True, null=True, verbose_name="文件类型")
 
 
 

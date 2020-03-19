@@ -14,14 +14,24 @@
             <div class="box-body">
                 <fieldset>
                     <legend>
-                        <h4>{{ file_name }}</h4>
+                        <h4>{{ file0.name }}</h4>
                     </legend>
                     <div class="form-group has-feedback">
                         <label class="col-sm-2 control-label">变更名称</label>
                         <div class="col-sm-6">
-                            <input class="form-control" name="name0" type="text" id="name0" value="{{ file_name }}"/>
+                            <input class="form-control" name="name0" type="text" id="name0" value="{{ file0.name }}"/>
                         </div>
-                        <span>(直接输入名称，无需输入.pdf等后缀名)</span>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">变更类型</label>
+                        <div class="col-sm-6">
+                            <select class="form-control" name="type0" type="text" id="type0" value="{{ file_name }}"/>
+                                <option value="">档案列表</option>
+                            {% for type in types %}
+                                <option value="{{ type.id }}" {% if file0.type_id == type.id %}selected{% endif %}>{{ type.name }}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
                     </div>
 
                 </fieldset>
@@ -56,11 +66,11 @@
                 cache: false,
                 success: function (msg) {
                     if (msg.status == 'success') {
-                        layer.alert('重命名成功！', {icon: 1}, function (index) {
+                        layer.alert('保存成功！', {icon: 1}, function (index) {
                             parent.location.reload();
                         });
                     } else {
-                        layer.alert('重命名失败', {icon: 5});
+                        layer.alert('保存失败', {icon: 5});
                         parent.location.reload();
                     }
                 }

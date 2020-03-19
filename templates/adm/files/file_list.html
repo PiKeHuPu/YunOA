@@ -29,6 +29,11 @@
                             <i class="fa fa-arrow-up"></i>上传
                         </button>
                     </div>
+                    <div class="btn-group pull-right">
+                        <button type="button" class="btn btn-default" onclick="BulletinType()">
+                            <i class="	glyphicon glyphicon-user"></i>类型设置
+                        </button>
+                    </div>
                 </div>
                 <div class="box-body">
                     <table id="dtbList" class="display" cellspacing="0" width="100%">
@@ -63,7 +68,7 @@
     <script type="text/javascript">
         $(function () {
             $('#FILE-MANAGE').addClass('active');
-            $('#FILE-LIST').addClass('active');
+            $('#FILE-LIST{{ type0 }}').addClass('active');
         });
     </script>
 
@@ -80,6 +85,7 @@
                             "url": "{% url 'file_list' %}",
                             "type": "post",
                             "data": function (d) {
+                                d.type0 = "{{ type0 }}";
                             }
                         },
 
@@ -103,7 +109,7 @@
                                     let ret = "<button title='查看' onclick='doShow(" + "\""
                                         + row.name +"\",\"" + data +
                                     "\")'><i class='fa fa-eye'></i></button>";
-                                    ret = ret + "<button title='重命名' onclick='doRename(" + "\""
+                                    ret = ret + "<button title='编辑' onclick='doRename(" + "\""
                                         + row.id +
                                     "\")'><i class='fa fa-wrench'></i></button>";
                                     ret = ret + "<button title='删除' onclick='doDelete(" + "\""
@@ -141,8 +147,8 @@
                     title: '文件上传',
                     shadeClose: false,
                     maxmin: true,
-                    area: ['800px', '200px'],
-                    content: "{% url 'file_upload' %}",
+                    area: ['800px', '350px'],
+                    content: "{% url 'file_upload' %}?type=" + {{ type1 }},
                     end: function () {
                         //关闭时做的事情
                         window.location.reload();
@@ -170,7 +176,7 @@
         function doRename(id) {
             layer.open({
                 type: 2,
-                title: '重命名',
+                title: '档案编辑',
                 shadeClose: false,
                 maxmin: true,
                 area: ['800px', '300px'],
@@ -208,6 +214,21 @@
                 }
             });
 
+        }
+
+
+        function BulletinType() {
+            layer.open({
+                type: 2,
+                title: '设置类型',
+                shadeClose: false,
+                maxmin: true,
+                area: ['800px', '600px'],
+                content: ["{% url 'file_type_set' %}"],
+                end: function () {
+                    window.location.reload();
+                }
+            });
         }
     </script>
     <script>
