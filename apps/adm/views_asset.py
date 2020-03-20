@@ -407,6 +407,7 @@ class AssetUseInfoView(LoginRequiredMixin, View):
         return render(request, 'adm/asset/asset_detail_use.html', ret)
 
     def post(self, request):
+        is_out = request.POST.get("is_out")
         res = dict()
         try:
             # 创建相应的在用物资
@@ -433,7 +434,9 @@ class AssetUseInfoView(LoginRequiredMixin, View):
             asset_order.asset_id = asset_id
             asset_order.quantity = use_quantity
             asset_order.purpose = request.POST.get('title')
-            if request.POST.get('use_time'):
+            if is_out == "0":
+                pass
+            elif is_out == "1":
                 asset_order.return_date = request.POST.get('use_time')
             asset_order.status = '0'
             asset_order.use_status = '0'

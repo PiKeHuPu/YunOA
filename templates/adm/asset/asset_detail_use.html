@@ -27,13 +27,20 @@
                         <div class="form-group has-feedback">
                             <label class="col-sm-2 control-label">领用用途</label>
                             <div class="col-sm-3">
-                                 <input class="form-control" name="title" type="text" id="asset_title" autocomplete="off"/>
+                                <input class="form-control" name="title" type="text" id="asset_title"
+                                       autocomplete="off"/>
+                            </div>
+                            <label class="col-sm-2 control-label">领用数量</label>
+                            <div class="col-sm-3">
+                                <div class="input-group">
+                                    <input class="form-control" name="assetCount" type="Number" min="1"
+                                           max="{{ asset.quantity }}"
+                                           placeholder="还有{{ asset.quantity }} {{ asset.unit }}"
+                                           id="use_count"/>
+                                    <span class="input-group-addon">{{ asset.unit }}</span>
+                                </div>
                             </div>
 
-                            <label class="col-sm-2 control-label">预计归还日期</label>
-                            <div class="col-sm-3">
-                                 <input class="form-control pull-right form_datetime" name="use_time" type="text" id="use_time" autocomplete="off"/>
-                            </div>
                         </div>
                         <label class="col-sm-2 control-label">资产编号</label>
                         <div class="col-sm-3">
@@ -62,13 +69,17 @@
 
                     </div>
                     <div class="form-group has-feedback">
-                        <label class="col-sm-2 control-label">领用数量</label>
+                        <label class="col-sm-2 control-label">是否外带</label>
                         <div class="col-sm-3">
-                            <div class="input-group">
-                                <input class="form-control" name="assetCount" type="Number" min="1" max="{{ asset.quantity }}" placeholder="还有{{ asset.quantity }} {{ asset.unit }}" id="use_count" />
-                                <span class="input-group-addon">{{ asset.unit }}</span>
-
-                            </div>
+                            <select name="is_out" id="is_out" class="form-control inputText select2" onchange="Is_out()">
+                                <option value="0">否</option>
+                                <option value="1">是</option>
+                            </select>
+                        </div>
+                        <label class="col-sm-2 control-label" id="time_lab" hidden>预计归还日期</label>
+                        <div class="col-sm-3" id="time_div" hidden>
+                            <input class="form-control pull-right form_datetime" name="use_time" type="text"
+                                   id="use_time" autocomplete="off"/>
                         </div>
                     </div>
                 </fieldset>
@@ -89,12 +100,22 @@
     <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
     <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
     <script type="text/javascript">
+        function Is_out(){
+            var k = $("#is_out").val();
+            if (k=="1") {
+                $("#time_lab").show();
+                $("#time_div").show();
+            } else if (k=="0") {
+                $("#time_lab").hide();
+                $("#time_div").hide();
+            }
+        }
 
         $("#btnSave").click(function () {
-            $(this).attr("disabled", "disabled");
             var useCount = $("#use_count").val();
             var title = $("#asset_title").val();
             var use_time = $("#use_time").val();
+            var is_out = $("#is_out").val();
             var id0 = $("#id0").val();
             if (useCount == "") {
                 layer.alert("领用数量不能为空", {icon: 5});
@@ -108,12 +129,18 @@
                 layer.alert("领用数量超出库存数量({{ asset.quantity }})", {icon: 5});
                 return
             }
+            if (is_out=="1" && use_time=="") {
+                layer.alert("请选择归还日期", {icon: 5});
+                return
+            }
             var data = {
                 id0: id0,
                 useCount: useCount,
                 title: title,
                 use_time: use_time,
+                is_out: is_out,
             };
+            $(this).attr("disabled", "disabled");
             $.ajax({
                 type: "POST",
                 url: "{% url 'personal-asset-use' %}",
@@ -151,8 +178,6 @@
         }).on('changeDate', function (ev) {
             $(this).datetimepicker('hide');
         });
-
-
         // select2
         $(function () {
             //Initialize Select2 Elements
