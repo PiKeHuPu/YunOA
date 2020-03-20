@@ -737,10 +737,10 @@ class FileUpload(LoginRequiredMixin, View):
         file_manage = FileManage()
         file_manage.name = file0.name
         file_manage.content = file0
-        if type0 == "-1":
-            file_manage.type = None
-        else:
+        if type1:
             file_manage.type = type1
+        else:
+            file_manage.type = None
         file_manage.uploader_id = user_id
         file_manage.save()
         return HttpResponse("上传成功")
