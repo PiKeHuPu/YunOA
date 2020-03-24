@@ -61,12 +61,12 @@ function fileUP () {
             showPreview: false,
             showUpload: false,
             uploadUrl: "/personal/workorder_Icrt/upload",
-            allowedFileExtensions: ['jpg', 'gif', 'png'],
+            allowedFileExtensions: ['jpg', 'gif', 'png', 'pdf'],
             uploadExtraData: {
                 id: ap_id,
             },
             maxFileCount: 1,
-            maxFileSize: 5120
+            maxFileSize: 20480
         });
 }
 

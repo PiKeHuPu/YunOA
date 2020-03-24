@@ -31,7 +31,7 @@ from system.views import SystemView
 from adm.views import AdmView, WarehouseView, \
     WarehouseCreateView, WarehouseDeleteView, AssetView, AssetCreateView, AssetAjaxView, AssetUseFlowView, \
     AssetApplyView, AssetApproveView, AssetApproveresultView, AssetApproveHistoryView, AssetOrderDetailView, \
-    AssetTransferView, FileUpload, FileList, FileRename, FileDelete
+    AssetTransferView, FileUpload, FileList, FileRename, FileDelete, SetFileType, FileTypeAjax
 from oilWear.views import OilOrderCreateView
 from personal import views as personal_views
 from personal import views_work_order as order
@@ -170,10 +170,12 @@ urlpatterns = [
     url(r'^adm/file_list/$', FileList.as_view(), name="file_list"),
     url(r'^adm/file_rename/$', FileRename.as_view(), name="file_rename"),
     url(r'^adm/file_delete/$', FileDelete.as_view(), name="file_delete"),
+    url(r'^adm/file_type_set/$', SetFileType.as_view(), name="file_type_set"),
+    url(r'^adm/file_type_ajax/$', FileTypeAjax.as_view(), name="file_type_ajax"),
     # 修改岗位职责
     url(r'^personal/create_statement', ChangeStatement.as_view(), name='create_statement'),
     url(r'^personal/show_statement', ShowStatement.as_view(), name='show_statement'),
-    #工作日志
+    # 工作日志
     url(r'^personal/work/worklog/', WorkLog_Show.as_view(), name="worklog_show"),
     url(r'^personal/work/create/', WorkLog_Create.as_view(), name="worklog_create"),
     url(r'^personal/work/detail/', WorkLog_Detail.as_view(), name="worklog_detail"),
