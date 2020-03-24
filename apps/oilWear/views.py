@@ -192,6 +192,7 @@ class OilOrderView(LoginRequiredMixin, View):
             vehicle_list = Vehicle.objects.filter(id__in=vehicle_id_list)
 
         ret["vehicle_list"] = vehicle_list
+        ret["user_id"] = user_id
         return render(request, "oilWear/oil_order.html", ret)
 
     def post(self, request):
@@ -200,7 +201,7 @@ class OilOrderView(LoginRequiredMixin, View):
         :param request:
         :return:
         """
-        fields = ["id", "vehicle_id__license_plate", "vehicle_id__type", "vehicle_id__department", "operator__name", "refuel_time", "mileage", "weight", "price", "amount", "remark", 'operate_time']
+        fields = ["id", "vehicle_id__license_plate", "vehicle_id__type", "vehicle_id__department", "operator__name", "operator_id", "refuel_time", "mileage", "weight", "price", "amount", "remark", 'operate_time']
 
         user_id = request.session.get("_auth_user_id")
         vehicle_id = list(Operator.objects.values("vehicle_id").filter(operator_id=user_id, vehicle__is_delete=False))

@@ -147,10 +147,14 @@
                                 width: "25%"
                             },
                             {
-                                data: "id",
-                                render: function (data) {
-                                    return "<button title='修改' onclick='change_log("
-                                        + data + ")'><i class='glyphicon glyphicon-wrench'></i></button>";
+                                data: "operator_id",
+                                render: function (data, row) {
+                                    var ret = "";
+                                    if (data=={{ user_id }}) {
+                                        ret = ret + "<button title='修改' onclick='change_log("
+                                        + data + ")'><i class='glyphicon glyphicon-wrench'></i></button>"
+                                    }
+                                    return ret;
                                 },
                             }],
                     }));
