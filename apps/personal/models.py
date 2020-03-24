@@ -233,7 +233,12 @@ class BusinessApply(models.Model):
 
 
 class Advise(models.Model):
-    creator = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE,verbose_name='建议人')
+    """
+    意见反馈
+    """
+    creator = models.ForeignKey(User, related_name="creator0", blank=True, null=True, on_delete=models.CASCADE,verbose_name='建议人')
+    operator = models.ForeignKey(User, related_name="operator0", blank=True, null=True, verbose_name="负责人")
     create_time = models.DateTimeField(auto_now_add=True, verbose_name='提交时间')
     back = models.TextField(max_length=1000, verbose_name="意见反馈")
-    is_done = models.BooleanField(default=False, verbose_name='是否已解决')
+    status = models.CharField(max_length=4, default="0", verbose_name="当前状态")  # "0": 处理中  "1":完成中  "2":已拒绝  "3":已完成
+    remark = models.CharField(max_length=200, blank=True, null=True, verbose_name="备注")

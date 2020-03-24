@@ -3,6 +3,7 @@ import re
 import calendar
 from datetime import date, timedelta, datetime
 
+from django.core.serializers.json import DjangoJSONEncoder
 from django.shortcuts import render
 from django.views.generic.base import View
 from django.http import HttpResponse
@@ -45,11 +46,13 @@ class PersonalView(LoginRequiredMixin, View):
         #  (('0', '审批提交'), ('1', '审批中'), ('2', '审批完成'), ('3', '审批被退回'))
         # 当月个人立项统计
         work_order = WorkOrder.objects.filter(
-                                              Q(cretor_id=request.user.id) |
-                                              Q(next_user_id=request.user.id)
-                                              )
-        ret['work_order_lx'] = work_order.filter(next_user_id=request.user.id, status__in=['1', '0'], type='0').count()  # 等待我审批的
-        ret['work_order_cc'] = work_order.filter(next_user_id=request.user.id, status__in=['1', '0'], type='1').count()  # 等待我审批的
+            Q(cretor_id=request.user.id) |
+            Q(next_user_id=request.user.id)
+        )
+        ret['work_order_lx'] = work_order.filter(next_user_id=request.user.id, status__in=['1', '0'],
+                                                 type='0').count()  # 等待我审批的
+        ret['work_order_cc'] = work_order.filter(next_user_id=request.user.id, status__in=['1', '0'],
+                                                 type='1').count()  # 等待我审批的
         ret['start_date'] = start_date
         # 当月个人报销统计
         busin_apply = BusinessApply.objects.filter(
@@ -67,7 +70,7 @@ class PersonalView(LoginRequiredMixin, View):
                 ret['apply_cc'] += BusinessApply.objects.filter(status='5', type='1').count()
         # 物资到期提醒
         three_months = today + timedelta(days=100)
-        structure = request.user.department    # 用户所在部门
+        structure = request.user.department  # 用户所在部门
         user = request.user
         if user.is_dep_administrator:
             asset = AssetInfo.objects.filter(Q(department=structure), Q(due_time__range=(today, three_months)))
@@ -89,20 +92,21 @@ class PersonalView(LoginRequiredMixin, View):
         asset_approve_num = len(AssetApproveDetail.objects.filter(approver_id=user_id, is_pass=None))
         ret['asset_approve_num'] = asset_approve_num
 
-        #报表的时间
+        # 报表的时间
         mon = datetime.now().month
         year = datetime.now().year
         if mon == 1:
             mon = 12
             year -= 1
         else:
-            mon -=1
+            mon -= 1
 
-        #个人报表 Q(create_time__month=mon), Q(create_time__year=year),
+        # 个人报表 Q(create_time__month=mon), Q(create_time__year=year),
         feeid = []
         manid = UserProfile.objects.filter(name=request.user)[0].id
         post = UserProfile.objects.filter(id=manid)[0].post
-        exist = WorkOrder.objects.filter(Q(create_time__month=mon), Q(create_time__year=year), Q(cretor_id=manid), ~Q(status=3),  ~Q(status=0), ~Q(status=1))
+        exist = WorkOrder.objects.filter(Q(create_time__month=mon), Q(create_time__year=year), Q(cretor_id=manid),
+                                         ~Q(status=3), ~Q(status=0), ~Q(status=1))
         if len(exist) == 0:
             ret.update({
                 'status': 0,
@@ -110,7 +114,7 @@ class PersonalView(LoginRequiredMixin, View):
             })
         else:
             for x in exist:
-                if x.feeid_id not in feeid and x.feeid_id !=None:
+                if x.feeid_id not in feeid and x.feeid_id != None:
                     feeid.append(x.feeid_id)
             if len(feeid) == 0:
                 ret['status'] = 1
@@ -126,7 +130,8 @@ class PersonalView(LoginRequiredMixin, View):
                         feetype.append(li[0].fee_type)
                 for x in feeid:
                     cost = 0
-                    li = WorkOrder.objects.filter(Q(create_time__month=mon), Q(create_time__year=year), Q(feeid_id=x), Q(cretor_id=manid), ~Q(status=3), ~Q(status=0), ~Q(status=1))
+                    li = WorkOrder.objects.filter(Q(create_time__month=mon), Q(create_time__year=year), Q(feeid_id=x),
+                                                  Q(cretor_id=manid), ~Q(status=3), ~Q(status=0), ~Q(status=1))
                     for y in li:
                         cost += float(y.cost)
                     allcost.append(cost)
@@ -141,7 +146,7 @@ class PersonalView(LoginRequiredMixin, View):
                 })
             print(ret)
 
-        #部门报表
+        # 部门报表
 
         if len(Structure.objects.filter(adm_list=manid)) != 0:
             if int(Structure.objects.filter(adm_list=manid)[0].adm_list) == int(manid):
@@ -151,13 +156,14 @@ class PersonalView(LoginRequiredMixin, View):
                 defeetype = []
                 decost = []
                 dedata = []
-                x = WorkOrder.objects.filter(Q(create_time__month=mon), Q(create_time__year=year), ~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=struid), ~Q(feeid_id=None))
+                x = WorkOrder.objects.filter(Q(create_time__month=mon), Q(create_time__year=year), ~Q(status=3),
+                                             ~Q(status=0), ~Q(status=1), Q(structure_id=struid), ~Q(feeid_id=None))
                 if len(x) == 0:
                     ret['m'] = 0
                 else:
 
                     for y in x:
-                        if y.feeid_id not in defeeid :
+                        if y.feeid_id not in defeeid:
                             defeeid.append(y.feeid_id)
                     for x in defeeid:
                         li = FeeType.objects.filter(fee_id=x)
@@ -165,7 +171,8 @@ class PersonalView(LoginRequiredMixin, View):
                             defeetype.append(li[0].fee_type)
                     for x in defeeid:
                         cost = 0
-                        li = WorkOrder.objects.filter(Q(feeid=x), ~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=struid), ~Q(feeid_id=None))
+                        li = WorkOrder.objects.filter(Q(feeid=x), ~Q(status=3), ~Q(status=0), ~Q(status=1),
+                                                      Q(structure_id=struid), ~Q(feeid_id=None))
                         for y in li:
                             cost += float(y.cost)
                         decost.append(cost)
@@ -180,13 +187,12 @@ class PersonalView(LoginRequiredMixin, View):
                             depeople.append(x.name)
                     ret.update({
                         'depeople': depeople,
-                        'm':  1,
+                        'm': 1,
                         'defeetype': defeetype,
                         'dedata': dedata
                     })
 
-
-        #全体员工的报表
+        # 全体员工的报表
         if post == '董事长' or post == '总经理':
             post = UserProfile.objects.filter(name=request.user)[0].post
             ret['post'] = post
@@ -194,7 +200,8 @@ class PersonalView(LoginRequiredMixin, View):
             totalfeetype = []
             totalcost = []
             totaldata = []
-            x = WorkOrder.objects.filter(Q(create_time__month=mon), Q(create_time__year=year), ~Q(status=3), ~Q(status=0), ~Q(status=1))
+            x = WorkOrder.objects.filter(Q(create_time__month=mon), Q(create_time__year=year), ~Q(status=3),
+                                         ~Q(status=0), ~Q(status=1))
             for y in x:
                 if y.feeid_id not in totalfeeid and y.feeid_id != None:
                     totalfeeid.append(y.feeid_id)
@@ -204,7 +211,8 @@ class PersonalView(LoginRequiredMixin, View):
                     totalfeetype.append(li[0].fee_type)
             for x in totalfeeid:
                 cost = 0
-                li = WorkOrder.objects.filter(Q(create_time__month=mon), Q(create_time__year=year), Q(feeid=x), ~Q(status=3), ~Q(status=0), ~Q(status=1))
+                li = WorkOrder.objects.filter(Q(create_time__month=mon), Q(create_time__year=year), Q(feeid=x),
+                                              ~Q(status=3), ~Q(status=0), ~Q(status=1))
                 for y in li:
                     cost += float(y.cost)
                 totalcost.append(cost)
@@ -215,14 +223,12 @@ class PersonalView(LoginRequiredMixin, View):
                 totaldata.append(dic)
             ret.update({
                 'totalfeetype': totalfeetype,
-                'totalcost':totalcost,
+                'totalcost': totalcost,
                 'totaldata': totaldata,
 
             })
 
         return render(request, 'personal/personal_index.html', ret)
-
-
 
     def post(self, request):
         mon = datetime.now().month
@@ -236,7 +242,7 @@ class PersonalView(LoginRequiredMixin, View):
             feetype = []
             cost = []
             data = []
-            #返回部门人员
+            # 返回部门人员
             depeople = []
             depeo = UserProfile.objects.filter(Q(department_id=c), ~Q(id=manid), Q(is_active=1))
             for x in depeo:
@@ -245,18 +251,20 @@ class PersonalView(LoginRequiredMixin, View):
             man = []
             g = ''
             for x in depeople:
-                m = '<option value="'+ x+'">' + x + '</option>'
+                m = '<option value="' + x + '">' + x + '</option>'
                 man.append(m)
                 g += m
             x = '<select name="depeo" id="depeo">' + '<option value="' + c + '"></option>' + g + '</select>'
             d['man'] = x
 
-            exist = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=c), Q(create_time__year=b), Q(create_time__month=a))
+            exist = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=c),
+                                             Q(create_time__year=b), Q(create_time__month=a))
             if len(exist) == 0:
                 d['status'] = 'fail0'
                 d['errors_info'] = '该部门此时间段内没有工单'
             else:
-                li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=c), ~Q(feeid_id=None),Q(create_time__year=b), Q(create_time__month=a))
+                li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=c),
+                                              ~Q(feeid_id=None), Q(create_time__year=b), Q(create_time__month=a))
                 if len(li) == 0:
                     d['status'] = 'fail0'
                     d['errors_info'] = '此时间段内该部门工单无费用类型'
@@ -270,7 +278,8 @@ class PersonalView(LoginRequiredMixin, View):
                             feetype.append(ll[0].fee_type)
                     for x in feeid:
                         cos = 0
-                        li = WorkOrder.objects.filter(Q(create_time__year=b), Q(create_time__month=a), ~Q(status=3), ~Q(status=0), ~Q(status=1), Q(structure_id=c), Q(feeid_id=x))
+                        li = WorkOrder.objects.filter(Q(create_time__year=b), Q(create_time__month=a), ~Q(status=3),
+                                                      ~Q(status=0), ~Q(status=1), Q(structure_id=c), Q(feeid_id=x))
                         for y in li:
                             cos += float(y.cost)
                         cost.append(cos)
@@ -285,7 +294,7 @@ class PersonalView(LoginRequiredMixin, View):
                     })
             return d
 
-        #部门人员报表
+        # 部门人员报表
         if request.POST.get('dep'):
             if mon != 1:
                 mon -= 1
@@ -295,15 +304,16 @@ class PersonalView(LoginRequiredMixin, View):
             dep = request.POST.get('dep')
             depfeeid = []
             depfeetype = []
-            depcost =[]
+            depcost = []
             depdata = []
             depid = UserProfile.objects.filter(name=dep)[0].id
-            exist = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1),Q(cretor_id=depid))
+            exist = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(cretor_id=depid))
             if len(exist) == 0:
                 ret['status'] = 'fail0'
                 ret['errors_info'] = '该人员没有工单'
             else:
-                li = WorkOrder.objects.filter(Q(create_time__year=year), Q(create_time__month=mon), ~Q(status=3), ~Q(status=0), ~Q(status=1), Q(cretor_id=depid), ~Q(feeid_id=None))
+                li = WorkOrder.objects.filter(Q(create_time__year=year), Q(create_time__month=mon), ~Q(status=3),
+                                              ~Q(status=0), ~Q(status=1), Q(cretor_id=depid), ~Q(feeid_id=None))
                 if len(li) == 0:
                     ret['status'] = 'fail1'
                     ret['errors_info'] = '该人员时间段内工单无费用类型'
@@ -317,7 +327,9 @@ class PersonalView(LoginRequiredMixin, View):
                             depfeetype.append(ll[0].fee_type)
                     for x in depfeeid:
                         cost = 0
-                        li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(cretor_id=depid),Q(feeid_id=x),Q(create_time__year=year), Q(create_time__month=mon),)
+                        li = WorkOrder.objects.filter(~Q(status=3), ~Q(status=0), ~Q(status=1), Q(cretor_id=depid),
+                                                      Q(feeid_id=x), Q(create_time__year=year),
+                                                      Q(create_time__month=mon), )
                         for y in li:
                             cost += float(y.cost)
                         depcost.append(cost)
@@ -342,7 +354,8 @@ class PersonalView(LoginRequiredMixin, View):
             paradepfeetype = []
             paradepcost = []
             paradepdata = []
-            exist = WorkOrder.objects.filter(Q(create_time__range=(start_time, end_time)), Q(cretor_id=paradepid), ~Q(status=3), ~Q(status=0), ~Q(status=1))
+            exist = WorkOrder.objects.filter(Q(create_time__range=(start_time, end_time)), Q(cretor_id=paradepid),
+                                             ~Q(status=3), ~Q(status=0), ~Q(status=1))
             if len(exist) == 0:
                 ret['status'] = 'fail0'
                 ret['errors_info'] = '该人员在此时间段内无工单提交'
@@ -360,7 +373,8 @@ class PersonalView(LoginRequiredMixin, View):
                             paradepfeetype.append(li[0].fee_type)
                     for x in paradepfeeid:
                         cost = 0
-                        li = WorkOrder.objects.filter(Q(create_time__range=(start_time, end_time)), Q(feeid=x), Q(cretor_id=paradepid), ~Q(status=3), ~Q(status=0), ~Q(status=1))
+                        li = WorkOrder.objects.filter(Q(create_time__range=(start_time, end_time)), Q(feeid=x),
+                                                      Q(cretor_id=paradepid), ~Q(status=3), ~Q(status=0), ~Q(status=1))
                         for y in li:
                             cost += float(y.cost)
                         paradepcost.append(cost)
@@ -374,7 +388,7 @@ class PersonalView(LoginRequiredMixin, View):
                         'paradepfeetype': paradepfeetype
                     })
 
-        #董事长报表中部门人员时间段报表
+        # 董事长报表中部门人员时间段报表
         if request.POST.get('depeo') and request.POST.get("dep_start") and request.POST.get("dep_end"):
             start_time = request.POST.get("dep_start")
             end_time = request.POST.get("dep_end")
@@ -384,7 +398,8 @@ class PersonalView(LoginRequiredMixin, View):
             managecost = []
             managedata = []
             if dep.isdigit() == True:
-                exist = WorkOrder.objects.filter(Q(create_time__range=(start_time, end_time)), Q( structure_id=dep), ~Q(status=3), ~Q(status=0), ~Q(status=1))
+                exist = WorkOrder.objects.filter(Q(create_time__range=(start_time, end_time)), Q(structure_id=dep),
+                                                 ~Q(status=3), ~Q(status=0), ~Q(status=1))
                 if len(exist) == 0:
                     ret['status'] = 'fail0'
                     ret['errors_info'] = '该部门在此时间段内无工单提交'
@@ -402,7 +417,8 @@ class PersonalView(LoginRequiredMixin, View):
                                 managefeetype.append(li[0].fee_type)
                         for x in managefeeid:
                             cost = 0
-                            li = WorkOrder.objects.filter(Q(create_time__range=(start_time, end_time)), Q(feeid=x), Q(structure_id=dep), ~Q(status=3), ~Q(status=0), ~Q(status=1))
+                            li = WorkOrder.objects.filter(Q(create_time__range=(start_time, end_time)), Q(feeid=x),
+                                                          Q(structure_id=dep), ~Q(status=3), ~Q(status=0), ~Q(status=1))
                             for y in li:
                                 cost += float(y.cost)
                             managecost.append(cost)
@@ -417,7 +433,8 @@ class PersonalView(LoginRequiredMixin, View):
                         })
             else:
                 manageid = UserProfile.objects.filter(name=dep)[0].id
-                exist = WorkOrder.objects.filter(Q(create_time__range=(start_time, end_time)), Q(cretor_id=manageid),  ~Q(status=3), ~Q(status=0), ~Q(status=1))
+                exist = WorkOrder.objects.filter(Q(create_time__range=(start_time, end_time)), Q(cretor_id=manageid),
+                                                 ~Q(status=3), ~Q(status=0), ~Q(status=1))
                 if len(exist) == 0:
                     ret['status'] = 'fail0'
                     ret['errors_info'] = '该人员在此时间段内无工单提交'
@@ -436,7 +453,8 @@ class PersonalView(LoginRequiredMixin, View):
                         for x in managefeeid:
                             cost = 0
                             li = WorkOrder.objects.filter(Q(create_time__range=(start_time, end_time)), Q(feeid=x),
-                                                          Q(cretor_id=manageid), ~Q(status=3), ~Q(status=0), ~Q(status=1))
+                                                          Q(cretor_id=manageid), ~Q(status=3), ~Q(status=0),
+                                                          ~Q(status=1))
                             for y in li:
                                 cost += float(y.cost)
                             managecost.append(cost)
@@ -450,8 +468,7 @@ class PersonalView(LoginRequiredMixin, View):
                             'managefeetype': managefeetype
                         })
 
-
-        #营销中心
+        # 营销中心
         if request.POST.get('saleCenter'):
             if mon != 1:
                 mon -= 1
@@ -461,7 +478,7 @@ class PersonalView(LoginRequiredMixin, View):
             sc = request.POST.get('saleCenter')
             ret = table(mon, year, sc, **ret)
 
-        #大数据事业部
+        # 大数据事业部
         if request.POST.get('BigData'):
             if mon != 1:
                 mon -= 1
@@ -471,7 +488,7 @@ class PersonalView(LoginRequiredMixin, View):
             bg = request.POST.get('BigData')
             ret = table(mon, year, bg, **ret)
 
-        #生产中心
+        # 生产中心
         if request.POST.get('production'):
             if mon != 1:
                 mon -= 1
@@ -481,7 +498,7 @@ class PersonalView(LoginRequiredMixin, View):
             pr = request.POST.get('production')
             ret = table(mon, year, pr, **ret)
 
-        #人事行政中心
+        # 人事行政中心
         if request.POST.get('personal'):
             if mon != 1:
                 mon -= 1
@@ -491,7 +508,7 @@ class PersonalView(LoginRequiredMixin, View):
             pe = request.POST.get('personal')
             ret = table(mon, year, pe, **ret)
 
-        #运维中心
+        # 运维中心
         if request.POST.get('ops'):
             if mon != 1:
                 mon -= 1
@@ -501,7 +518,7 @@ class PersonalView(LoginRequiredMixin, View):
             op = request.POST.get('ops')
             ret = table(mon, year, op, **ret)
 
-        #证券事务中心 Securities affairs centre
+        # 证券事务中心 Securities affairs centre
         if request.POST.get('SAC'):
             if mon != 1:
                 mon -= 1
@@ -511,7 +528,7 @@ class PersonalView(LoginRequiredMixin, View):
             sa = request.POST.get('SAC')
             ret = table(mon, year, sa, **ret)
 
-        #财务部
+        # 财务部
         if request.POST.get('finance'):
             if mon != 1:
                 mon -= 1
@@ -521,7 +538,7 @@ class PersonalView(LoginRequiredMixin, View):
             fi = request.POST.get('finance')
             ret = table(mon, year, fi, **ret)
 
-        #售后服务
+        # 售后服务
         if request.POST.get('afterSale'):
             if mon != 1:
                 mon -= 1
@@ -531,7 +548,7 @@ class PersonalView(LoginRequiredMixin, View):
             af = request.POST.get('afterSale')
             ret = table(mon, year, af, **ret)
 
-        #物资管理
+        # 物资管理
         if request.POST.get('materials'):
             if mon != 1:
                 mon -= 1
@@ -541,7 +558,7 @@ class PersonalView(LoginRequiredMixin, View):
             mm = request.POST.get('materials')
             ret = table(mon, year, mm, **ret)
 
-        #通信工程
+        # 通信工程
         if request.POST.get('communication'):
             if mon != 1:
                 mon -= 1
@@ -551,7 +568,7 @@ class PersonalView(LoginRequiredMixin, View):
             co = request.POST.get('communication')
             ret = table(mon, year, co, **ret)
 
-        #电力工程
+        # 电力工程
         if request.POST.get('electric'):
             if mon != 1:
                 mon -= 1
@@ -561,8 +578,7 @@ class PersonalView(LoginRequiredMixin, View):
             epp = request.POST.get('electric')
             ret = table(mon, year, epp, **ret)
 
-
-        #时间段搜索工单
+        # 时间段搜索工单
         if request.POST.get("start_time") and request.POST.get("end_time"):
             parafeeid = []  # para是段落的前四个字母,表示时间段内的费用id
             parafeetype = []
@@ -570,7 +586,8 @@ class PersonalView(LoginRequiredMixin, View):
             paradata = []
             start_time = request.POST.get("start_time")
             end_time = request.POST.get("end_time")
-            exist = WorkOrder.objects.filter(Q(create_time__range=(start_time, end_time)), Q(cretor_id=manid), ~Q(status=3), ~Q(status=0), ~Q(status=1))
+            exist = WorkOrder.objects.filter(Q(create_time__range=(start_time, end_time)), Q(cretor_id=manid),
+                                             ~Q(status=3), ~Q(status=0), ~Q(status=1))
             if len(exist) == 0:
                 ret['status'] = 'fail0'
                 ret['errors_info'] = '请提交工单使用'
@@ -588,7 +605,8 @@ class PersonalView(LoginRequiredMixin, View):
                             parafeetype.append(li[0].fee_type)
                     for x in parafeeid:
                         cost = 0
-                        li = WorkOrder.objects.filter(Q(create_time__range=(start_time, end_time)), Q(feeid=x), Q(cretor_id=manid), ~Q(status=3), ~Q(status=0), ~Q(status=1))
+                        li = WorkOrder.objects.filter(Q(create_time__range=(start_time, end_time)), Q(feeid=x),
+                                                      Q(cretor_id=manid), ~Q(status=3), ~Q(status=0), ~Q(status=1))
                         for y in li:
                             cost += float(y.cost)
                         paraallcost.append(cost)
@@ -637,6 +655,7 @@ class ChangeStatement(LoginRequiredMixin, View):
     """
     修改岗位职责
     """
+
     def get(self, request):
         ret = dict()
         user_id = request.session.get("_auth_user_id")
@@ -659,6 +678,7 @@ class ShowStatement(LoginRequiredMixin, View):
     """
     展示个人职责
     """
+
     def get(self, request):
         ret = dict()
         id0 = request.GET.get("id")
@@ -716,6 +736,7 @@ class PhoneBookView(LoginRequiredMixin, View):
     """
     个人中心
     """
+
     def get(self, request):
         fields = ['id', 'name', 'mobile', 'email', 'post', 'department__title', 'image', 'personal_statement']
         ret = dict(linkmans=list(User.objects.exclude(username='admin').filter(is_active=1).values(*fields)))
@@ -774,6 +795,7 @@ class DueAssetView(LoginRequiredMixin, View):
     """
     物资续期提醒页面
     """
+
     def get(self, request):
         ret = dict()
         # 物资到期提醒
@@ -808,6 +830,117 @@ class FeedbackView(LoginRequiredMixin, View):
     """
     意见反馈
     """
+
     def get(self, request):
         ret = dict()
+        # 判断是否为程序员
+        user_id = request.session.get("_auth_user_id")
+        user = User.objects.filter(id=user_id).first()
+        department = Structure.objects.filter(title="研发中心").first()
+        if department:
+            if user.department_id == department.id:
+                ret["is_op"] = "1"
+        return render(request, "personal/feedback_list.html", ret)
+
+    def post(self, request):
+        fields = ['id', 'back', 'create_time', 'status', 'remark', 'operator__name', 'creator__name']
+        user_id = request.session.get("_auth_user_id")
+        user = User.objects.filter(id=user_id).first()
+        department = Structure.objects.filter(title="研发中心").first()
+        if department:
+            if user.department_id == department.id:
+                ret = dict(data=list(Advise.objects.all().values(*fields).order_by("-id")))
+            else:
+                ret = dict(data=list(Advise.objects.filter(creator_id=user_id).values(*fields).order_by("-id")))
+        else:
+            ret = dict(data=list(Advise.objects.filter(creator_id=user_id).values(*fields).order_by("-id")))
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
+
+
+class CreateFeedback(LoginRequiredMixin, View):
+    """
+    创建意见反馈
+    """
+
+    def get(self, request):
+        ret = dict()
+        id0 = request.GET.get("id", None)
+        if id0:
+            advise = Advise.objects.filter(id=id0).first()
+            ret["advice"] = advise
         return render(request, "feedback.html", ret)
+
+    def post(self, request):
+        ret = dict()
+        back = request.POST.get("advise")
+        id0 = request.POST.get("advise_id")
+        user_id = request.session.get("_auth_user_id")
+        if id0:
+            advise = Advise.objects.filter(id=id0).first()
+        else:
+            advise = Advise()
+        advise.creator_id = user_id
+        advise.back = back
+        advise.save()
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
+
+
+class FeedbackDelete(LoginRequiredMixin, View):
+    """
+    删除意见反馈
+    """
+
+    def post(self, request):
+        ret = dict()
+        id0 = request.POST.get("id")
+        advise = Advise.objects.filter(id=id0).first()
+        advise.delete()
+        ret["result"] = True
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
+
+
+class FeedbackAjax(LoginRequiredMixin, View):
+    """
+    意见反馈ajax
+    """
+
+    def get(self, request):
+        ret = dict()
+        id0 = request.GET.get("id")
+        user_id = request.session.get("_auth_user_id")
+        advise = Advise.objects.filter(id=id0).first()
+        advise.status = "1"
+        advise.operator_id = user_id
+        advise.save()
+        ret["result"] = True
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
+
+
+class FeedbackRemark(LoginRequiredMixin, View):
+    """
+    意见反馈备注
+    """
+    def get(self, request):
+        ret = dict()
+        id0 = request.GET.get("id")
+        ps = request.GET.get("ps")
+        ret["id"] = id0
+        ret["ps"] = ps
+        return render(request, "personal/feedback_remark.html", ret)
+
+    def post(self, request):
+        ret = dict()
+        user_id = request.session.get("_auth_user_id")
+        id0 = request.POST.get("id")
+        ps = request.POST.get("ps")
+        content = request.POST.get("content")
+        advise = Advise.objects.filter(id=id0).first()
+        if ps == "0":
+            advise.status = "2"
+        if ps == "1":
+            advise.status = "3"
+        advise.remark = content
+        advise.operator_id = user_id
+        advise.save()
+        ret["success"] = True
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
