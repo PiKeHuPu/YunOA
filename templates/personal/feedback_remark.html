@@ -1,0 +1,47 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>备注</title>
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+</head>
+<body>
+    <p style="margin-left: 20px; font-size: 20px; font-weight: bolder">备注</p>
+    <textarea name="opinion" id="opinion" cols="40" rows="7" style="font-size: 17px; margin-left: 10px"></textarea>
+    <div style="text-align: center">
+        <button class="btn btn-default" onclick="cancel()">取消</button>
+        <button class="btn btn-primary" onclick="confirm()">确定</button>
+    </div>
+</body>
+<!-- jQuery 2.2.3 -->
+<script src="{% static 'plugins/jQuery/jquery-2.2.3.min.js' %}"></script>
+<!-- Bootstrap 3.3.6 -->
+<script src="{% static 'bootstrap/js/bootstrap.min.js' %}"></script>
+<script>
+   function confirm() {
+       $.ajax({
+            url: "{% url 'feedback_remark' %}",
+            type: "post",
+            data: {"id": {{ id }},
+                   "ps": {{ ps }},
+                   "content": $("#opinion").val()},
+            success: function (ret) {
+                if (ret.success) {
+                    alert("操作成功")
+                } else {
+                    alert("操作失败")
+                }
+                var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                parent.layer.close(index); //再执行关闭
+                window.location.reload()
+            }
+        });
+   }
+   function cancel() {
+        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+        parent.layer.close(index); //再执行关闭
+   }
+</script>
+</html>

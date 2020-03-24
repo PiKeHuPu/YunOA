@@ -9,9 +9,9 @@
 <body>
     <div class="box box-danger">
         <form class="form-horizontal" id="addForm" method="post">
-            <input type="hidden" name='order' value="{{ work_order.id }}" id="orderId"/>
+            <input type="text" name='advise_id' value="{{ advice.id }}" id="advise_id" hidden/>
             <div class="col-sm-12">
-                <textarea class="form-control" name="title" id="advise" style="height:150px;width: 100%"></textarea>
+                <textarea class="form-control" name="title" id="advise" style="height:150px;width: 100%">{{ advice.back }}</textarea>
             </div>
             <div class="box-footer ">
                 <div style="text-align: center">
@@ -31,26 +31,23 @@
 <script>
     function Save() {
         var advise = $("#advise").val();
+        var advise_id = $("#advise_id").val();
         if (advise == '') {
             alert('请输入反馈内容！');
-        } else if (advise.length>300) {
-            alert('建议内容过长，请删减内容')
+        } else if (advise.length>1000) {
+            alert('内容过长，请删减内容')
         }
         else {
-            retData = {
+            var data = {
                 advise: advise,
+                advise_id: advise_id
             };
-            var data = retData;
-            if (data === false) {
-                return
-            }
-            var url = "/direction/";
+            var url = "{% url 'feedback_create' %}";
             $.ajax({
                 type: 'POST',
                 url: url,
-                data: JSON.stringify(data),
-                contentType: "application/json; charset=UTF-8",
-                success: function (data) {
+                data: data,
+                success: function (ret) {
                     alert('提交成功');
                     var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
                     parent.layer.close(index); //再执行关闭

@@ -1,0 +1,266 @@
+{% extends "base-left.html" %}
+{% load staticfiles %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugins/datatables/jquery.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+    <!-- iCheck for checkboxes and radio inputs -->
+{% endblock %}
+
+{% block content %}
+
+    <!-- Content Header (Page header) -->
+
+    <section class="content-header margin-bottom">
+        <ol class="breadcrumb">
+            <li><a href=""><i class="fa fa-dashboard"></i>办公平台</a></li>
+            <li class="active"><a href="{% url 'personal' %}">我的工作台</a></li>
+            <li class="active"><a href="#">意见反馈</a></li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div id="devlist">
+            <div class="box box-primary" id="liebiao">
+                <div class="box-header">
+                    <div class="btn-group pull-left">&nbsp</div>
+                    <div class="btn-group pull-left">
+                        {% if is_op == "1" %}
+
+                        {% else %}
+                            <button type="button" id="btnCreate" class="btn btn-primary ">
+                                <i class="glyphicon glyphicon-plus"></i>新增
+                            </button>
+                        {% endif %}
+                </div>
+                <div class="box-body">
+                    <input type="text" id="is_op" value="{{ is_op }}" hidden>
+                    <table id="dtbList" class="display" cellspacing="0" width="100%">
+                        <thead>
+                        <tr valign="middle">
+                            <th>ID</th>
+                            <th>意见或建议</th>
+                            <th>提交时间</th>
+                            <th>状态</th>
+                            <th>负责人</th>
+                            <th>备注</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <br> <br>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- /.content -->
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables/dataTables.const.js' %}"></script>
+    <script src="{% static 'plugins/datatables/moment.min.js' %}"></script>
+    <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+    <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
+    <!-- iCheck 1.0.1 -->
+    <script type="text/javascript">
+        $(function () {
+            $('#FEEDBACK-VIEW').addClass('active');
+        });
+    </script>
+
+    <script type="text/javascript">
+        $(function () {
+            oDataTable = initTable();
+
+            function initTable() {
+                var oTable = $('#dtbList').DataTable(
+                    $.extend(true, {"scrollX": true},
+                    DATATABLES_CONSTANT.DATA_TABLES.DEFAULT_OPTION,
+                    {
+                        ajax: {
+                            "url": "{% url 'feedback_view' %}",
+                            "type": "post",
+                            "data": function (d) {
+                            }
+                        },
+                        columns: [
+                            {
+                                data: "id",
+                            },
+                            {
+                                data: "back",
+                            },
+                            {
+                                data: "create_time",
+                                 render: function (data, type, full, meta) {
+                                    return moment(data).format("YYYY-MM-DD HH:mm");
+                                }
+                            },
+                            {
+                                data: "status",
+                                render: function (data, type, row, meta) {
+                                    var ret = "";
+                                    if (data == "0") {
+                                        ret = "<button class='btn btn-warning btn-xs'>处理中</button>";}
+                                    if (data == "1") {
+                                        ret = "<button class='btn btn-info btn-xs'>完成中</button>";}
+                                    if (data == "2") {
+                                        ret = "<button class='btn btn-danger btn-xs'>已退回</button>";}
+                                    if (data == "3") {
+                                        ret = "<button class='btn btn-success btn-xs'>已完成</button>";}
+                                    return ret;
+                                }
+                            },
+                            {
+                                data: "operator__name",
+                            },
+                            {
+                                data: "remark",
+                            },
+                            {
+                                data: "id",
+                                bSortable: "false",
+                                render: function (data, type, row, meta) {
+                                    var ret = "";
+                                    var is_op = $("#is_op").val();
+                                    if (is_op=="1") {
+                                        ret = ret + "<button title='申请人：" + row.creator__name + "'><i class='fa fa-user-circle-o'></i></button>";
+                                        if (row.status == '0') {
+                                            ret = ret + "<button title='接受' onclick='doAccept("
+                                            + data + ")'><i class='fa fa-check'></i></button>";
+                                            ret = ret + "<button title='拒绝' onclick='doRefuse("
+                                            + data + ", 0" + ")'><i class='fa fa-close'></i></button>";
+                                        } else if (row.status == "1") {
+                                            ret = ret + "<button title='完成' onclick='doFinish("
+                                            + data + ", 1" + ")'><i class='fa fa-ambulance'></i></button>";
+                                        }
+                                    } else {
+                                        if (row.status == '0') {
+                                            ret = ret + "<button title='编辑' onclick='doUpdate("
+                                            + data + ")'><i class='glyphicon glyphicon-pencil'></i></button>";
+                                            ret = ret + "<button title='删除' onclick='doDelete("
+                                            + data + ")'><i class='glyphicon glyphicon-trash'></i></button>";
+                                        }
+                                    }
+                                    return ret;
+                                }
+                            }],
+                    }));
+                return oTable;
+            }
+        });
+
+        $("#btnCreate").click(function () {
+            layer.open({
+                type: 2,
+                title: '意见反馈',
+                shadeClose: false,
+                maxmin: true,
+                area: ['800px', '250px'],
+                content: "{% url 'feedback_create' %}",
+                end: function () {
+                    window.location.reload()
+                }
+            });
+        });
+
+        function doUpdate(id) {
+            layer.open({
+                type: 2,
+                title: '意见反馈',
+                shadeClose: false,
+                maxmin: true,
+                area: ['800px', '250px'],
+                content: "{% url 'feedback_create' %}?id=" + id,
+                end: function () {
+                    window.location.reload()
+                }
+            });
+        }
+
+        function doDelete(id) {
+            layer.alert('确定删除吗？', {
+                title: '提示'
+                , icon: 3 //0:感叹号 1：对号 2：差号 3：问号 4：小锁 5：哭脸 6：笑脸
+                , time: 0 //不自动关闭
+                , btn: ['YES', 'NO']
+                , yes: function (index) {
+                    layer.close(index);
+                    $.ajax({
+                        type: "POST",
+                        url: "{% url 'feedback_delete' %}",
+                        data: {"id": id},  //防止post数据时报 csrf_token 403
+                        cache: false,
+                        success: function (msg) {
+                            if (msg.result) {
+                                layer.alert('删除成功', {icon: 1});
+                                oDataTable.ajax.reload();
+                            } else {
+                                //alert(msg.message);
+                                layer.alert('删除失败，当前状态不能删除', {icon: 4});
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        function doAccept(id) {
+            var con= confirm('确定接受吗？');
+            if (con) {
+                $.ajax({
+                    type: "GET",
+                    url: "{% url 'feedback_ajax' %}",
+                    data: {"id": id},
+                    cache: false,
+                    success: function (msg) {
+                        if (msg.result) {
+                            layer.alert('操作成功', {icon: 1});
+                            oDataTable.ajax.reload();
+                        } else {
+                            //alert(msg.message);
+                            layer.alert('操作失败', {icon: 4});
+                        }
+                    }
+                })
+            }
+        }
+
+        function doRefuse(id, ps) {
+            layer.open({
+                type: 2,
+                content: "{% url 'feedback_remark' %}?id=" + id + "&ps=" + ps,
+                area: ['400px', '300px'],
+                title: "备注",
+                end: function () {
+                    window.location.reload()
+                }
+            });
+        }
+
+        function doFinish(id, ps) {
+            layer.open({
+                type: 2,
+                content: "{% url 'feedback_remark' %}?id=" + id + "&ps=" + ps,
+                area: ['400px', '300px'],
+                title: "备注",
+                end: function () {
+                    window.location.reload()
+                }
+            });
+        }
+    </script>
+    <script>
+        $(function () {
+            //Initialize Select2 Elements
+            $(".select2").select2();
+        });
+    </script>
+{% endblock %}

@@ -154,7 +154,11 @@ urlpatterns = [
     # 物资续期提醒
     url(r'due_asset', personal_views.DueAssetView.as_view(), name="due_asset"),
     # 意见反馈
-    url(r'feedback', personal_views.FeedbackView.as_view(), name="feedback"),
+    url(r'^personal/feedback_view$', personal_views.FeedbackView.as_view(), name="feedback_view"),
+    url(r'feedback_create', personal_views.CreateFeedback.as_view(), name="feedback_create"),
+    url(r'feedback_delete', personal_views.FeedbackDelete.as_view(), name="feedback_delete"),
+    url(r'feedback_ajax', personal_views.FeedbackAjax.as_view(), name="feedback_ajax"),
+    url(r'feedback_remark', personal_views.FeedbackRemark.as_view(), name="feedback_remark"),
     # 抄送
     url(r'^personal/workorder_copy/$', order.CopyTo.as_view(), name="copy_to"),
     # 考核模块
