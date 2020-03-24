@@ -12,33 +12,60 @@
             <div class="box-body">
                 <fieldset>
                     <div class="form-group has-feedback">
+
                         <label class="col-sm-2 control-label">工作内容</label>
                         <div class="col-sm-10">
-                            <textarea name="worklog" id="worklog" cols="73" rows="2"
-                                      maxlength="50"></textarea>
+                            <textarea name="content" id="content" cols="73" rows="3"
+                                      maxlength="50" style=""></textarea>
                         </div>
-                        <br><br>
-                        <label class="col-sm-2 control-label">完成状态</label>
-                        <div class="col-sm-10">
-                            <select name="status" id="status">
-                                <option value="222"></option>
-                                <option value="1">是</option>
-                                <option value="0">否</option>
-                                <option value="555">终止</option>
+                        <label class="col-sm-2 control-label">实施阶段</label>
+                        <div class="col-sm-4">
+                            <select name="stage" id="stage">
+                                <option value="0"></option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
                             </select>
                         </div>
-                        <br><br>
-                        <label class="col-sm-2 control-label">未完成<br>(终止)原因</label>
-                        <div class="col-sm-10">
-                            <textarea name="reason" id="reason" cols="73" rows="2"
-                                      maxlength="50" ></textarea>
+
+                        <label class="col-sm-2 control-label" >只能生成一次</label>
+                        <div class="col-sm-4">
+                            <button type="button" id="btnGenerate" class="btn btn-info margin-right ">生成</button>
                         </div>
                     </div>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">部门</label>
+                        <div class="col-sm-10">
+                            <select name="department" id="department">
+                                <option value="0"></option>
+                                {% for foo in department %}
+                                    <option value="{{ foo.id }}">{{ foo.title }}</option>
+                                {% endfor %}
+
+                            </select>
+                        </div>
+                    </div>
+
+
+
+                        {#                        <label class="col-sm-2 control-label">未完成<br>(终止)原因</label>#}
+                        {#                        <div class="col-sm-10">#}
+                        {#                            <textarea name="reason" id="reason" cols="73" rows="2"#}
+                        {#                                      maxlength="50" ></textarea>#}
+                        {#                        </div>#}
+                     <span id="generatediv"></span>
+
+
+
                 </fieldset>
             </div>
             <div class="box-footer ">
                 <div class="row span7 text-center ">
-{#                    <button type="button" id="btnCancel" class="btn btn-default margin-right ">重置</button>#}
+                    {#                    <button type="button" id="btnCancel" class="btn btn-default margin-right ">重置</button>#}
                     <button type="button" id="btnSave" class="btn btn-info margin-right ">保存</button>
                 </div>
             </div>
@@ -53,16 +80,102 @@
     <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
     <script type="text/javascript">
 
+        {# 自动生成区域 #}
+        $("#btnGenerate").click(function () {
+            var create = $("#stage").val();    // 定义一个数字，用于指定要生成多少个DIV
+            {#alert($("#stage").val())#}
+            {#var idStr = "";   // 这里是生成之后的所有 div 的  id 字符串#}
+            {#var idList = new Array();    // 这里是生成之后，所有 div 的 id 数组#}
+            for (var i = 1; i <= create; i++) {
+                {#var id = "div" + i;#}
+                var div = $('<div style="border-bottom:1px solid #F00"><div class="form-group has-feedback">' +
+                    '<label class="col-sm-2 control-label">工作计划：</label>' +
+                    '   <div class="col-sm-10">\n' +
+                    '<textarea name="workplan'+i+'" id="workplan'+i+'" cols="73" rows="3"\n' + 'maxlength="60"></textarea>\n' +
+                    '</div> </div>' +
+                    '<div class="form-group has-feedback">' +
+                    '<label class="col-sm-2 control-label">开始时间：</label>\n' +
+                                        '<div class="col-sm-3">\n' +
+                    '                        <input class="form-control timepick" name="start_time'+i+'" id="start_time'+i+'" type="text"\n' +
+                    '                               />\n' +
+                    '                    </div>\n' +
+                    '                    <label class="col-sm-2 control-label">结束时间：</label>\n' +
+                    '                    <div class="col-sm-3">\n' +
+                    '                        <input class="form-control timepick" name="end_time'+i+'" id="end_time'+i+'" type="text"\n' +
+                    '                               />\n' +
+                    '                    </div> </div>' +
+                    '<div class="form-group has-feedback">' +
+                    '<label class="col-sm-2 control-label">责任人：</label>' +
+                    '<div class="col-sm-4">' +
+                    '<select name="dutyman'+i+'" id="dutyman'+i+'">' +
+                    '<option value="0"></option>' +
+                    '{% for foo in dutyman %}\n'+
+                        '<option value="{{ foo.id }}">{{ foo.name }}</option>\n'+
+                        '{% endfor %}' +
+                    '</select></div><br><br><label class="col-sm-2 control-label">是否完成：</label>' +
+                    '<div class="col-sm-4">' +
+                    '<select name="is_done'+i+'" id="is_done'+i+'">' +
+                    '<option value="0">否</option>' +
+                    '<option value="1">是</option>' +
+                    '</select></div></div>' +
+                    '<div class="form-group has-feedback">' +
+                    '<label class="col-sm-2 control-label">完成情况：</label>' +
+                    '<div class="col-sm-10"> <textarea name="complete'+i+'" id="complete'+i+'" cols="73" rows="3"\n' + 'maxlength="60"></textarea></div> <br>' +
+                    '<label class="col-sm-2 control-label" >备注：</label>' +
+                    '<div class="col-sm-10" >' +
+                    '<textarea name="remark'+i+'" id="remark'+i+'" cols="73" rows="3" maxlength="60"></textarea>' +
+                    '</div></div></div>');
+                $("#generatediv").append(div);// body 拼接一个 div
+                {#idStr += id + " ";    // 拼接 id 字符串#}
+                {#idList.push(id);      // 把 id 放到数组里面#}
+            }
+            $(".timepick").datetimepicker({
+            format: 'yyyy-mm-dd',
+            language: 'zh',
+            autoclose: 1,
+            forceParse: 0,
+            minView: 2,
+        });
+
+        })
+
+
+        $(".timepick").datetimepicker({
+            format: 'yyyy-mm-dd',
+            language: 'zh',
+            autoclose: 1,
+            forceParse: 0,
+            minView: 2,
+        });
+
+        $(".form_datetime").datetimepicker({
+            format: 'yyyy-mm-dd',
+            language: 'zh',
+            autoclose: 1,
+            forceParse: 0,
+            minView: 2,
+        });
+
         $("#btnSave").click(function () {
+            if($("#content").val() == ""){
+                    alert("请填写工作内容")
+            }else if($("#department").val() == 0){
+                    alert("请选择部门")
+            }
+            for (let i = 1; i < $("#stage").val()+1; i++) {
+                if($("#workplan+i").val() === ""){
+                    alert("请填写工作计划")
+                }
+            }
             if ($("#worklog").val() == "") {
                 alert("请填写工作日志")
-            }else if ($("#status").val() == "222") {
+            } else if ($("#status").val() == "222") {
                 alert("请选择是否完成")
             } else if ($("#status").val() == "0" && $("#reason").val() == "") {
                 alert("请填写未完成原因")
-            }else if ($("#status").val() == "555" && $("#reason").val() == "") {
+            } else if ($("#status").val() == "555" && $("#reason").val() == "") {
                 alert("请填写终止原因")
-            }else {
+            } else {
                 var data = $("#addForm").serialize();
                 $.ajax({
                     type: $("#addForm").attr('method'),
