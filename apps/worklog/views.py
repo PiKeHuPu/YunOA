@@ -167,9 +167,9 @@ class WorkLog_Edit(LoginRequiredMixin,View):
             else:
                 if "," in x:
                     work_id = x.split(",")
-                    list1.append(work_id)
+                    list1 += work_id
                 else:
-                    list1.append(x)
+                    list1 += x
         # adm_work_id = adm_work_list.split(",")
 
         if str(creman) in list1:
