@@ -11,7 +11,7 @@ var DATATABLES_CONSTANT = {
                 sInfoEmpty : "显示第 0 至 0 项结果，共 0 项",  
                 sInfoFiltered :"",// "(由 _MAX_ 项结果过滤)",  
                 sInfoPostFix : "",  
-                sSearch : "&nbsp;&nbsp;&nbsp;&nbsp;过滤:",  
+                sSearch : "&nbsp;&nbsp;&nbsp;&nbsp;查询筛选:",
                 sUrl : "",  
                 sEmptyTable : "表中数据为空",  
                 sLoadingRecords : "载入中...",  

@@ -225,6 +225,10 @@ class AssetUseFlowListView(LoginRequiredMixin, View):
             filters['asset__warehouse__id'] = request.GET['asset_warehouse']
         if request.GET.get('asset_name'):
             filters['asset__name'] = request.GET['asset_name']
+        if request.GET.get("start_time") and request.GET.get("end_time"):
+            start_time = request.GET.get("start_time")
+            end_time = request.GET.get("end_time")
+            filters['create_time__range'] = (start_time, end_time)
         filters['asset__warehouse__in'] = warehouse_list
         ret = dict(data=list(AssetApprove.objects.values(*fields).filter(**filters).order_by("-create_time")))
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')

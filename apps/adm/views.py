@@ -331,11 +331,9 @@ class AssetCreateView(LoginRequiredMixin, View):
                 if AssetInfo.objects.filter(Q(number=number) & Q(is_delete=False) & ~Q(name=name)):
                     ret['asset_form_errors'] = "资产编号已存在"
                     raise AttributeError
-                print("66666666666666666")
                 added_adm = AssetInfo.objects.filter(
                     Q(number=number) & Q(name=name) & Q(status="0") & Q(unit=unit) & Q(
                         type=type0) & Q(department_id=department_id) & Q(warehouse_id=warehouse_id)).first()
-                print("222222222222233333333")
                 if added_adm:
                     asset = added_adm
                     asset.quantity += int(quantity)
@@ -719,7 +717,6 @@ class FileUpload(LoginRequiredMixin, View):
     """
     档案上传
     """
-
     def get(self, request):
         ret = dict()
         type0 = request.GET.get("type")
