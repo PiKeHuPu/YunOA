@@ -82,6 +82,7 @@
 
         {# 自动生成区域 #}
         $("#btnGenerate").click(function () {
+            $(this).attr("disabled", "disabled");
             var create = $("#stage").val();    // 定义一个数字，用于指定要生成多少个DIV
             {#alert($("#stage").val())#}
             {#var idStr = "";   // 这里是生成之后的所有 div 的  id 字符串#}
