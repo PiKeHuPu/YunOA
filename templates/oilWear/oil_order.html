@@ -148,11 +148,11 @@
                             },
                             {
                                 data: "operator_id",
-                                render: function (data, row) {
+                                render: function (data, type, row, meta) {
                                     var ret = "";
                                     if (data=={{ user_id }}) {
                                         ret = ret + "<button title='修改' onclick='change_log("
-                                        + data + ")'><i class='glyphicon glyphicon-wrench'></i></button>"
+                                        + row.id + ")'><i class='glyphicon glyphicon-wrench'></i></button>"
                                     }
                                     return ret;
                                 },

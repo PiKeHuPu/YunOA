@@ -235,7 +235,7 @@ class OilOrderCreateView(LoginRequiredMixin, View):
         ret["rels"] = rels
         id0 = request.GET.get("id")
         if id0:
-            oilwear = OilWear.objects.filter(id=id0)[0]
+            oilwear = OilWear.objects.filter(id=id0).first()
             ret["oilwear"] = oilwear
         return render(request, "oilWear/oil_order_create.html", ret)
 
