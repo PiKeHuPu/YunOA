@@ -174,8 +174,15 @@ class EditSchedule(LoginRequiredMixin, View):
         ret = dict()
         user_id = request.session.get("_auth_user_id")
         dep_goal_id = request.GET.get("id")
-        per_goal = AssessPerDetail.objects.filter(principal_id=user_id, dep_goal_id=dep_goal_id)
-        ret["per_goal"] = per_goal
+        dep_goal = AssessDepDetail.objects.filter(id=dep_goal_id).first()
+        department = Structure.objects.filter(id=dep_goal.department_id).first()
+        user_list = department.userprofile_set.filter(is_active="1")
+        goal_list = []
+        for user in user_list:
+            per_goal = AssessPerDetail.objects.filter(principal_id=user.id, dep_goal_id=dep_goal_id)
+            if len(per_goal) != 0:
+                goal_list.append({user.name: per_goal})
+        ret['goal_list'] = goal_list
         ret['dep_goal_id'] = dep_goal_id
         return render(request, "assess/edit_schedule.html", ret)
 
@@ -183,9 +190,8 @@ class EditSchedule(LoginRequiredMixin, View):
         ret = dict()
         numArr = request.POST.getlist("numArr")
         contentArr = request.POST.getlist("contentArr")
-        user_id = request.session.get("_auth_user_id")
         dep_goal_id = request.POST.get("dep_goal_id")
-        per_goal = AssessPerDetail.objects.filter(principal_id=user_id, dep_goal_id=dep_goal_id)
+        per_goal = AssessPerDetail.objects.filter(dep_goal_id=dep_goal_id)
         for i in range(len(per_goal)):
             per_goal[i].complete_degree = numArr[i]
             per_goal[i].describe = contentArr[i]

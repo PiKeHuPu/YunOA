@@ -7,22 +7,29 @@
     <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
 </head>
 <body>
-    <input type="text" value="{{ dep_goal_id }}" id="dep_goal_id" hidden>
-    {% for goal in per_goal %}
-        <div class="col-lg-6">
-            <span>{{ goal.content }}</span>
-        </div>
-        <div class="col-lg-1" style="margin-top: 10px">
-            <span>完成度:<input type="number" style="width: 50px" class="schedule" value="{{ goal.complete_degree }}">%</span>
-        </div>
-        <div class="col-lg-5" style="margin-top: 10px">
-            <textarea class="content" cols="100" rows="2" placeholder="工作描述">{% if goal.describe %}{{ goal.describe }}{% endif %} </textarea>
-        </div>
+<input type="text" value="{{ dep_goal_id }}" id="dep_goal_id" hidden>
+{% for goal in goal_list %}
+    {% for key, value in goal.items %}
+        <span style="font-size: 20px; font-weight: bolder; margin-left: 20px; margin-top: 20px">{{ key }}</span>
         <hr>
+        {% for v in value %}
+            <div class="col-lg-6">
+                <span>{{ v.content }}</span>
+            </div>
+            <div class="col-lg-1" style="margin-top: 10px">
+            <span>完成度:<input type="number" style="width: 50px" class="schedule"
+                             value="{{ v.complete_degree }}">%</span>
+            </div>
+            <div class="col-lg-5" style="margin-top: 10px">
+            <textarea class="content" cols="100" rows="2" placeholder="工作描述">{% if v.describe %}{{ v.describe }}{% endif %}</textarea>
+            </div>
+            <hr>
+        {% endfor %}
     {% endfor %}
-    <div style="text-align: center; margin-bottom: 20px">
-        <button type="button" class="btn btn-info" id="goal_save">提交</button>
-    </div>
+{% endfor %}
+<div style="text-align: center; margin-bottom: 20px">
+    <button type="button" class="btn btn-info" id="goal_save">提交</button>
+</div>
 </body>
 </html>
 <!-- jQuery 2.2.3 -->
@@ -33,10 +40,10 @@
     $("#goal_save").click(function () {
         var numArr = [];
         var contentArr = [];
-        $('.schedule').each(function(){
+        $('.schedule').each(function () {
             numArr.push($(this).val());//添加至数组
         });
-        $('.content').each(function(){
+        $('.content').each(function () {
             contentArr.push($(this).val())
         });
         $.ajax({
