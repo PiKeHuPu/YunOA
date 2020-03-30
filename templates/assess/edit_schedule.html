@@ -8,26 +8,43 @@
 </head>
 <body>
 <input type="text" value="{{ dep_goal_id }}" id="dep_goal_id" hidden>
-{% for goal in goal_list %}
-    {% for key, value in goal.items %}
-        <span style="font-size: 20px; font-weight: bolder; margin-left: 20px; margin-top: 20px">{{ key }}</span>
-        <hr>
-        {% for v in value %}
-            <input type="text" value="{{ v.id }}" class="p_goal_id" hidden>
-            <div class="col-lg-6">
-                <span>{{ v.content }}</span>
-            </div>
-            <div class="col-lg-1" style="margin-top: 10px">
+{% if status == "0" %}
+    {% for goal in goal_list %}
+        {% for key, value in goal.items %}
+            <span style="font-size: 20px; font-weight: bolder; margin-left: 20px; margin-top: 20px">{{ key }}</span>
+            <hr>
+            {% for v in value %}
+                <input type="text" value="{{ v.id }}" class="p_goal_id" hidden>
+                <div class="col-lg-6">
+                    <span>{{ v.content }}</span>
+                </div>
+                <div class="col-lg-1" style="margin-top: 10px">
             <span>完成度:<input type="number" style="width: 50px" class="schedule"
                              value="{{ v.complete_degree }}">%</span>
-            </div>
-            <div class="col-lg-5" style="margin-top: 10px">
-            <textarea class="content" cols="100" rows="2" placeholder="工作描述">{% if v.describe %}{{ v.describe }}{% endif %}</textarea>
-            </div>
-            <hr>
+                </div>
+                <div class="col-lg-5" style="margin-top: 10px">
+                    <textarea class="content" cols="100" rows="2" placeholder="工作描述">{% if v.describe %}{{ v.describe }}{% endif %}</textarea>
+                </div>
+                <hr>
+            {% endfor %}
         {% endfor %}
     {% endfor %}
-{% endfor %}
+{% elif status == "1" %}
+    {% for v in goal_list %}
+        <input type="text" value="{{ v.id }}" class="p_goal_id" hidden>
+        <div class="col-lg-6">
+            <span>{{ v.content }}</span>
+        </div>
+        <div class="col-lg-1" style="margin-top: 10px">
+            <span>完成度:<input type="number" style="width: 50px" class="schedule"
+                             value="{{ v.complete_degree }}">%</span>
+        </div>
+        <div class="col-lg-5" style="margin-top: 10px">
+                    <textarea class="content" cols="100" rows="2" placeholder="工作描述">{% if v.describe %}{{ v.describe }}{% endif %}</textarea>
+        </div>
+        <hr>
+    {% endfor %}
+{% endif %}
 <div style="text-align: center; margin-bottom: 20px">
     <button type="button" class="btn btn-info" id="goal_save">提交</button>
 </div>
@@ -55,7 +72,12 @@
             url: "{% url "edit_schedule" %}",
             type: "post",
             traditional: true,
-            data: {"p_goal_id": p_goal_id_arr, "numArr": numArr, "contentArr": contentArr, "dep_goal_id": $("#dep_goal_id").val()},
+            data: {
+                "p_goal_id": p_goal_id_arr,
+                "numArr": numArr,
+                "contentArr": contentArr,
+                "dep_goal_id": $("#dep_goal_id").val()
+            },
             success: function (ret) {
                 if (ret.status == "1") {
                     alert("提交成功")

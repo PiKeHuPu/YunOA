@@ -84,13 +84,18 @@
                     </button>
                     {% if was_submit == "1" %}
                         <button type="button" class="btn btn-primary"
-                                onclick=edit_schedule({{ assess_dep_detail.id }})>
+                                onclick=edit_schedule({{ assess_dep_detail.id }},"0")>
                             填写完成情况
                         </button>
                     {% endif %}
                     <button type="button" class="btn btn-primary" style="float: right"
                             onclick=assess_score({{ assess_dep_detail.id }})>
                         评分
+                    </button>
+                {% elif is_mem == '1' and not finish %}
+                    <button type="button" class="btn btn-primary"
+                            onclick=edit_schedule({{ assess_dep_detail.id }},"1")>
+                        填写完成情况
                     </button>
                 {% endif %}
                 <table class="col-lg-12" id="per_goal">
@@ -228,14 +233,14 @@
             });
         }
 
-        function edit_schedule(id) {
+        function edit_schedule(id, status) {
             layer.open({
                 type: 2,
                 title: '完成情况',
                 shadeClose: false,
                 maxmin: true,
                 area: ['50%', '60%'],
-                content: "{% url 'edit_schedule' %}?id=" + id,
+                content: "{% url 'edit_schedule' %}?id=" + id + "&st=" + status,
                 end: function () {
                     window.location.reload()
                 }

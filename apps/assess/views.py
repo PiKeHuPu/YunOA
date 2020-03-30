@@ -172,17 +172,23 @@ class EditSchedule(LoginRequiredMixin, View):
     """
     def get(self, request):
         ret = dict()
-        user_id = request.session.get("_auth_user_id")
         dep_goal_id = request.GET.get("id")
         dep_goal = AssessDepDetail.objects.filter(id=dep_goal_id).first()
         department = Structure.objects.filter(id=dep_goal.department_id).first()
-        user_list = department.userprofile_set.filter(is_active="1")
-        goal_list = []
-        for user in user_list:
-            per_goal = AssessPerDetail.objects.filter(principal_id=user.id, dep_goal_id=dep_goal_id).order_by("id")
-            if len(per_goal) != 0:
-                goal_list.append({user.name: per_goal})
-        ret['goal_list'] = goal_list
+        status = request.GET.get("st")
+        ret["status"] = status
+        if status == "0":
+            user_list = department.userprofile_set.filter(is_active="1")
+            goal_list = []
+            for user in user_list:
+                per_goal = AssessPerDetail.objects.filter(principal_id=user.id, dep_goal_id=dep_goal_id).order_by("id")
+                if len(per_goal) != 0:
+                    goal_list.append({user.name: per_goal})
+            ret['goal_list'] = goal_list
+        elif status == "1":
+            user_id = request.session.get("_auth_user_id")
+            per_goal = AssessPerDetail.objects.filter(principal_id=user_id, dep_goal_id=dep_goal_id).order_by("id")
+            ret['goal_list'] = per_goal
         ret['dep_goal_id'] = dep_goal_id
         return render(request, "assess/edit_schedule.html", ret)
 
