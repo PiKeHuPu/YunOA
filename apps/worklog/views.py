@@ -36,8 +36,6 @@ class WorkLog_Show(LoginRequiredMixin, View):
 
         if request.POST.get('status'):
             filters['content_part__is_done'] = request.POST.get('status')
-        if request.POST.get('department'):
-            filters['department__title'] = request.POST.get('department')
         if request.POST.get("start_time"):
             start_time = request.POST.get("start_time").split("-")
             filters['s_time__year'] = start_time[0]

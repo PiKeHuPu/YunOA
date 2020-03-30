@@ -79,21 +79,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 <div class="box-header">
                     <form class="form-inline" id="queryForm">
                         <div class="form-group searchArea margin-r-5 margin-top-5">
-                            <label>工单状态：</label>
+                            <label>完成状态：</label>
                             <select class="form-control inputText select2" name="status"
                                     id="status">
                                 <option></option>
                                 <option value="1">已完成</option>
                                 <option value="0">未完成</option>
-                            </select>
-                        </div>
-                        <div class="form-group searchArea margin-r-5 margin-top-5">
-                            <label>部门选择：</label>
-                            <select class="form-control inputText select2" name="department" id="department">
-                                <option></option>
-                                {% for dep in department %}
-                                    <option value={{ dep.title }}>{{ dep.title }}</option>
-                                {% endfor %}
                             </select>
                         </div>
                         <div class="form-group searchArea margin-r-5 margin-top-5">
@@ -152,7 +143,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
     $(function () {
         $('#WORK-LOG').addClass('active');
         $('#WORK-LOG-SHOW').addClass('active');
-
     });
 
     $(".timepick").datetimepicker({
@@ -242,7 +232,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         url: "/personal/work/worklog/",
                         data: function (d) {
                             d.status = $("#status").val();
-                            d.department = $("#department").val();
                             d.start_time = $("#start_time").val();
                         }
                     },
@@ -282,7 +271,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
                         }, {
                             data: "remark",
                             width: "10%",
-
                         },
                         {
                             data: "is_done",
@@ -303,8 +291,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             width: "6%",
                             render: function (data, type, row, meta) {
                                 var check_btn = "", write_btn = "";
-                                if (row.content_part__is_done == false) {
-                                    check_btn = "<button title='修改任务详情' onclick='editlog("
+                                if (row.is_done == false) {
+                                    check_btn = "<button title='编辑任务详情' onclick='editlog("
                                         + data + ")'><i class='glyphicon glyphicon-list-alt'></i></button>";
                                 } else {
 
