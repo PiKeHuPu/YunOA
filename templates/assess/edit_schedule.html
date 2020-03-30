@@ -13,6 +13,7 @@
         <span style="font-size: 20px; font-weight: bolder; margin-left: 20px; margin-top: 20px">{{ key }}</span>
         <hr>
         {% for v in value %}
+            <input type="text" value="{{ v.id }}" class="p_goal_id" hidden>
             <div class="col-lg-6">
                 <span>{{ v.content }}</span>
             </div>
@@ -40,17 +41,21 @@
     $("#goal_save").click(function () {
         var numArr = [];
         var contentArr = [];
+        var p_goal_id_arr = [];
         $('.schedule').each(function () {
             numArr.push($(this).val());//添加至数组
         });
         $('.content').each(function () {
             contentArr.push($(this).val())
         });
+        $('.p_goal_id').each(function () {
+            p_goal_id_arr.push($(this).val())
+        });
         $.ajax({
             url: "{% url "edit_schedule" %}",
             type: "post",
             traditional: true,
-            data: {"numArr": numArr, "contentArr": contentArr, "dep_goal_id": $("#dep_goal_id").val()},
+            data: {"p_goal_id": p_goal_id_arr, "numArr": numArr, "contentArr": contentArr, "dep_goal_id": $("#dep_goal_id").val()},
             success: function (ret) {
                 if (ret.status == "1") {
                     alert("提交成功")

@@ -188,14 +188,14 @@ class EditSchedule(LoginRequiredMixin, View):
 
     def post(self, request):
         ret = dict()
+        idArr = request.POST.getlist("p_goal_id")
         numArr = request.POST.getlist("numArr")
         contentArr = request.POST.getlist("contentArr")
-        dep_goal_id = request.POST.get("dep_goal_id")
-        per_goal = AssessPerDetail.objects.filter(dep_goal_id=dep_goal_id).order_by("id")
-        for i in range(len(per_goal)):
-            per_goal[i].complete_degree = numArr[i]
-            per_goal[i].describe = contentArr[i]
-            per_goal[i].save()
+        for i in range(len(idArr)):
+            per_goal = AssessPerDetail.objects.filter(id=idArr[i]).first()
+            per_goal.complete_degree = numArr[i]
+            per_goal.describe = contentArr[i]
+            per_goal.save()
         ret["status"] = "1"
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
 
