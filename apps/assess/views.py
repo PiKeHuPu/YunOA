@@ -53,7 +53,7 @@ class AssessDetail(LoginRequiredMixin, View):
         ret['assess_dep_detail'] = assess_dep_detail
 
         # 判断当前是否存在个人目标
-        was_submit = AssessPerDetail.objects.filter(principal_id=user_id, dep_goal_id=assess_dep_detail.id)
+        was_submit = AssessPerDetail.objects.filter(dep_goal_id=assess_dep_detail.id)
         if was_submit:
             ret["was_submit"] = "1"
 
