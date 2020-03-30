@@ -12,50 +12,87 @@
             <div class="box-body">
                 <fieldset>
                     <div class="form-group has-feedback">
-                        <input type="hidden" name='id' value="{{ id }}"/>
+                        <input type="hidden" name='part_id' id="part_id" value="{{ id }}"/>
                         <label class="col-sm-2 control-label">工作内容</label>
                         <div class="col-sm-10">
                             <textarea name="content" id="content" cols="73" rows="3"
                                       maxlength="50" style="" disabled>{{ content }}</textarea>
                         </div>
-                        <label class="col-sm-2 control-label">实施阶段</label>
-                        <div class="col-sm-4">
-                            <select name="stage" id="stage">
+                        <label class="col-sm-2 control-label">阶段</label>
+                        <div class="col-sm-2">
+                            <select name="stage" id="stage" class="form-control inputText select2" disabled>
                                 <option value="0"></option>
-                                <option value="1" {% if stage == 1 %}selected {% endif %}>1</option>
-                                <option value="2" {% if stage == 2 %}selected {% endif %}>2</option>
-                                <option value="3" {% if stage == 3 %}selected {% endif %}>3</option>
-                                <option value="4" {% if stage == 4 %}selected {% endif %}>4</option>
-                                <option value="5" {% if stage == 5 %}selected {% endif %}>5</option>
-                                <option value="6" {% if stage == 6 %}selected {% endif %}>6</option>
-                                <option value="7" {% if stage == 7 %}selected {% endif %}>7</option>
+                                <option value="1" {% if logpart.stage == 1 %}selected {% endif %}>1</option>
+                                <option value="2" {% if logpart.stage == 2 %}selected {% endif %}>2</option>
+                                <option value="3" {% if logpart.stage == 3 %}selected {% endif %}>3</option>
+                                <option value="4" {% if logpart.stage == 4 %}selected {% endif %}>4</option>
+                                <option value="5" {% if logpart.stage == 5 %}selected {% endif %}>5</option>
+                                <option value="6" {% if logpart.stage == 6 %}selected {% endif %}>6</option>
+                                <option value="7" {% if logpart.stage == 7 %}selected {% endif %}>7</option>
                             </select>
                         </div>
                     </div>
-                    <div class="form-group has-feedback">
-                        <label class="col-sm-2 control-label">部门</label>
-                        <div class="col-sm-10">
-                            <select name="department" id="department">
-                                <option value="0"></option>
-                                {% for foo in department %}
-                                    <option value="{{ foo.id }}" {% if dep == foo.id %}selected {% endif %}>{{ foo.title }}</option>
-                                {% endfor %}
-
-                            </select>
+                    {#                        <label class="col-sm-2 control-label">未完成<br>(终止)原因</label>#}
+                    {#                        <div class="col-sm-10">#}
+                    {#                            <textarea name="reason" id="reason" cols="73" rows="2"#}
+                    {#                                      maxlength="50" ></textarea>#}
+                    {#                        </div>#}
+                    <div style="border-bottom:1px solid #F00">
+                        <div class="form-group has-feedback">
+                            <label class="col-sm-2 control-label">工作计划：</label>
+                            <div class="col-sm-10">
+                                <textarea name="workplan'+i+'" id="workplan'+i+'" cols="73" rows="3"
+                                          maxlength="60" disabled>{{ logpart.plan }}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <label class="col-sm-2 control-label">开始时间：</label>
+                            <div class="col-sm-3">
+                                <input class="form-control timepick" name="start_time'+i+'"
+                                       value="{{ logpart.s_time|date:"Y-m-d" }}" id="start_time'+i+'" type="text"
+                                       disabled>
+                            </div>
+                            <label class="col-sm-2 control-label">结束时间：</label>
+                            <div class="col-sm-3">
+                                <input class="form-control timepick" name="end_time"
+                                       value="{{ logpart.e_time|date:"Y-m-d" }}" id="end_time" type="text">
+                            </div>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <label class="col-sm-2 control-label">责任人：</label>
+                            <div class="col-sm-3">
+                                <select name="dutyman" id="dutyman" class="form-control inputText select2"
+                                        disabled>
+                                    <option value="{{ logpart.dutyman_id }}">{{ logpart.dutyman.name }}</option>
+                                </select></div>
+                            <label class="col-sm-2 control-label">部门</label>
+                            <div class="col-sm-3">
+                                <select name="department" id="department" class="form-control inputText select2"
+                                        disabled>
+                                    <option value="{{ logpart.department_id }}">{{ logpart.department.title }}</option>
+                                </select>
+                            </div>
+                            <br><br><label class="col-sm-2 control-label">是否完成：</label>
+                            <div class="col-sm-2">
+                                <select name="is_done" id="is_done" class="form-control inputText select2">
+                                    <option value="0" {% if logpart.is_done == 0 %}selected {% endif %}>否</option>
+                                    <option value="1" {% if logpart.is_done == 1 %}selected {% endif %}>是</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <label class="col-sm-2 control-label">完成情况：</label>
+                            <div class="col-sm-10"><textarea name="complete" id="complete" cols="73" rows="3"
+                                                             maxlength="60">{{ logpart.performance }}</textarea>
+                            </div>
+                            <br>
+                            <label class="col-sm-2 control-label">备注：</label>
+                            <div class="col-sm-10">
+                                <textarea name="remark" id="remark" cols="73" rows="3"
+                                          maxlength="60">{{ logpart.remark }}</textarea>
+                            </div>
                         </div>
                     </div>
-
-
-
-                        {#                        <label class="col-sm-2 control-label">未完成<br>(终止)原因</label>#}
-                        {#                        <div class="col-sm-10">#}
-                        {#                            <textarea name="reason" id="reason" cols="73" rows="2"#}
-                        {#                                      maxlength="50" ></textarea>#}
-                        {#                        </div>#}
-                     <span id="generatediv"></span>
-
-
-
                 </fieldset>
             </div>
             <div class="box-footer ">
@@ -74,66 +111,6 @@
     <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
     <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
     <script type="text/javascript">
-
-        {# 自动生成区域 #}
-        $(function () {
-            var create = {{ stage }};    // 定义一个数字，用于指定要生成多少个DIV
-            var i=1;
-
-            {#var idStr = "";   // 这里是生成之后的所有 div 的  id 字符串#}
-            {#var idList = new Array();    // 这里是生成之后，所有 div 的 id 数组#}
-            {% for par in part %}
-                var div = $('<div style="border-bottom:1px solid #F00"><div class="form-group has-feedback">' +
-                    '<label class="col-sm-2 control-label">工作计划：</label>' +
-                    '   <div class="col-sm-10">\n' +
-                    '<textarea name="workplan'+i+'" id="workplan'+i+'" cols="73" rows="3"\n' + 'maxlength="60" >{{ par.plan }}</textarea>\n' +
-                    '</div> </div>' +
-                    '<div class="form-group has-feedback">' +
-                    '<label class="col-sm-2 control-label">开始时间：</label>\n' +
-                                        '<div class="col-sm-3">\n' +
-                    '                        <input class="form-control timepick" name="start_time'+i+'"  value = "{{ par.s_time|date:"Y-m-d" }}"  id="start_time'+i+'" type="text"\n' +
-                    '                               />\n' +
-                    '                    </div>\n' +
-                    '                    <label class="col-sm-2 control-label">结束时间：</label>\n' +
-                    '                    <div class="col-sm-3">\n' +
-                    '                        <input class="form-control timepick" name="end_time'+i+'"  value = "{{ par.e_time|date:"Y-m-d" }}"   id="end_time'+i+'" type="text"\n' +
-                    '                               />\n' +
-                    '                    </div> </div>' +
-                    '<div class="form-group has-feedback">' +
-                    '<label class="col-sm-2 control-label">责任人：</label>' +
-                    '<div class="col-sm-4">' +
-                    '<select name="dutyman'+i+'" id="dutyman'+i+'">' +
-                    '<option value="0"></option>' +
-                    '{% for foo in dutyman %}\n'+
-                        '<option value="{{ foo.id }}" {% if foo.id == par.dutyman_id %}selected {% endif %}>{{ foo.name }}</option>\n'+'{% endfor %}' +
-                    '</select></div><br><br><label class="col-sm-2 control-label">是否完成：</label>' +
-                    '<div class="col-sm-4">' +
-                    '<select name="is_done'+i+'" id="is_done'+i+'">' +
-                    '<option value="0" {% if par.is_done == 0 %}selected {% endif %}>否</option>' +
-                    '<option value="1" {% if par.is_done == 1 %}selected {% endif %}>是</option>' +
-                    '</select></div></div>' +
-                    '<div class="form-group has-feedback">' +
-                    '<label class="col-sm-2 control-label">完成情况：</label>' +
-                    '<div class="col-sm-10"> <textarea name="complete'+i+'" id="complete'+i+'" cols="73" rows="3"\n' + 'maxlength="60">{{ par.performance }}</textarea></div> <br>' +
-                    '<label class="col-sm-2 control-label" >备注：</label>' +
-                    '<div class="col-sm-10" >' +
-                    '<textarea name="remark'+i+'" id="remark'+i+'" cols="73" rows="3" maxlength="60">{{ par.remark }}</textarea>' +
-                    '</div></div></div>');
-                i++;
-                $("#generatediv").append(div);
-            {% endfor %}
-
-            $(".timepick").datetimepicker({
-            format: 'yyyy-mm-dd',
-            language: 'zh',
-            autoclose: 1,
-            forceParse: 0,
-            minView: 2,
-        });
-
-        })
-
-
         $(".timepick").datetimepicker({
             format: 'yyyy-mm-dd',
             language: 'zh',
@@ -167,13 +144,15 @@
                     data: data,
                     cache: false,
                     success: function (msg) {
-                        if (msg.result == true) {
+                        if (msg.result == "1") {
                             layer.alert('数据保存成功！', {icon: 1}, function (index) {
                                 parent.layer.closeAll(); //关闭所有弹窗
                             });
-                        } else {
+                        } else if (msg.result == "0"){
                             layer.alert('你不是填写人员', {icon: 5});
                             //$('errorMessage').html(msg.message)
+                        } else {
+                            layer.alert(msg.result)
                         }
                     },
                 });

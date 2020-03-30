@@ -22,23 +22,22 @@ class WorkLog_Show(LoginRequiredMixin, View):
         ret['department'] = department
         return render(request, 'work/worklog_show.html', ret)
 
-    def post(self,request):
+    def post(self, request):
         mon = datetime.now().month
         year = datetime.now().year
         day = datetime.now().day
 
-        fields = [ "plan", "stage", "s_time", "e_time",
+        fields = ["plan", "stage", "s_time", "e_time",
                   "performance", "id", "remark", "dutyman_id__name",
-                   "content_part__content", "content_part__department__title"
-                   , "is_done", "content_part__is_done", "content_part__step",
-                   "content_part__department__id", "content_part_id"]
+                  "content_part__content", "department__title"
+            , "is_done", "content_part__is_done", "content_part__step",
+                  "department__id", "content_part_id"]
         filters = dict()
 
         if request.POST.get('status'):
-            print(request.POST.get('status'))
             filters['content_part__is_done'] = request.POST.get('status')
         if request.POST.get('department'):
-            filters['content_part__department__title'] = request.POST.get('department')
+            filters['department__title'] = request.POST.get('department')
         if request.POST.get("start_time"):
             start_time = request.POST.get("start_time").split("-")
             filters['s_time__year'] = start_time[0]
@@ -53,15 +52,19 @@ class WorkLog_Show(LoginRequiredMixin, View):
         #                                 | (Q(status=0) & Q(create_time__lt=datetime(year, mon, day)))
         #                                 | Q(over_time__year=year, over_time__month=mon, over_time__day=day),
         #                                 **filters).values(*fields).order_by('create_time'))))
-        ret = (dict(data=list(WorklogPart.objects.filter(**filters).values(*fields).order_by('content_part__content'))))
+        ret = (dict(data=list(WorklogPart.objects.filter(**filters).values(*fields).order_by('-content_part__id'))))
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
 
 
 class WorkLog_Create(LoginRequiredMixin, View):
+    """
+    看板工作创建
+    """
+
     def get(self, requset):
         ret = dict()
         depart = Structure.objects.all()
-        dutyman = UserProfile.objects.filter(Q(is_active=1), ~Q(username='admin'),~Q(username='admin0'))
+        dutyman = UserProfile.objects.filter(Q(is_active=1), ~Q(username='admin'), ~Q(username='admin0'))
         ret['dutyman'] = dutyman
         ret['department'] = depart
         return render(requset, 'work/worklog_create.html', ret)
@@ -85,21 +88,19 @@ class WorkLog_Create(LoginRequiredMixin, View):
                         list1 += work_id
                     else:
                         list1 += x
-            #adm_work_id = adm_work_list.split(",")
-            print(list1)
+            # adm_work_id = adm_work_list.split(",")
 
             if str(creman) in list1:
                 content = request.POST.get("content")
                 stage = request.POST.get("stage")
-                department = request.POST.get("department")
                 worklog = Worklog()
                 worklog.content = content
                 worklog.step = stage
-                worklog.department_id = department
+                worklog.cre_man_id = creman
                 worklog.save()
                 logid = worklog.id
                 is_done = []
-                for i in range(1, int(stage)+1):
+                for i in range(1, int(stage) + 1):
                     logpart = WorklogPart()
                     logpart.plan = request.POST.get('workplan' + str(i))
                     logpart.stage = i
@@ -108,6 +109,7 @@ class WorkLog_Create(LoginRequiredMixin, View):
                     logpart.e_time = request.POST.get('end_time' + str(i))
                     logpart.performance = request.POST.get('complete' + str(i))
                     logpart.remark = request.POST.get('remark' + str(i))
+                    logpart.department_id = request.POST.get('department' + str(i))
                     logpart.content_part_id = logid
                     logpart.dutyman_id = request.POST.get('dutyman' + str(i))
                     logpart.save()
@@ -122,83 +124,104 @@ class WorkLog_Create(LoginRequiredMixin, View):
             else:
                 res['result'] = "2"
         except Exception as e:
+            e = str(e)
             res['result'] = e
         return HttpResponse(json.dumps(res, cls=DjangoJSONEncoder), content_type='application/json')
 
-class WorkLog_Edit(LoginRequiredMixin,View):
-    def get(self,request):
+
+class WorkLog_Edit(LoginRequiredMixin, View):
+    """
+    看板工作修改
+    """
+
+    def get(self, request):
         ret = dict()
         id = request.GET.get("id")
-        logpart = WorklogPart.objects.filter(id= id)[0]
+        logpart = WorklogPart.objects.filter(id=id)[0]
         log_id = logpart.content_part_id
         content = Worklog.objects.filter(id=log_id)[0]
-        dep = content.department_id
-        stage = content.step
         content = content.content
-        department = Structure.objects.all()
-        dutyman = UserProfile.objects.filter(Q(is_active=1), ~Q(username='admin'), ~Q(username='admin0'))
-        part = WorklogPart.objects.filter(content_part_id=log_id)
-        ret['part'] = part
-        ret['dutyman'] = dutyman
-        ret['department'] = department
-        ret['dep'] = dep
-        ret['stage'] = stage
         ret['content'] = content
-        ret['id'] = log_id
-
+        ret['id'] = id
+        ret['logpart'] = logpart
         return render(request, "work/worklog_edit.html", ret)
-    def post(self,request):
+
+    def post(self, request):
         res = dict()
-        #models.UserInfo.objects.filter(user='yangmv').update(pwd='520')
-        logid = request.POST.get("id")
-        Worklog.objects.filter(id=logid).update(department_id=request.POST.get("department"))
-        stage = len(WorklogPart.objects.filter(content_part_id=logid))
-        is_done = []
-        creman = request.session.get("_auth_user_id")
-        list1 = []
-        # adm_work_id = adm_work_list.split(",")
-        # if creman in adm_work_id:
-        adm_work_list = Structure.objects.values("adm_work")
-        for i in adm_work_list:
-            x = []
-            x.append(i['adm_work'])
-            if x == None:
-                pass
-            else:
-                if "," in x:
-                    work_id = x.split(",")
-                    list1 += work_id
+        try:
+            # #models.UserInfo.objects.filter(user='yangmv').update(pwd='520')
+            # logid = request.POST.get("id")
+            # Worklog.objects.filter(id=logid).update(department_id=request.POST.get("department"))
+            # stage = len(WorklogPart.objects.filter(content_part_id=logid))
+            # is_done = []
+            creman = request.session.get("_auth_user_id")
+            list1 = []
+            # adm_work_id = adm_work_list.split(",")
+            # if creman in adm_work_id:
+            adm_work_list = Structure.objects.values("adm_work")
+            for i in adm_work_list:
+                x = []
+                x.append(i['adm_work'])
+                if x == None:
+                    pass
                 else:
-                    list1 += x
-        # adm_work_id = adm_work_list.split(",")
+                    if "," in x:
+                        work_id = x.split(",")
+                        list1 += work_id
+                    else:
+                        list1 += x
+            # adm_work_id = adm_work_list.split(",")
 
-        if str(creman) in list1:
-            for i in range(1, stage+1):
-                WorklogPart.objects.filter(content_part_id=logid, stage=i).update(plan=request.POST.get('workplan' + str(i)))
-                WorklogPart.objects.filter(content_part_id=logid, stage=i).update(is_done=request.POST.get('is_done' + str(i)))
-                WorklogPart.objects.filter(content_part_id=logid, stage=i).update(s_time=request.POST.get('start_time' + str(i)))
-                WorklogPart.objects.filter(content_part_id=logid, stage=i).update(e_time=request.POST.get('end_time' + str(i)))
-                WorklogPart.objects.filter(content_part_id=logid, stage=i).update(performance=request.POST.get('complete' + str(i)))
-                WorklogPart.objects.filter(content_part_id=logid, stage=i).update(remark=request.POST.get('remark' + str(i)))
-                WorklogPart.objects.filter(content_part_id=logid, stage=i).update(dutyman_id=request.POST.get('dutyman' + str(i)))
-                if int(request.POST.get('is_done' + str(i))) == 1:
-                    is_done.append(int(request.POST.get('is_done' + str(i))))
-            if len(is_done) == int(stage):
+            if str(creman) in list1:
+                #     for i in range(1, stage+1):
+                #         WorklogPart.objects.filter(content_part_id=logid, stage=i).update(plan=request.POST.get('workplan' + str(i)))
+                #         WorklogPart.objects.filter(content_part_id=logid, stage=i).update(is_done=request.POST.get('is_done' + str(i)))
+                #         WorklogPart.objects.filter(content_part_id=logid, stage=i).update(s_time=request.POST.get('start_time' + str(i)))
+                #         WorklogPart.objects.filter(content_part_id=logid, stage=i).update(e_time=request.POST.get('end_time' + str(i)))
+                #         WorklogPart.objects.filter(content_part_id=logid, stage=i).update(performance=request.POST.get('complete' + str(i)))
+                #         WorklogPart.objects.filter(content_part_id=logid, stage=i).update(remark=request.POST.get('remark' + str(i)))
+                #         WorklogPart.objects.filter(content_part_id=logid, stage=i).update(dutyman_id=request.POST.get('dutyman' + str(i)))
+                #         if int(request.POST.get('is_done' + str(i))) == 1:
+                #             is_done.append(int(request.POST.get('is_done' + str(i))))
+                #     if len(is_done) == int(stage):
+                #
+                #         Worklog.objects.filter(id=logid).update(is_done=True)
+                #     else:
+                #         Worklog.objects.filter(id=logid).update(is_done=False)
+                #     res['result'] = True
+                # else:
+                #     res['result'] = False
 
-                Worklog.objects.filter(id=logid).update(is_done=True)
+                part_id = request.POST.get("part_id")
+                end_time = request.POST.get("end_time")
+                is_done = request.POST.get("is_done")
+                complete = request.POST.get("complete")
+                remark = request.POST.get("remark")
+                log_part = WorklogPart.objects.filter(id=part_id).first()
+                log_part.e_time = end_time
+                if is_done == "1":
+                    log_part.is_done = True
+                log_part.performance = complete
+                log_part.remark = remark
+                log_part.save()
+                work_log = log_part.content_part
+                is_done_num = len(WorklogPart.objects.filter(content_part=work_log, is_done=True))
+                if is_done_num == work_log.step:
+                    work_log.is_done = True
+                    work_log.save()
+                res['result'] = "1"
             else:
-                Worklog.objects.filter(id=logid).update(is_done=False)
-            res['result'] = True
-        else:
-            res['result'] = False
+                res['result'] = "0"
+        except Exception as e:
+            res['result'] = str(e)
         return HttpResponse(json.dumps(res), content_type='application/json')
 
 
 class WorkLog_Detail(LoginRequiredMixin, View):
-    def get(self,request):
+
+    def get(self, request):
         ret = dict()
         id = request.GET.get("id")
-
 
         worklog = Worklog.objects.filter(id=id)[0]
 
@@ -214,7 +237,8 @@ class WorkLog_Detail(LoginRequiredMixin, View):
         }
         return render(request, 'work/worklog_detail.html', ret)
 
-#设置填写人员
+
+# 设置填写人员
 class WorkLog_Set(LoginRequiredMixin, View):
     def get(self, request):
         if 'id' in request.GET and request.GET['id']:

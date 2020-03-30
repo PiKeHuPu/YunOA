@@ -2,7 +2,10 @@
 {% load staticfiles %}
 {% block css %}
     <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-datetimepicker.min.css' %}">
+    <link rel="stylesheet" href="/static/dist/css/AdminLTE.min.css">
+    <link rel="stylesheet" href="/static/dist/css/myself.css">
     <!-- iCheck for checkboxes and radio inputs -->
 {% endblock %}
 {% block main %}
@@ -16,11 +19,11 @@
                         <label class="col-sm-2 control-label">工作内容</label>
                         <div class="col-sm-10">
                             <textarea name="content" id="content" cols="73" rows="3"
-                                      maxlength="50" style=""></textarea>
+                                      maxlength="500" style=""></textarea>
                         </div>
                         <label class="col-sm-2 control-label">实施阶段</label>
-                        <div class="col-sm-4">
-                            <select name="stage" id="stage">
+                        <div class="col-sm-2">
+                            <select name="stage" id="stage" class="form-control inputText select2">
                                 <option value="0"></option>
                                 <option value="1">1</option>
                                 <option value="2">2</option>
@@ -32,35 +35,19 @@
                             </select>
                         </div>
 
-                        <label class="col-sm-2 control-label" >只能生成一次</label>
+                        <label class="col-sm-2 control-label">选择实施阶段后点击生成</label>
                         <div class="col-sm-4">
                             <button type="button" id="btnGenerate" class="btn btn-info margin-right ">生成</button>
                         </div>
                     </div>
-                    <div class="form-group has-feedback">
-                        <label class="col-sm-2 control-label">部门</label>
-                        <div class="col-sm-10">
-                            <select name="department" id="department">
-                                <option value="0"></option>
-                                {% for foo in department %}
-                                    <option value="{{ foo.id }}">{{ foo.title }}</option>
-                                {% endfor %}
-
-                            </select>
-                        </div>
-                    </div>
 
 
-
-                        {#                        <label class="col-sm-2 control-label">未完成<br>(终止)原因</label>#}
-                        {#                        <div class="col-sm-10">#}
-                        {#                            <textarea name="reason" id="reason" cols="73" rows="2"#}
-                        {#                                      maxlength="50" ></textarea>#}
-                        {#                        </div>#}
-                     <span id="generatediv"></span>
-
-
-
+                    {#                        <label class="col-sm-2 control-label">未完成<br>(终止)原因</label>#}
+                    {#                        <div class="col-sm-10">#}
+                    {#                            <textarea name="reason" id="reason" cols="73" rows="2"#}
+                    {#                                      maxlength="50" ></textarea>#}
+                    {#                        </div>#}
+                    <span id="generatediv"></span>
                 </fieldset>
             </div>
             <div class="box-footer ">
@@ -76,7 +63,9 @@
 {% endblock %}
 
 {% block javascripts %}
+    <script src="{% static 'plugins/jQuery/jquery-2.2.3.min.js' %}"></script>
     <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+    <script src="{% static 'plugins/select2/select2.min.js' %}"></script>
     <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
     <script type="text/javascript">
 
@@ -92,53 +81,63 @@
                 var div = $('<div style="border-bottom:1px solid #F00"><div class="form-group has-feedback">' +
                     '<label class="col-sm-2 control-label">工作计划：</label>' +
                     '   <div class="col-sm-10">\n' +
-                    '<textarea name="workplan'+i+'" id="workplan'+i+'" cols="73" rows="3"\n' + 'maxlength="60"></textarea>\n' +
+                    '<textarea name="workplan' + i + '" id="workplan' + i + '" cols="73" rows="3"\n' + 'maxlength="500"></textarea>\n' +
                     '</div> </div>' +
                     '<div class="form-group has-feedback">' +
                     '<label class="col-sm-2 control-label">开始时间：</label>\n' +
-                                        '<div class="col-sm-3">\n' +
-                    '                        <input class="form-control timepick" name="start_time'+i+'" id="start_time'+i+'" type="text"\n' +
+                    '<div class="col-sm-3">\n' +
+                    '                        <input class="form-control timepick" name="start_time' + i + '" id="start_time' + i + '" type="text" autocomplete="off"\n' +
                     '                               />\n' +
                     '                    </div>\n' +
                     '                    <label class="col-sm-2 control-label">结束时间：</label>\n' +
                     '                    <div class="col-sm-3">\n' +
-                    '                        <input class="form-control timepick" name="end_time'+i+'" id="end_time'+i+'" type="text"\n' +
+                    '                        <input class="form-control timepick" name="end_time' + i + '" id="end_time' + i + '" type="text" autocomplete="off"\n' +
                     '                               />\n' +
                     '                    </div> </div>' +
                     '<div class="form-group has-feedback">' +
                     '<label class="col-sm-2 control-label">责任人：</label>' +
-                    '<div class="col-sm-4">' +
-                    '<select name="dutyman'+i+'" id="dutyman'+i+'">' +
+                    '<div class="col-sm-3">' +
+                    '<select name="dutyman' + i + '" id="dutyman' + i + '" class="form-control inputText select2">' +
                     '<option value="0"></option>' +
                     '{% for foo in dutyman %}\n'+
                         '<option value="{{ foo.id }}">{{ foo.name }}</option>\n'+
                         '{% endfor %}' +
-                    '</select></div><br><br><label class="col-sm-2 control-label">是否完成：</label>' +
-                    '<div class="col-sm-4">' +
-                    '<select name="is_done'+i+'" id="is_done'+i+'">' +
+                    '</select></div>' +
+                    '                        <label class="col-sm-2 control-label">部门</label>\n' +
+                    '                        <div class="col-sm-3">\n' +
+                    '                            <select name="department' + i + '" id="department' + i + '"class="form-control inputText select2">\n' +
+                    '                                <option value="0"></option>\n' +
+                    '                                {% for foo in department %}\n'+
+                        '                                    <option value="{{ foo.id }}">{{ foo.title }}</option>\n'+
+                        '                                {% endfor %}\n' + '</select>\n' +
+                    '</div><br/><br/>' +
+                    '<label class="col-sm-2 control-label">是否完成：</label>' +
+                    '<div class="col-sm-2">' +
+                    '<select name="is_done' + i + '" id="is_done' + i + '" class="form-control inputText select2">' +
                     '<option value="0">否</option>' +
                     '<option value="1">是</option>' +
                     '</select></div></div>' +
                     '<div class="form-group has-feedback">' +
                     '<label class="col-sm-2 control-label">完成情况：</label>' +
-                    '<div class="col-sm-10"> <textarea name="complete'+i+'" id="complete'+i+'" cols="73" rows="3"\n' + 'maxlength="60"></textarea></div> <br>' +
+                    '<div class="col-sm-10"> <textarea name="complete' + i + '" id="complete' + i + '" cols="73" rows="3"\n' + 'maxlength="60"></textarea></div> <br>' +
                     '<label class="col-sm-2 control-label" >备注：</label>' +
                     '<div class="col-sm-10" >' +
-                    '<textarea name="remark'+i+'" id="remark'+i+'" cols="73" rows="3" maxlength="60"></textarea>' +
+                    '<textarea name="remark' + i + '" id="remark' + i + '" cols="73" rows="3" maxlength="60"></textarea>' +
                     '</div></div></div>');
                 $("#generatediv").append(div);// body 拼接一个 div
                 {#idStr += id + " ";    // 拼接 id 字符串#}
                 {#idList.push(id);      // 把 id 放到数组里面#}
             }
             $(".timepick").datetimepicker({
-            format: 'yyyy-mm-dd',
-            language: 'zh',
-            autoclose: 1,
-            forceParse: 0,
-            minView: 2,
+                format: 'yyyy-mm-dd',
+                language: 'zh',
+                autoclose: 1,
+                forceParse: 0,
+                minView: 2,
+            });
+            //Initialize Select2 Elements
+            $(".select2").select2();
         });
-
-        })
 
 
         $(".timepick").datetimepicker({
@@ -158,13 +157,13 @@
         });
 
         $("#btnSave").click(function () {
-            if($("#content").val() == ""){
-                    alert("请填写工作内容")
-            }else if($("#department").val() == 0){
-                    alert("请选择部门")
+            if ($("#content").val() == "") {
+                alert("请填写工作内容")
+            } else if ($("#department").val() == 0) {
+                alert("请选择部门")
             }
-            for (let i = 1; i < $("#stage").val()+1; i++) {
-                if($("#workplan+i").val() === ""){
+            for (let i = 1; i < $("#stage").val() + 1; i++) {
+                if ($("#workplan+i").val() === "") {
                     alert("请填写工作计划")
                 }
             }
@@ -188,7 +187,7 @@
                             layer.alert('数据保存成功！', {icon: 1}, function (index) {
                                 parent.layer.closeAll(); //关闭所有弹窗
                             });
-                        } else if (msg.result == "2"){
+                        } else if (msg.result == "2") {
                             layer.alert('你不是填写人员', {icon: 5});
                             //$('errorMessage').html(msg.message)
                         } else {
