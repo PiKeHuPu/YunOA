@@ -179,7 +179,7 @@ class EditSchedule(LoginRequiredMixin, View):
         user_list = department.userprofile_set.filter(is_active="1")
         goal_list = []
         for user in user_list:
-            per_goal = AssessPerDetail.objects.filter(principal_id=user.id, dep_goal_id=dep_goal_id)
+            per_goal = AssessPerDetail.objects.filter(principal_id=user.id, dep_goal_id=dep_goal_id).order_by("id")
             if len(per_goal) != 0:
                 goal_list.append({user.name: per_goal})
         ret['goal_list'] = goal_list
@@ -191,7 +191,7 @@ class EditSchedule(LoginRequiredMixin, View):
         numArr = request.POST.getlist("numArr")
         contentArr = request.POST.getlist("contentArr")
         dep_goal_id = request.POST.get("dep_goal_id")
-        per_goal = AssessPerDetail.objects.filter(dep_goal_id=dep_goal_id)
+        per_goal = AssessPerDetail.objects.filter(dep_goal_id=dep_goal_id).order_by("id")
         for i in range(len(per_goal)):
             per_goal[i].complete_degree = numArr[i]
             per_goal[i].describe = contentArr[i]
