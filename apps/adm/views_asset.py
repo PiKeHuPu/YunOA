@@ -453,9 +453,13 @@ class AssetUseInfoView(LoginRequiredMixin, View):
             else:
                 user = User.objects.filter(id=user_id).first()
                 department = user.department
-                approver_list = department.adm_list.split(",")
-                for i in range(len(approver_list)):
-                    approver_list[i] = int(approver_list[i])
+                approver_list = department.adm_list
+                if approver_list:
+                    approver_list = approver_list.split(",")
+                    for i in range(len(approver_list)):
+                        approver_list[i] = int(approver_list[i])
+                else:
+                    approver_list = []
                 if asset.is_vice_approve:
                     vice_manager_id = department.vice_manager_id
                     if vice_manager_id:
@@ -483,10 +487,9 @@ class AssetUseInfoView(LoginRequiredMixin, View):
             else:
                 asset_order.status = "2"
                 asset_order.save()
-
             res['status'] = 'success'
         except Exception as e:
-            res['e'] = e
+            res['e'] = str(e)
         return HttpResponse(json.dumps(res), content_type='application/json')
 
 
