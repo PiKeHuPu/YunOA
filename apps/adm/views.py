@@ -365,7 +365,7 @@ class AssetCreateView(LoginRequiredMixin, View):
             if request.POST.get("vice_approve") == "on":
                 asset.is_vice_approve = True
             else:
-                asset.is_no_return = False
+                asset.is_vice_approve = False
             asset.save()
             if id0 == "":
                 asset_edit_flow = AssetEditFlow()
