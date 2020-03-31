@@ -46,7 +46,7 @@
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
             <div class="small-box"
-                 style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #86d6bc, #86d6da)">
+                 style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #a8d2bc, #63b298)">
                 <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">
                     查看我的报销</p>
                 <div class="inner">
@@ -68,7 +68,7 @@
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
             <div class="small-box"
-                 style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #63b284, #63b2ac)">
+                 style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #63b284, #397566)">
                 <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">
                     审批申请</p>
                 <div class="inner">
@@ -125,11 +125,9 @@
                                                    onmouseover="this.style.color='#5D1C8E'"
                                                    onmouseout="this.style.color='white'">部门列表</p>
                     </a>
-                    <a href="/personal/work/worklog/">
-                    <p style="font-size:28px; color: white; font-family: 楷体"
-                                                    onmouseover="this.style.color='#5D1C8E'"
-                                                    onmouseout="this.style.color='white'">
-                        看板展示</p></a>
+                    <a href="/personal/assess_dep/">
+                    <p style="font-size:28px; color: rgba(217, 107, 116, 0.0); font-family: 楷体">
+                        部门列表</p></a>
                 </div>
                 <div class="icon" style="margin-top: 40px">
                     <i class="fa fa-line-chart"></i>
@@ -140,7 +138,29 @@
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
             <div class="small-box"
-                 style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #37967e, #37969c)">
+                 style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #249362, #37968d)">
+                <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">
+                    看板</p>
+                <div class="inner">
+                    <a href="/personal/work/worklog/"
+                       class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体"
+                                                   onmouseover="this.style.color='#5D1C8E'"
+                                                   onmouseout="this.style.color='white'">看板展示</p>
+                    </a>
+                    <a href="/personal/work/worklog"/>
+                    <p style="font-size:28px; color: rgba(217, 107, 116, 0.0); font-family: 楷体">
+                        看板展示</p></a>
+                </div>
+                <div class="icon" style="margin-top: 40px">
+                    <i class="fa fa-calendar-check-o"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-xs-6">
+            <!-- small box -->
+            <div class="small-box"
+                 style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #37967e, #3a8fa7)">
                 <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">
                     公告</p>
                 <div class="inner">
@@ -165,7 +185,7 @@
             <div class="col-lg-3 col-xs-6">
                 <!-- small box -->
                 <div class="small-box"
-                     style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #3a8f99, #3a8fb7)">
+                     style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #3a8f99, #51a8ce)">
                     <p class="small-box-footer"
                        style="font-weight: bolder; height: 35px; font-size: 20px; color: white">物资续期提醒</p>
                     <div class="inner">
@@ -188,7 +208,7 @@
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
             <div class="small-box"
-                 style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #51a8bf, #51a8dd)">
+                 style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #51a8bf, #7db9cf)">
                 <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">
                     物资相关</p>
                 <div class="inner">
@@ -211,7 +231,7 @@
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
             <div class="small-box"
-                 style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #7db9c0, #7db9de)">
+                 style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #7db9c0, #b5dee6)">
                 <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">
                     油耗表</p>
                 <div class="inner">
@@ -235,9 +255,9 @@
             <div class="small-box" style="box-shadow: 0 0 10px gray; background-image: linear-gradient(to bottom right, #A5DEE4, #c7dee8)">
                 <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">意见或建议</p>
                 <div class="inner">
-                    <a href="{% url 'feedback_view' %}" onclick="feedback()" class="small-box-footer">
+                    <a href="{% url 'feedback_view' %}" class="small-box-footer">
                         <p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='#5d1c8e'" onmouseout="this.style.color='white'">意见反馈</p></a>
-                    <a href="#"><p style="font-size:28px; color: rgba(217, 107, 116, 0.0); font-family: 楷体">意见反馈</p></a>
+                    <a href="{% url 'feedback_view' %}" class="small-box-footer"><p style="font-size:28px; color: rgba(217, 107, 116, 0.0); font-family: 楷体">意见反馈</p></a>
                 </div>
                 <div class="icon" style="margin-top: 40px">
                     <i class="fa fa-comments"></i>
@@ -245,8 +265,7 @@
             </div>
         </div>
     </section>
-    <br><br><br><br><br><br><br><br>
-    <div style="padding-left: 30px;">
+    <div style="padding-left: 30px;" class="col-lg-12">
         <div id="per" style="display: none;">
             <h1 style="font-family: 楷体; font-size: 30px; margin-left: 0">个人报表</h1>
             <div id="content">

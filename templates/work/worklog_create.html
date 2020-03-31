@@ -47,6 +47,7 @@
                     {#                            <textarea name="reason" id="reason" cols="73" rows="2"#}
                     {#                                      maxlength="50" ></textarea>#}
                     {#                        </div>#}
+                    <hr style="border-bottom:3px solid #F00"/>
                     <span id="generatediv"></span>
                 </fieldset>
             </div>
@@ -78,7 +79,7 @@
             {#var idList = new Array();    // 这里是生成之后，所有 div 的 id 数组#}
             for (var i = 1; i <= create; i++) {
                 {#var id = "div" + i;#}
-                var div = $('<div style="border-bottom:1px solid #F00"><div class="form-group has-feedback">' +
+                var div = $('<div style="border-bottom:3px solid #F00"><div class="form-group has-feedback"><br/>' +
                     '<label class="col-sm-2 control-label">工作计划：</label>' +
                     '   <div class="col-sm-10">\n' +
                     '<textarea name="workplan' + i + '" id="workplan' + i + '" cols="73" rows="3"\n' + 'maxlength="500"></textarea>\n' +
