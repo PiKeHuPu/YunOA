@@ -156,20 +156,13 @@ class WorkLog_Edit(LoginRequiredMixin, View):
             list1 = []
             # adm_work_id = adm_work_list.split(",")
             # if creman in adm_work_id:
-            adm_work_list = Structure.objects.values("adm_work")
+            adm_work_list = Structure.objects.values("adm_work").filter(~Q(adm_work=None))
             for i in adm_work_list:
-                x = []
-                x.append(i['adm_work'])
-                if x == None:
-                    pass
+                if "," in i["adm_work"]:
+                    work_id = i["adm_work"].split(",")
+                    list1 += work_id
                 else:
-                    if "," in x:
-                        work_id = x.split(",")
-                        list1 += work_id
-                    else:
-                        list1 += x
-            # adm_work_id = adm_work_list.split(",")
-
+                    list1 += i["adm_work"]
             if str(creman) in list1:
                 #     for i in range(1, stage+1):
                 #         WorklogPart.objects.filter(content_part_id=logid, stage=i).update(plan=request.POST.get('workplan' + str(i)))
