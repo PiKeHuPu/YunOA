@@ -20,15 +20,14 @@
     {% if is_null %}
         <h1>部门当前无个人目标，无法评分</h1>
     {% else %}
-        <h1>个人目标评分(各项分数满分均为100)</h1>
+        <h1>个人目标评分</h1>
         {% for user in users %}
             <div class="col-lg-12">
                 <input class="principal_id" type="text" value="{{ user.id }}" hidden>
                 <span style="font-size: 22px; font-weight: bolder">{{ user.name }}</span>
-                <p style="margin-top: 10px; font-size: 20px">目标考核分数: <input type="number" class="target" value="{% for score in scores %}{% if score.principal_id == user.id %}{{ score.goal_score }}{% endif %}{% endfor %}"> 能力考核分数：<input type="number" class="ability" value="{% for score in scores %}{% if score.principal_id == user.id %}{{ score.capacity_score }}{% endif %}{% endfor %}"> 态度考核分数: <input type="number" class="attitude" value="{% for score in scores %}{% if score.principal_id == user.id %}{{ score.attitude_score }}{% endif %}{% endfor %}"></p>
+                <p style="margin-top: 10px; font-size: 20px">目标考核分数(满分70): <input type="number" max="70" class="target" value="{% for score in scores %}{% if score.principal_id == user.id %}{{ score.goal_score }}{% endif %}{% endfor %}"> 能力考核分数(满分15)：<input type="number" max="15" class="ability" value="{% for score in scores %}{% if score.principal_id == user.id %}{{ score.capacity_score }}{% endif %}{% endfor %}"> 态度考核分数(满分15): <input type="number" max="15" class="attitude" value="{% for score in scores %}{% if score.principal_id == user.id %}{{ score.attitude_score }}{% endif %}{% endfor %}"></p>
                 <p style="font-size: 20px">备注：</p>
                 <textarea class="remark" cols="150" rows="3">{% for score in scores %}{% if score.principal_id == user.id %}{{ score.remark }}{% endif %}{% endfor %}</textarea>
-
                 <hr style="margin-bottom: 50px">
             </div>
         {% endfor %}

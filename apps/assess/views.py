@@ -256,8 +256,7 @@ class AssessScore0(LoginRequiredMixin, View):
             if attitudeArr[i]:
                 per_goal.attitude_score = float(attitudeArr[i])
             if targetArr[i] and abilityArr[i] and attitudeArr[i]:
-                per_goal.total_score = format(
-                    (float(targetArr[i]) * 0.7 + float(abilityArr[i]) * 0.15 + float(attitudeArr[i]) * 0.15), ".1f")
+                per_goal.total_score = float(targetArr[i]) + float(abilityArr[i]) + float(attitudeArr[i])
             per_goal.remark = remarkArr[i]
             per_goal.save()
         ret["status"] = "1"
