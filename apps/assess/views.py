@@ -9,7 +9,7 @@ from django.shortcuts import render
 from django.views import View
 
 from assess.models import AssessDepDetail, AssessPerDetail, AssessScore
-from users.models import Structure
+from users.models import Structure, UserProfile
 from utils.mixin_utils import LoginRequiredMixin
 
 
@@ -141,9 +141,15 @@ class CreatePerGoal(LoginRequiredMixin, View):
         dep_goal_list = dep_goal.content.split("\n")
         ret["dep_goal_list"] = dep_goal_list
 
-        department = dep_goal.department
-        users = department.userprofile_set.filter(is_active="1")
-        ret["users"] = users
+        status = request.GET.get("status")
+        ret["status"] = status
+        if status == "0":
+            department = dep_goal.department
+            users = department.userprofile_set.filter(is_active="1")
+            ret["users"] = users
+        elif status == "1":
+            user_id = request.session.get("_auth_user_id")
+            ret["user_id"] = user_id
         return render(request, "assess/create_per_goal.html", ret)
 
     def post(self, request):

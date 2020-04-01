@@ -8,14 +8,19 @@
 </head>
 <body>
 <input type="text" value="{{ id0 }}" hidden id="id0">
+{#<input type="text" value="{{ status }}" hidden id="status">#}
 <div style="margin-left: 20px">
-    <p style="font-size: 20px">负责人：<select name="user" id="user" style="width: 100px">
+    {% if status == "0" %}
+        <p style="font-size: 20px">负责人：<select name="user" id="user" style="width: 100px">
         <option value=""></option>
         {% for user in users %}
             <option value="{{ user.id }}">{{ user.name }}</option>
         {% endfor %}
-
     </select></p>
+    {% elif status == "1" %}
+        <input type="text" id="user" value="{{ user_id }}" hidden>
+    {% endif %}
+
 </div>
 <div class="col-lg-12">
         <span style="font-size: 17px">

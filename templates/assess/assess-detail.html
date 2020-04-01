@@ -79,7 +79,7 @@
             <div class="col-lg-12" style="margin-top: 30px">
                 {% if is_adm == '1' and not finish %}
                     <button type="button" class="btn btn-primary"
-                            onclick=create_per_goal({{ assess_dep_detail.id }},{{ assess_dep_detail.year }},{{ assess_dep_detail.month }})>
+                            onclick=create_per_goal({{ assess_dep_detail.id }},{{ assess_dep_detail.year }},{{ assess_dep_detail.month }},"0")>
                         填写个人目标
                     </button>
                     {% if was_submit == "1" %}
@@ -93,6 +93,10 @@
                         评分
                     </button>
                 {% elif is_mem == '1' and not finish %}
+                    <button type="button" class="btn btn-primary"
+                            onclick=create_per_goal({{ assess_dep_detail.id }},{{ assess_dep_detail.year }},{{ assess_dep_detail.month }},"1")>
+                        填写个人目标
+                    </button>
                     <button type="button" class="btn btn-primary"
                             onclick=edit_schedule({{ assess_dep_detail.id }},"1")>
                         填写完成情况
@@ -219,14 +223,14 @@
             });
         }
 
-        function create_per_goal(id, year, month) {
+        function create_per_goal(id, year, month, status) {
             layer.open({
                 type: 2,
                 title: '新建个人目标',
                 shadeClose: false,
                 maxmin: true,
                 area: ['50%', '60%'],
-                content: "{% url 'create_per_goal' %}?id=" + id + "&year=" + year + "&month=" + month,
+                content: "{% url 'create_per_goal' %}?id=" + id + "&year=" + year + "&month=" + month + "&status=" + status,
                 end: function () {
                     window.location.reload()
                 }
