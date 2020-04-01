@@ -12,7 +12,7 @@ from django.shortcuts import render
 from django.views import View
 
 from users.models import UserProfile, Structure
-from .models import Worklog, WorklogPart, User
+from .models import Worklog, WorklogPart, User, WorkRecordTem
 
 
 class WorkLog_Show(LoginRequiredMixin, View):
@@ -80,7 +80,7 @@ class WorkLog_Create(LoginRequiredMixin, View):
                     work_id = i["adm_work"].split(",")
                     list1 += work_id
                 else:
-                    list1 += i["adm_work"]
+                    list1.append(i["adm_work"])
             # adm_work_id = adm_work_list.split(",")
 
             if str(creman) in list1:
@@ -157,7 +157,7 @@ class WorkLog_Edit(LoginRequiredMixin, View):
                     work_id = i["adm_work"].split(",")
                     list1 += work_id
                 else:
-                    list1 += i["adm_work"]
+                    list1.append(i["adm_work"])
             if str(creman) in list1:
                 #     for i in range(1, stage+1):
                 #         WorklogPart.objects.filter(content_part_id=logid, stage=i).update(plan=request.POST.get('workplan' + str(i)))
@@ -257,4 +257,5 @@ class WorkLog_Set(LoginRequiredMixin, View):
         structure.save()
         res['result'] = True
         return HttpResponse(json.dumps(res), content_type='application/json')
+
 
