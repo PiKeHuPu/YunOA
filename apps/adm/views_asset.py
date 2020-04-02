@@ -414,23 +414,24 @@ class AssetUseInfoView(LoginRequiredMixin, View):
         is_out = request.POST.get("is_out")
         res = dict()
         try:
-            # 创建相应的在用物资
+            # 如外带则创建相应的在用物资
             asset_id = request.POST.get('id0')
             use_quantity = request.POST.get('useCount')
             asset = AssetInfo.objects.get(id=asset_id)
-            asset.quantity = int(asset.quantity) - int(use_quantity)
-            asset.save()
-            if asset.is_no_return:
-                pass
-            else:
-                use_asset = asset
-                use_asset.id = None
-                use_asset.save()
-                use_asset.quantity = int(use_quantity)
-                use_asset.create_time = asset.create_time
-                use_asset.status = '1'
-                use_asset.user_id = request.session.get('_auth_user_id')
-                use_asset.save()
+            if is_out == "1":
+                asset.quantity = int(asset.quantity) - int(use_quantity)
+                asset.save()
+                if asset.is_no_return:
+                    pass
+                else:
+                    use_asset = asset
+                    use_asset.id = None
+                    use_asset.save()
+                    use_asset.quantity = int(use_quantity)
+                    use_asset.create_time = asset.create_time
+                    use_asset.status = '1'
+                    use_asset.user_id = request.session.get('_auth_user_id')
+                    use_asset.save()
 
             user_id = request.session.get('_auth_user_id')
             asset_order = AssetApprove()
@@ -520,30 +521,30 @@ class AssetBackView(LoginRequiredMixin, View):
             asset_order.return_quantity = back_count
             asset_order.t_return_date = datetime.today()
 
-            asset = asset_order.asset
-            asset.quantity += int(back_count)
-            asset.save()
+            if asset_order.return_date != None:
+                asset = asset_order.asset
+                asset.quantity += int(back_count)
+                asset.save()
 
-            use_asset = AssetInfo.objects.filter(name=asset_order.asset.name, user_id=asset_order.proposer_id,
-                                                 quantity__lte=asset_order.quantity,
-                                                 warehouse=asset_order.asset.warehouse)[0]
-            use_asset.delete()
+                use_asset = AssetInfo.objects.filter(name=asset_order.asset.name, user_id=asset_order.proposer_id, quantity__lte=asset_order.quantity, warehouse=asset_order.asset.warehouse)[0]
+                use_asset.delete()
             asset_order.save()
         elif int(back_count) < int(asset_order.quantity) - int(asset_order.return_quantity):
-            use_asset = AssetInfo.objects.filter(name=asset_order.asset.name, user_id=asset_order.proposer_id,
-                                                 quantity__lte=asset_order.quantity,
-                                                 warehouse=asset_order.asset.warehouse)[0]
-            use_asset.quantity -= int(back_count)
-            use_asset.save()
+            if asset_order.return_date != None:
+                use_asset = AssetInfo.objects.filter(name=asset_order.asset.name, user_id=asset_order.proposer_id,
+                                                     quantity__lte=asset_order.quantity,
+                                                     warehouse=asset_order.asset.warehouse)[0]
+                use_asset.quantity -= int(back_count)
+                use_asset.save()
+
+                asset = asset_order.asset
+                asset.quantity += int(back_count)
+                asset.save()
 
             asset_order.return_quantity += int(back_count)
             asset_order.return_operator_id = user_id
             asset_order.t_return_date = datetime.today()
             asset_order.save()
-
-            asset = asset_order.asset
-            asset.quantity += int(back_count)
-            asset.save()
         ret["status"] = "success"
 
         return HttpResponse(json.dumps(ret), content_type='application/json')
