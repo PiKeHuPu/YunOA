@@ -498,17 +498,19 @@ class AssetApplyView(LoginRequiredMixin, View):
         user_id = request.session.get("_auth_user_id")
         asset_log = AssetApprove.objects.filter(id=id0).first()
         asset_log.use_status = "5"
-        asset = asset_log.asset
-        asset.quantity += asset_log.quantity
-        asset.save()
         asset_log.return_quantity = asset_log.quantity
         asset_log.return_operator_id = user_id
         asset_log.t_return_date = datetime.today()
         asset_log.save()
-        use_asset = AssetInfo.objects.filter(name=asset_log.asset.name, user_id=asset_log.proposer_id,
-                                             quantity__lte=asset_log.quantity,
-                                             warehouse=asset_log.asset.warehouse).first()
-        use_asset.delete()
+        if asset_log.return_date != None:
+            asset = asset_log.asset
+            asset.quantity += asset_log.quantity
+            asset.save()
+
+            use_asset = AssetInfo.objects.filter(name=asset_log.asset.name, user_id=asset_log.proposer_id,
+                                                 quantity__lte=asset_log.quantity,
+                                                 warehouse=asset_log.asset.warehouse).first()
+            use_asset.delete()
         ret["success"] = "1"
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
 
