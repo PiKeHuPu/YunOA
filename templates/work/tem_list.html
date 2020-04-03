@@ -163,6 +163,10 @@
                                                 ret = ret + "<button title='取消完成' onclick='Done(" + data + ", 0)'><i class='fa fa-close'></i></button>";
                                             }
                                             {#ret = ret + "<button title='修改' onclick='Update(" + data + ")'><i class='fa fa-pencil'></i></button>";#}
+                                        }
+                                        if ({{ key1 }} == "1" || {{ key2 }} == "1"
+                                    )
+                                        {
                                             ret = ret + "<button title='删除' onclick='Delete(" + data + ")'><i class='fa fa-trash'></i></button>";
                                         }
                                         return ret;
