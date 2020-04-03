@@ -12,7 +12,7 @@ from django.shortcuts import render
 from django.views import View
 
 from users.models import UserProfile, Structure
-from .models import Worklog, WorklogPart, User, WorkRecordTem
+from .models import Worklog, WorklogPart, User, WorkRecordTem, WorkRecord
 
 
 class WorkLog_Show(LoginRequiredMixin, View):
@@ -259,3 +259,228 @@ class WorkLog_Set(LoginRequiredMixin, View):
         return HttpResponse(json.dumps(res), content_type='application/json')
 
 
+class WorkRecordDep(LoginRequiredMixin, View):
+    """
+    日志部门列表
+    """
+
+    def get(self, request):
+        ret = dict()
+        department = Structure.objects.filter(~Q(id="16"), ~Q(title="董事长"), ~Q(title="总经理"), ~Q(title="副总经理"),
+                                              ~Q(title="总部"), ~Q(title="电力工程"), ~Q(title="测试"), )
+        ret['department'] = department
+        return render(request, "work/work_record_dep.html", ret)
+
+
+class WorkRecordUser(LoginRequiredMixin, View):
+    """
+    日志部门人员列表
+    """
+
+    def get(self, request):
+        ret = dict()
+        dep_id = request.GET.get("id")
+        department = Structure.objects.filter(id=dep_id).first()
+        users = department.userprofile_set.filter(is_active="1")
+        ret["department"] = department
+        ret["users"] = users
+        return render(request, "work/dep_user.html", ret)
+
+    def post(self, request):
+        """
+        日志模板删除
+        :param request:
+        :return:
+        """
+        ret = dict()
+        try:
+            id0 = request.POST.get("id")
+            tem = WorkRecordTem.objects.filter(id=id0).first()
+            tem.is_delete = True
+            tem.save()
+            ret["result"] = True
+        except Exception as e:
+            ret["e"] = str(e)
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
+
+
+# 与上方datetime有冲突  重新导入
+import datetime
+
+
+class WorkRecordTemList(LoginRequiredMixin, View):
+    """
+    日志模板列表
+    """
+
+    def get(self, request):
+        ret = dict()
+        user_id = request.GET.get("id")
+        user = UserProfile.objects.filter(id=user_id).first()
+        ret["user_id"] = user_id
+        ret["user"] = user
+
+        # 判断是否是本人或部门负责人
+        c_user_id = request.session.get("_auth_user_id")
+        if c_user_id == user_id:
+            ret["key1"] = "1"
+        else:
+            ret["key1"] = "0"
+        adm_list = user.department.adm_list
+        if adm_list:
+            adm_list = adm_list.split(",")
+        else:
+            adm_list = []
+        if c_user_id in adm_list:
+            ret["key2"] = "1"
+        else:
+            ret["key2"] = "0"
+
+        # 判断今日日志是否提交
+        today = datetime.date.today()
+        tem = WorkRecordTem.objects.filter(user_id=user_id, is_delete=False).first()
+        if tem:
+            record = WorkRecord.objects.filter(tem_id=tem.id, date=today).first()
+            if record:
+                if record.is_submit:
+                    ret["is_submit"] = "1"
+                else:
+                    ret["is_submit"] = "0"
+            else:
+                ret["is_submit"] = "0"
+        else:
+            ret["is_submit"] = "0"
+        return render(request, "work/tem_list.html", ret)
+
+    def post(self, request):
+        user_id = request.POST.get("user_id")
+        fields = ["id", "content", "remark", "type"]
+        today = datetime.date.today()
+        tem = WorkRecordTem.objects.values(*fields).filter(user_id=user_id, is_delete=False)
+        record_list = []
+        for i in range(len(tem)):
+            record = WorkRecord.objects.filter(tem_id=tem[i]["id"], date=today).first()
+            if record:
+                if record.is_done:
+                    is_done = {"is_done": "是"}
+                else:
+                    is_done = {"is_done": "否"}
+            else:
+                is_done = {"is_done": "否"}
+            record_list.append(dict(tem[i], **is_done))
+        ret = dict(data=record_list)
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
+
+
+class WorkRecordCreate(LoginRequiredMixin, View):
+    """
+    日志模板新增
+    """
+
+    def get(self, request):
+        ret = dict()
+        user_id = request.GET.get("id0")
+        ret["user_id"] = user_id
+        tem_id = request.GET.get("tem_id")
+        if tem_id:
+            tem = WorkRecordTem.objects.filter(id=tem_id).first()
+            ret["tem"] = tem
+        return render(request, "work/workrecord_tem_create.html", ret)
+
+    def post(self, request):
+        ret = dict()
+        try:
+            user_id = request.POST.get("id0")
+            type0 = request.POST.get("type")
+            content = request.POST.get("content")
+            remark = request.POST.get("remark")
+            tem_id = request.POST.get("tem_id")
+            if tem_id:
+                tem = WorkRecordTem.objects.filter(id=tem_id).first()
+            else:
+                tem = WorkRecordTem()
+            tem.user_id = user_id
+            tem.type = type0
+            tem.content = content
+            tem.remark = remark
+            tem.save()
+            ret["status"] = "success"
+        except Exception as e:
+            ret["e"] = str(e)
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
+
+
+class WorkRecordAjax(LoginRequiredMixin, View):
+    """
+    日志ajax
+    """
+
+    def get(self, request):
+        """
+        当日完成情况ajax
+        :param request:
+        :return:
+        """
+        ret = dict()
+        tem_id = request.GET.get("id")
+        status = request.GET.get("status")
+        today = datetime.date.today()
+        if status == "1":
+            record = WorkRecord()
+            record.tem_id = tem_id
+            record.is_submit = False
+            record.is_done = True
+            record.save()
+        if status == "0":
+            record = WorkRecord.objects.filter(tem_id=tem_id, date=today, is_done=True).first()
+            record.delete()
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
+
+    def post(self, request):
+        """
+        日志提交ajax
+        :param request:
+        :return:
+        """
+        ret = dict()
+        try:
+            user_id = request.session.get("_auth_user_id")
+            today = datetime.date.today()
+            tem_list = WorkRecordTem.objects.filter(user_id=user_id, is_delete=False)
+            for tem in tem_list:
+                record = WorkRecord.objects.filter(tem_id=tem.id, date=today).first()
+                if record:
+                    record.is_submit = True
+                    record.save()
+                else:
+                    record = WorkRecord()
+                    record.tem_id = tem.id
+                    record.is_done = False
+                    record.is_submit = True
+                    record.save()
+            ret["status"] = "1"
+        except Exception as e:
+            ret["e"] = str(e)
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
+
+
+class WorkRecordHistory(LoginRequiredMixin, View):
+    """
+    日志记录历史
+    """
+    def get(self, request):
+        ret = dict()
+        user_id = request.GET.get("id")
+        user = UserProfile.objects.filter(id=user_id).first()
+        ret["user_id"] = user_id
+        ret["user"] = user
+        return render(request, "work/record_list.html", ret)
+
+    def post(self, request):
+        user_id = request.POST.get("user_id")
+        fields = ["id", "tem__content", "tem__type", "date", "tem__remark", "is_done"]
+        filters = dict()
+        if request.POST.get("date"):
+            filters["date"] = request.POST.get("date")
+        ret = dict(data=list(WorkRecord.objects.values(*fields).filter(is_submit=True, tem__user_id=user_id, **filters).order_by("-date")))
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')

@@ -1,0 +1,116 @@
+{% extends 'base-layer.html' %}
+{% load staticfiles %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-datetimepicker.min.css' %}">
+{% endblock %}
+
+{% block main %}
+    <div class="box box-danger">
+        <form class="form-horizontal" id="addForm" method="post">
+            {% csrf_token %}
+            <div class="box-body">
+                <fieldset>
+                    <legend>
+                    </legend>
+                    <div class="form-group has-feedback">
+                        <input class="form-control" name="id0" id="id0" type="hidden" value="{{ user_id }}"/>
+                        <input class="form-control" name="tem_id" id="tem_id" type="hidden" value="{{ tem.id }}"/>
+                        <div class="form-group has-feedback">
+                            <label class="col-sm-2 control-label">工作类型</label>
+                            <div class="col-sm-3">
+                                <select class="form-control select2" style="width:100%;" name="type" id="type">
+                                    <option value="0">常规性固定工作</option>
+                                    <option value="1" {% if tem.type == "1" %}selected{% endif %}
+                                    >临时性工作</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <label class="col-sm-2 control-label">工作内容</label>
+                            <div class="col-sm-8">
+                            <textarea class="form-control" name="content" id="content"
+                                      rows="5">{{ tem.content }}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <label class="col-sm-2 control-label">备注</label>
+                            <div class="col-sm-8">
+                            <textarea class="form-control" name="remark" id="remark"
+                                      rows="5">{{ tem.remark }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="box-footer ">
+                <div class="row span7 text-center ">
+                    <button type="button" id="btnCancel" class="btn btn-default margin-right ">重置</button>
+                    <button type="button" id="btnSave" class="btn btn-info margin-right ">保存</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
+    <script type="text/javascript">
+
+        $("#btnSave").click(function () {
+            if ($("#content").val() == "") {
+                alert("请输入工作内容")
+            } else {
+                var data = $("#addForm").serialize();
+                $.ajax({
+                    type: $("#addForm").attr('method'),
+                    url: "{% url 'work_record_tem_create' %}",
+                    data: data,
+                    cache: false,
+                    success: function (msg) {
+                        if (msg.status == 'success') {
+                            layer.alert('保存成功！', {icon: 1}, function (index) {
+                                parent.layer.closeAll(); //关闭所有弹窗
+                            });
+                        } else {
+                            layer.alert(msg.e, {icon: 5});
+                        }
+                    }
+                });
+            }
+        });
+
+
+        /*点取消刷新新页面*/
+        $("#btnCancel").click(function () {
+            window.location.reload();
+        });
+
+
+        /*input 时间输入选择*/
+        $(".form_datetime").datetimepicker({
+            language: 'zh',
+            minView: 'month', //选择范围知道日期，不选择时分
+            autoclose: 1,
+            todayHighlight: 1,
+            //startView: 2,
+            forceParse: 0,
+            showMeridian: 1,
+            format: 'yyyy-mm-dd'
+        }).on('changeDate', function (ev) {
+            $(this).datetimepicker('hide');
+        });
+
+        // select2
+        $(function () {
+            //Initialize Select2 Elements
+            $(".select2").select2();
+        });
+    </script>
+
+{% endblock %}

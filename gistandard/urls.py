@@ -39,7 +39,8 @@ from adm.views_asset import AssetUseHtmlView, AssetUseInfoView, AssetBackView
 from bulletin import views as bulletin_views
 from oilWear import views as oilWear_views
 from users.views_structure import StructureAssetAdmView
-from worklog.views import WorkLog_Show, WorkLog_Create, WorkLog_Detail, WorkLog_Edit, WorkLog_Set
+from worklog.views import WorkLog_Show, WorkLog_Create, WorkLog_Detail, WorkLog_Edit, WorkLog_Set, WorkRecordDep, \
+    WorkRecordUser, WorkRecordTemList, WorkRecordCreate, WorkRecordAjax, WorkRecordHistory
 
 urlpatterns = [
     url(r'^xadmin/', xadmin.site.urls),
@@ -183,6 +184,12 @@ urlpatterns = [
     url(r'^personal/work/worklog/', WorkLog_Show.as_view(), name="worklog_show"),
     url(r'^personal/work/create/', WorkLog_Create.as_view(), name="worklog_create"),
     url(r'^personal/work/detail/', WorkLog_Detail.as_view(), name="worklog_detail"),
-    url(r'^personal/work/edit/',WorkLog_Edit.as_view(),name="worklog_edit"),
+    url(r'^personal/work/edit/', WorkLog_Edit.as_view(),name="worklog_edit"),
     url(r'^worklog/set/$', WorkLog_Set.as_view(), name="worklog_set"),
+    url(r'^personal/work/work_record_dep/', WorkRecordDep.as_view(), name="work_record_dep"),
+    url(r'^personal/work/work_record_user/', WorkRecordUser.as_view(), name="work_record_user"),
+    url(r'^personal/work/work_record_tem_list/', WorkRecordTemList.as_view(), name="work_record_tem_list"),
+    url(r'^personal/work/work_record_tem_create/', WorkRecordCreate.as_view(), name="work_record_tem_create"),
+    url(r'^personal/work/work_record_ajax/', WorkRecordAjax.as_view(), name="work_record_ajax"),
+    url(r'^personal/work/work_record_history/', WorkRecordHistory.as_view(), name="work_record_history"),
 ]

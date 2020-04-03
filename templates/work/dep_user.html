@@ -1,0 +1,38 @@
+{% extends "base-left.html" %}
+{% load staticfiles %}
+
+{% block content %}
+    <h1 style="text-align: center">{{ department.title }}</h1>
+    {% for user in users %}
+        <button style="margin-left: 10px" type="button" class="btn btn-lg btn-info"><a style="font-size: 22px; color: white" href="/personal/work/work_record_tem_list/?id={{ user.id }}">{{ user.name }}</a></button>
+
+    {% endfor %}
+    <div class="col-lg-12" style="text-align: center; margin-top: 20px">
+        <input class="btn btn-danger" type=button value="返回" onClick="javascript:history.go(-1);">
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'plugins/combo-select/jquery.combo.select.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
+    <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+    <script src="{% static 'plugins/ajaxfileupload/ajaxfile-upload.js' %}"></script>
+    <script src="{% static 'plugins/fileinput/fileinput.js' %}"></script>
+    <script src="{% static 'plugins/fileinput/zh.js' %}"></script>
+
+    <script type="text/javascript">
+        function create_goal(id) {
+            layer.open({
+                type: 2,
+                title: '新建部门目标',
+                shadeClose: false,
+                maxmin: true,
+                area: ['50%', '60%'],
+                content: "{% url 'create_goal' %}?id=" + id,
+                end: function () {
+                    window.location.reload()
+                }
+            });
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,275 @@
+{% extends "base-left.html" %}
+{% load staticfiles %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugins/datatables/jquery.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+    <!-- iCheck for checkboxes and radio inputs -->
+{% endblock %}
+
+{% block content %}
+
+    <!-- Content Header (Page header) -->
+
+    <section class="content-header margin-bottom">
+        <ol class="breadcrumb">
+            <li><a href=""><i class="fa fa-dashboard"></i>办公平台</a></li>
+            <li class="active"><a href="{% url 'personal' %}">我的工作台</a></li>
+            <li class="active"><a href="#">日志模板</a></li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div id="devlist">
+            <div class="box box-primary" id="liebiao">
+                <div class="box-header">
+                    <div class="btn-group pull-left">&nbsp</div>
+                    <div class="btn-group pull-left">
+                        <button type="button" class="btn btn-danger"
+                                onClick="javascript:history.go(-1);">
+                            <i class="fa fa-mail-reply"></i>返回
+                        </button>
+                    </div>
+                    {% if key2 == "1" %}
+                        <div class="btn-group pull-left">&nbsp</div>
+                        <div class="btn-group pull-left">
+                            <button type="button" id="btnCreate" class="btn btn-primary ">
+                                <i class="glyphicon glyphicon-plus"></i>新增
+                            </button>
+                        </div>
+                        {% if key1 == "1" %}
+                            <div class="btn-group pull-left">&nbsp</div>
+                            <div class="btn-group pull-left">
+                                <button type="button" id="btnSubmit" class="btn btn-info"
+                                        {% if is_submit == "1" %}disabled{% endif %}><i class="fa fa-upload"></i>
+                                    {% if is_submit == "1" %}今日已提交{% else %}提交今日日志{% endif %}
+                                </button>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                    <div class="btn-group pull-left">&nbsp</div>
+                    <div class="btn-group pull-left">
+                        <a href="{% url 'work_record_history' %}?id={{ user_id }}">
+                            <button type="button" id="btnRecord" class="btn btn-success">
+                                <i class="fa fa-calendar"></i>历史日志记录
+                            </button>
+                        </a>
+                    </div>
+                    <br><br>
+                    <div style="text-align: center; font-size: 25px; font-weight: bolder">{{ user.name }}日志模板</div>
+                </div>
+                <input type="text" id="user_id" value="{{ user_id }}" hidden>
+                <div class="box-body">
+                    <table id="dtbList" class="display" cellspacing="0" width="100%">
+                        <thead>
+                        <tr valign="middle">
+                            <th>ID</th>
+                            <th>工作内容</th>
+                            <th>工作类型</th>
+                            <th>今日是否完成</th>
+                            <th>备注</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <br> <br>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- /.content -->
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables/dataTables.const.js' %}"></script>
+    <script src="{% static 'plugins/datatables/moment.min.js' %}"></script>
+    <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+    <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
+    <!-- iCheck 1.0.1 -->
+    <script type="text/javascript">
+        $(function () {
+            $('#WORK-LOG').addClass('active');
+
+        });
+    </script>
+
+    <script type="text/javascript">
+        $(".timepick").datetimepicker({
+            format: 'yyyy-mm-dd',
+            language: 'zh',
+            autoclose: 1,
+            forceParse: 0,
+            minView: 2,
+        });
+        var oDataTable = null;
+
+        $(function () {
+            oDataTable = initTable();
+
+            function initTable() {
+                var oTable = $('#dtbList').DataTable(
+                    $.extend(true, {"scrollX": true},
+                        DATATABLES_CONSTANT.DATA_TABLES.DEFAULT_OPTION,
+                        {
+                            ajax: {
+                                "url": "{% url 'work_record_tem_list' %}",
+                                "type": "post",
+                                "data": function (d) {
+                                    d.user_id = $("#user_id").val();
+                                }
+                            },
+                            columns: [
+                                {
+                                    data: "id",
+                                },
+                                {
+                                    data: "content",
+                                },
+                                {
+                                    data: "type",
+                                    render: function (data, type, row, meta) {
+                                        var ret;
+                                        if (data == "0") {
+                                            ret = "常规性固定工作"
+                                        } else if (data == "1") {
+                                            ret = "临时性工作"
+                                        }
+                                        return ret;
+                                    }
+                                },
+                                {
+                                    data: "is_done",
+                                },
+                                {
+                                    data: "remark",
+                                },
+                                {
+                                    data: "id",
+                                    render: function (data, type, row, meta) {
+                                        var ret = "";
+                                        if ({{ key1 }} == "1"
+                                    )
+                                        {
+                                            if (row.is_done == "否" && {{ is_submit }} == "0") {
+                                                ret = ret + "<button title='完成' onclick='Done(" + data + ", 1)'><i class='fa fa-check'></i></button>";
+                                            } else if (row.is_done == "是" && {{ is_submit }} == "0") {
+                                                ret = ret + "<button title='取消完成' onclick='Done(" + data + ", 0)'><i class='fa fa-close'></i></button>";
+                                            }
+                                            {#ret = ret + "<button title='修改' onclick='Update(" + data + ")'><i class='fa fa-pencil'></i></button>";#}
+                                            ret = ret + "<button title='删除' onclick='Delete(" + data + ")'><i class='fa fa-trash'></i></button>";
+                                        }
+                                        return ret;
+                                    }
+                                }],
+                        }));
+                return oTable;
+            }
+
+            $("#btnCreate").click(function () {
+                var id = $("#user_id").val();
+                var div = layer.open({
+                    type: 2,
+                    title: '新增日志模板',
+                    shadeClose: false,
+                    maxmin: true,
+                    area: ['800px', '600px'],
+                    content: "{% url 'work_record_tem_create' %}?id0=" + id,
+                    end: function () {
+                        //关闭时做的事情
+                        oDataTable.ajax.reload();
+                    }
+                });
+                layer.full(div)
+            });
+
+            $("#btnSubmit").click(function () {
+                var con = confirm("提交后无法修改，确定提交今日日志吗？");
+                if (con) {
+                    $.ajax({
+                        type: "POST",
+                        url: "{% url 'work_record_ajax' %}",
+                        success: function (ret) {
+                            if (ret.status == "1") {
+                                alert("提交成功");
+                                window.location.reload();
+                            } else {
+                                layer.alert(ret.e, {icon: 4});
+                            }
+                        }
+                    });
+                }
+            });
+
+        });
+
+        function Update(id) {
+            var id0 = $("#user_id").val();
+            var div = layer.open({
+                type: 2,
+                title: '修改日志模板',
+                shadeClose: false,
+                maxmin: true,
+                area: ['800px', '600px'],
+                content: ["{% url 'work_record_tem_create' %}" + '?tem_id=' + id + '&id0=' + id0],
+                end: function () {
+                    //oDataTable.ajax.reload();
+                    window.location.reload();
+
+                }
+            });
+            layer.full(div)
+        }
+
+        function Done(id, status) {
+            $.ajax({
+                type: "GET",
+                url: "{% url 'work_record_ajax' %}?id=" + id + "&status=" + status,
+                cache: false,
+                success: function () {
+                    oDataTable.ajax.reload();
+                }
+            });
+        }
+
+        function Delete(id) {
+            layer.alert('确定删除吗？', {
+                title: '提示'
+                , icon: 3 //0:感叹号 1：对号 2：差号 3：问号 4：小锁 5：哭脸 6：笑脸
+                , time: 0 //不自动关闭
+                , btn: ['YES', 'NO']
+                , yes: function (index) {
+                    layer.close(index);
+                    $.ajax({
+                        type: "POST",
+                        url: "{% url 'work_record_user' %}",
+                        data: {"id": id, csrfmiddlewaretoken: '{{ csrf_token }}'},  //防止post数据时报 csrf_token 403
+                        cache: false,
+                        success: function (msg) {
+                            if (msg.result) {
+                                layer.alert('删除成功', {icon: 1});
+                                oDataTable.ajax.reload();
+                            } else {
+                                //alert(msg.message);
+                                layer.alert('删除失败，' + msg.e, {icon: 4});
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+    </script>
+    <script>
+        $(function () {
+            //Initialize Select2 Elements
+            $(".select2").select2();
+        });
+    </script>
+{% endblock %}
