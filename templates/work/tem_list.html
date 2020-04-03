@@ -64,7 +64,7 @@
                     <table id="dtbList" class="display" cellspacing="0" width="100%">
                         <thead>
                         <tr valign="middle">
-                            <th>ID</th>
+                            <th>序号</th>
                             <th>工作内容</th>
                             <th>工作类型</th>
                             <th>今日是否完成</th>
@@ -114,6 +114,7 @@
             oDataTable = initTable();
 
             function initTable() {
+                var num = 1;
                 var oTable = $('#dtbList').DataTable(
                     $.extend(true, {"scrollX": true},
                         DATATABLES_CONSTANT.DATA_TABLES.DEFAULT_OPTION,
@@ -128,6 +129,11 @@
                             columns: [
                                 {
                                     data: "id",
+                                    render: function (data, type, row, meta) {
+                                        var ret = num;
+                                        num = num + 1;
+                                        return ret;
+                                    }
                                 },
                                 {
                                     data: "content",
