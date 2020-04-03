@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Q
@@ -15,6 +15,7 @@ from users.models import UserProfile, Structure
 from .models import Worklog, WorklogPart, User, WorkRecordTem, WorkRecord
 
 
+from datetime import datetime
 class WorkLog_Show(LoginRequiredMixin, View):
     def get(self, request):
         ret = dict()
@@ -23,10 +24,6 @@ class WorkLog_Show(LoginRequiredMixin, View):
         return render(request, 'work/worklog_show.html', ret)
 
     def post(self, request):
-        mon = datetime.now().month
-        year = datetime.now().year
-        day = datetime.now().day
-
         fields = ["plan", "stage", "s_time", "e_time",
                   "performance", "id", "remark", "dutyman_id__name",
                   "content_part__content", "department__title"
