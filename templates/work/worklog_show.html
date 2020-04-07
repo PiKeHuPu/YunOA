@@ -130,7 +130,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             <th>工作计划</th>
                             <th>部门</th>
                             <th>责任人</th>
-                            <th>起始时间</th>
+                            <th>开始时间</th>
+                            <th>结束时间</th>
                             <th>完成情况</th>
                             <th>备注</th>
                             <th>是否完成</th>
@@ -288,7 +289,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             width: "8%",
                             render: function (data, type, full, row) {
                                 var ret = moment(data).format("YYYY-MM-DD ");
-                                ret = ret + moment(row.e_time).format("YYYY-MM-DD ")
+                                return ret;
+                            }
+                        },
+                        {
+                            data: "e_time",
+                            width: "8%",
+                            render: function (data, type, full, row) {
+                                var ret = moment(data).format("YYYY-MM-DD ");
                                 return ret;
                             }
                         },
