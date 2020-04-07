@@ -189,7 +189,10 @@ class WorkLog_Edit(LoginRequiredMixin, View):
                 log_part.e_time = end_time
                 if is_done == "1":
                     log_part.is_done = True
-                log_part.performance = complete
+                if log_part == "" or log_part == None:
+                    log_part.performance = complete
+                else:
+                    log_part.performance += "\n" + complete
                 log_part.remark = remark
                 log_part.save()
                 work_log = log_part.content_part
