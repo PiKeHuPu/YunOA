@@ -367,7 +367,7 @@ class WorkRecordTemList(LoginRequiredMixin, View):
             record = WorkRecord.objects.filter(tem_id=tem[i]["id"], date=today).first()
             if record:
                 if record.is_done:
-                    is_done = {"is_done": "是"}
+                    is_done = {"is_done": "是 √"}
                 else:
                     is_done = {"is_done": "否"}
             else:

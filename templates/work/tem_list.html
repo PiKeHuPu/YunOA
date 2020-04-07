@@ -168,7 +168,7 @@
                                         {
                                             if (row.is_done == "否" && {{ is_submit }} == "0") {
                                                 ret = ret + "<button title='完成' onclick='Done(" + data + ", 1)'><i class='fa fa-check'></i></button>";
-                                            } else if (row.is_done == "是" && {{ is_submit }} == "0") {
+                                            } else if (row.is_done == "是 √" && {{ is_submit }} == "0") {
                                                 ret = ret + "<button title='取消完成' onclick='Done(" + data + ", 0)'><i class='fa fa-close'></i></button>";
                                             }
                                             {#ret = ret + "<button title='修改' onclick='Update(" + data + ")'><i class='fa fa-pencil'></i></button>";#}
