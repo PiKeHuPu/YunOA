@@ -20,7 +20,9 @@ class WorkLog_Show(LoginRequiredMixin, View):
     def get(self, request):
         ret = dict()
         department = Structure.objects.all()
-        ret['department'] = department
+        ret['departments'] = department
+        users = UserProfile.objects.filter(is_active="1")
+        ret['users'] = users
         return render(request, 'work/worklog_show.html', ret)
 
     def post(self, request):
@@ -33,11 +35,14 @@ class WorkLog_Show(LoginRequiredMixin, View):
 
         if request.POST.get('status'):
             filters['content_part__is_done'] = request.POST.get('status')
+        if request.POST.get('department'):
+            filters['department__id'] = request.POST.get('department')
+        if request.POST.get('duty_officer'):
+            filters['dutyman_id'] = request.POST.get('duty_officer')
         if request.POST.get("start_time"):
-            start_time = request.POST.get("start_time").split("-")
-            filters['s_time__year'] = start_time[0]
-            filters['s_time__month'] = start_time[1]
-            filters['s_time__day'] = start_time[2]
+            filters['s_time__gte'] = request.POST.get('start_time')
+        if request.POST.get("end_time"):
+            filters['s_time__lte'] = request.POST.get('end_time')
 
         # x = list(Worklog.objects.filter(Q(create_time__year=year, create_time__month=mon, create_time__day=day)
         #                                 | (Q(status=0) & Q(create_time__lt=datetime(year, mon, day)))
