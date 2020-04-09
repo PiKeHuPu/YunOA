@@ -31,7 +31,7 @@
                                         {% for ps in position_statement %}
                                             {% if ps.department_id == dep.id %}
                                                 <a href="#"
-                                                   onclick="doShow({{ ps.id }}, {{ ps.name }}, '{{ ps.file }}')">{{ ps.name }}</a>
+                                                   onclick="doShow({{ ps.id }}, '{{ ps.name }}', '{{ ps.file }}')">{{ ps.name }}</a>
                                             {% endif %}
                                         {% endfor %}
                                     </h4>

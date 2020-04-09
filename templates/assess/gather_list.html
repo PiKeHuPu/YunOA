@@ -39,6 +39,7 @@
                         <thead>
                         <tr valign="middle">
                             <th>姓名</th>
+                            <th>部门</th>
                             <th>目标考核分数</th>
                             <th>能力考核分数</th>
                             <th>态度考核分数</th>
@@ -98,6 +99,9 @@
                             columns: [
                                 {
                                     data: "principal__name",
+                                },
+                                {
+                                    data: "dep_goal__department__title",
                                 },
                                 {
                                     data: "goal_score",

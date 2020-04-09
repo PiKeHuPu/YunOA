@@ -70,12 +70,14 @@
             data: {"principal_id": principal_id, "targetArr": targetArr, "abilityArr": abilityArr, "attitudeArr": attitudeArr, "remarkArr": remarkArr, "dep_goal_id": $("#dep_goal_id").val()},
             success: function (ret) {
                 if (ret.status === "1") {
-                    alert("提交成功")
+                    alert("提交成功");
+                    var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+                    parent.layer.close(index); //再执行关闭
+                }else if (ret.status == "szygsql") {
+                    alert("总分低于90需填写备注")
                 } else {
                     alert("提交失败，请稍后重试")
                 }
-                var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
-                parent.layer.close(index); //再执行关闭
             }
         })
     })

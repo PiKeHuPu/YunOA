@@ -249,6 +249,7 @@ class AssessScore0(LoginRequiredMixin, View):
         attitudeArr = request.POST.getlist("attitudeArr")
         remarkArr = request.POST.getlist("remarkArr")
         dep_goal_id = request.POST.get("dep_goal_id")
+        ret["status"] = "0"
         for i in range(len(principal_id)):
             per_goal = AssessScore.objects.filter(dep_goal_id=dep_goal_id, principal_id=principal_id[i]).first()
             if per_goal:
@@ -266,8 +267,12 @@ class AssessScore0(LoginRequiredMixin, View):
             if targetArr[i] and abilityArr[i] and attitudeArr[i]:
                 per_goal.total_score = float(targetArr[i]) + float(abilityArr[i]) + float(attitudeArr[i])
             per_goal.remark = remarkArr[i]
+            if per_goal.total_score < 90 and (remarkArr[i] == "" or remarkArr[i] == None or len(remarkArr[i].strip(" ")) == 0):
+                ret["status"] = "szygsql"
+                break
             per_goal.save()
-        ret["status"] = "1"
+        if ret["status"] != "szygsql":
+            ret["status"] = "1"
 
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
 
@@ -381,7 +386,7 @@ class AssessGatherList(LoginRequiredMixin, View):
     def post(self, request):
         year = request.POST.get('year')
         month = request.POST.get('month')
-        field = ['principal__name', 'goal_score', 'capacity_score', 'attitude_score', 'total_score', 'remark', 'dep_goal__is_done']
+        field = ['principal__name', 'goal_score', 'capacity_score', 'attitude_score', 'total_score', 'remark', 'dep_goal__is_done', 'dep_goal__department__title']
         ret = dict(data=list(AssessScore.objects.values(*field).filter(dep_goal__year=year, dep_goal__month=month)))
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
 

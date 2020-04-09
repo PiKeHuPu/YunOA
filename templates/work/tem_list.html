@@ -246,7 +246,7 @@
                 url: "{% url 'work_record_ajax' %}?id=" + id + "&status=" + status,
                 cache: false,
                 success: function () {
-                    oDataTable.ajax.reload();
+                    window.location.reload()
                 }
             });
         }
