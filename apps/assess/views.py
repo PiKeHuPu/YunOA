@@ -1,4 +1,5 @@
 import json
+import os
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Q
@@ -8,7 +9,7 @@ from django.shortcuts import render
 # Create your views here.
 from django.views import View
 
-from assess.models import AssessDepDetail, AssessPerDetail, AssessScore
+from assess.models import AssessDepDetail, AssessPerDetail, AssessScore, PositionStatement
 from users.models import Structure, UserProfile
 from utils.mixin_utils import LoginRequiredMixin
 
@@ -21,6 +22,13 @@ class AssessDep(LoginRequiredMixin, View):
         ret = dict()
         department = Structure.objects.filter(~Q(id="16"), ~Q(title="董事长"), ~Q(title="总经理"), ~Q(title="副总经理"), ~Q(title="总部"), ~Q(title="电力工程"), ~Q(title="测试"),)
         ret['department'] = department
+        position_statement = PositionStatement.objects.all()
+        ret['position_statement'] = position_statement
+        ps_list = set()
+        for ps in position_statement:
+            ps_list.add(ps.department_id)
+        ps_list = list(ps_list)
+        ret['ps_list'] = ps_list
         return render(request, "assess/assess-dep.html", ret)
 
 
@@ -279,3 +287,102 @@ class YearMonth(LoginRequiredMixin, View):
         if department.adm_list and user_id in department.adm_list:
             ret["is_adm"] = "1"
         return render(request, "assess/year_month.html", ret)
+
+
+class PositionStatementList(LoginRequiredMixin, View):
+    """
+    部门岗位职责列表
+    """
+    def get(self, request):
+        ret = dict()
+        return render(request, "assess/position_statement_list.html", ret)
+
+    def post(self, request):
+        fields = ['id', 'name', 'department__title', 'file']
+        ret = dict(data=list(PositionStatement.objects.values(*fields).all()))
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
+
+
+class PositionStatementCreate(LoginRequiredMixin, View):
+    """
+    部门岗位职责创建
+    """
+    def get(self, request):
+        ret = dict()
+        departments = Structure.objects.all()
+        ret["departments"] = departments
+        return render(request, "assess/positon_statement_create.html", ret)
+
+    def post(self, request):
+        ret = dict()
+        name = request.POST.get("title")
+        department = request.POST.get("department")
+        file0 = request.FILES.get("file_content", None)
+        position = PositionStatement()
+        position.name = name
+        position.department_id = department
+        position.file = file0
+        position.save()
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
+
+
+class PositionStatementAjax(LoginRequiredMixin, View):
+    """
+    部门岗位职责ajax
+    """
+    def get(self, request):
+        return
+
+    def post(self, request):
+        """
+        岗位职责删除
+        :param request:
+        :return:
+        """
+        ret = dict()
+        id0 = request.POST.get("id")
+        position = PositionStatement.objects.filter(id=id0).first()
+        path = "media/" + str(position.file)
+        os.remove(path)
+        position.delete()
+        ret["status"] = "1"
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
+
+
+class AssessGather(LoginRequiredMixin, View):
+    """
+    考核汇总日期列表
+    """
+    def get(self, request):
+        ret = dict()
+        dep_goals = AssessDepDetail.objects.all()
+        date_list = set()
+        for d in dep_goals:
+            date = (d.year, d.month)
+            date_list.add(date)
+        date_list = list(date_list)
+        date_list.sort()
+        ret["date_list"] = date_list
+        return render(request, "assess/year_month_total.html", ret)
+
+
+class AssessGatherList(LoginRequiredMixin, View):
+    """
+    考核汇总列表
+    """
+    def get(self, request):
+        ret = dict()
+        year = request.GET.get("year")
+        month = request.GET.get("month")
+        ret["year"] = year
+        ret["month"] = month
+        return render(request, "assess/gather_list.html", ret)
+
+    def post(self, request):
+        year = request.POST.get('year')
+        month = request.POST.get('month')
+        field = ['principal__name', 'goal_score', 'capacity_score', 'attitude_score', 'total_score', 'remark', 'dep_goal__is_done']
+        ret = dict(data=list(AssessScore.objects.values(*field).filter(dep_goal__year=year, dep_goal__month=month)))
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
+
+

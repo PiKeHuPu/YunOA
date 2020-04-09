@@ -38,4 +38,13 @@ class AssessScore(models.Model):
     attitude_score = models.FloatField(blank=True, null=True, verbose_name="态度考核分数")
     total_score = models.FloatField(blank=True, null=True, verbose_name="总分")
     remark = models.CharField(max_length=500, blank=True, null=True, verbose_name="备注")
+
+
+class PositionStatement(models.Model):
+    """
+    部门岗位职责
+    """
+    department = models.ForeignKey(Structure, verbose_name="所属部门")
+    name = models.CharField(max_length=50, verbose_name="岗位名称")
+    file = models.FileField(upload_to='position_statement/', verbose_name="岗位职责附件")
 # Create your models here.

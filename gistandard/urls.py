@@ -20,7 +20,8 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.views.static import serve
 
-from assess.views import AssessDep, AssessDetail, CreateGoal, CreatePerGoal, EditSchedule, AssessScore0, YearMonth
+from assess.views import AssessDep, AssessDetail, CreateGoal, CreatePerGoal, EditSchedule, AssessScore0, YearMonth, \
+    PositionStatementList, PositionStatementCreate, PositionStatementAjax, AssessGather, AssessGatherList
 from gistandard.settings import MEDIA_ROOT
 
 import xadmin
@@ -170,6 +171,11 @@ urlpatterns = [
     url(r'^personal/edit_schedule/$', EditSchedule.as_view(), name="edit_schedule"),
     url(r'^personal/assess_score/$', AssessScore0.as_view(), name="assess_score"),
     url(r'^personal/year_month/$', YearMonth.as_view(), name="year_month"),
+    url(r'^personal/assess_gather/$', AssessGather.as_view(), name="assess_gather"),
+    url(r'^personal/assess_gather_list/$', AssessGatherList.as_view(), name="assess_gather_list"),
+    url(r'system/position_statement$', PositionStatementList.as_view(), name="position_statement"),
+    url(r'system/position_statement_create$', PositionStatementCreate.as_view(), name="position_statement_create"),
+    url(r'system/position_statement_ajax$', PositionStatementAjax.as_view(), name="position_statement_ajax"),
     # 档案管理
     url(r'^adm/file_upload/$', FileUpload.as_view(), name="file_upload"),
     url(r'^adm/file_list/$', FileList.as_view(), name="file_list"),
@@ -177,7 +183,7 @@ urlpatterns = [
     url(r'^adm/file_delete/$', FileDelete.as_view(), name="file_delete"),
     url(r'^adm/file_type_set/$', SetFileType.as_view(), name="file_type_set"),
     url(r'^adm/file_type_ajax/$', FileTypeAjax.as_view(), name="file_type_ajax"),
-    # 修改岗位职责
+    # 修改个人岗位职责
     url(r'^personal/create_statement', ChangeStatement.as_view(), name='create_statement'),
     url(r'^personal/show_statement', ShowStatement.as_view(), name='show_statement'),
     # 工作日志

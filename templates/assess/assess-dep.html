@@ -8,59 +8,104 @@
 {% endblock %}
 
 {% block content %}
-<section class="content-header margin-bottom">
-  <ol class="breadcrumb">
-    <li><a href=""><i class="fa fa-dashboard"></i>办公平台</a></li>
-    <li class="active"><a href="{% url 'personal' %}">我的工作台</a></li>
-    <li class="active"><a href="{% url 'personal-phonebook' %}">考核</a></li>
-  </ol>
-</section>
+    <section class="content-header margin-bottom">
+        <ol class="breadcrumb">
+            <li><a href=""><i class="fa fa-dashboard"></i>办公平台</a></li>
+            <li class="active"><a href="{% url 'personal' %}">我的工作台</a></li>
+            <li class="active"><a href="{% url 'personal-phonebook' %}">考核</a></li>
+        </ol>
+    </section>
     <!-- Main content -->
-<section class="content">
-  <div class="row">
-  {% for dep in department %}
-     <div class="col-md-3">
-      <div class="box box-primary">
-        <div class="box-body box-profile">
-          <h3 class="profile-username text-center"><a href="/personal/year_month?id={{ dep.id }}">{{ dep.title }}</a></h3>
-        </div>
-        <!-- /.box-body -->
-      </div>
-     </div>
-  {% endfor %}
- </div>
+    <section class="content">
+        <div class="row">
+            <div id="container">
+                {% for dep in department %}
+                    <div class="col-lg-3 pin" style="margin-top: 5px">
+                        <div class="box box-primary">
+                            <div class="box-body box-profile">
+                                <h3 class="profile-username text-center"><a
+                                        href="/personal/year_month?id={{ dep.id }}">{{ dep.title }}</a></h3>
+                                {% if dep.id in ps_list %}
+                                    <hr>
+                                    <h4>岗位:
+                                        {% for ps in position_statement %}
+                                            {% if ps.department_id == dep.id %}
+                                                <a href="#"
+                                                   onclick="doShow({{ ps.id }}, {{ ps.name }}, '{{ ps.file }}')">{{ ps.name }}</a>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </h4>
+                                {% endif %}
+                            </div>
+                            <!-- /.box-body -->
+                        </div>
+                    </div>
+                {% endfor %}
+                <div class="col-lg-12 pin">
+                    <div class="box box-primary">
+                        <div class="box-body box-profile">
+                            <h3 class="profile-username text-center"><a
+                                    href="{% url 'assess_gather' %}">汇总</a>
+                            </h3>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                </div>
 
-<!-- Modal -->
-</section>
+            </div>
+
+        </div>
+
+        <!-- Modal -->
+    </section>
 
 {% endblock %}
 {% block javascripts %}
-<script src="{% static 'plugins/combo-select/jquery.combo.select.js' %}"></script>
-<script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
-<script src="{% static 'js/plugins/layer/layer.js' %}"></script>
-<script src="{% static 'plugins/ajaxfileupload/ajaxfile-upload.js' %}"></script>
-<script src="{% static 'plugins/fileinput/fileinput.js' %}"></script>
-<script src="{% static 'plugins/fileinput/zh.js' %}"></script>
+    <script src="{% static 'plugins/combo-select/jquery.combo.select.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
+    <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+    <script src="{% static 'plugins/ajaxfileupload/ajaxfile-upload.js' %}"></script>
+    <script src="{% static 'plugins/fileinput/fileinput.js' %}"></script>
+    <script src="{% static 'plugins/fileinput/zh.js' %}"></script>
+    <script src="{% static 'js/masonry.pkgd.min.js' %}"></script>
 
-<script type="text/javascript">
-	$(function() {
-		$('#ASSESS').addClass('active');
-		$('#ASSESS-DEP').addClass('active');
+    <script type="text/javascript">
+        $(function () {
+            $('#ASSESS').addClass('active');
+            $('#ASSESS-DEP').addClass('active');
 
-	});
-    function year_month(id, title) {
-        layer.open({
-            type: 2,
-            title: title,
-            shadeClose: false,
-            maxmin: true,
-            area: ['50%', '60%'],
-            content: "{% url 'year_month' %}?id=" + id,
-            end: function () {
-                window.location.reload()
-            }
+            // 瀑布流初始化
+            $('#container').masonry({
+                // options
+                itemSelector: '.pin',
+            });
         });
-    }
-  </script>
+
+        function year_month(id, title) {
+            layer.open({
+                type: 2,
+                title: title,
+                shadeClose: false,
+                maxmin: true,
+                area: ['50%', '60%'],
+                content: "{% url 'year_month' %}?id=" + id,
+                end: function () {
+                    window.location.reload()
+                }
+            });
+        }
+
+        function doShow(id, title, file_content) {
+            var lay = layer.open({
+                type: 2,
+                title: title,
+                shadeClose: false,
+                maxmin: true,
+                area: ['800px', '400px'],
+                content: ["{{ MEDIA_URL }}" + file_content]
+            });
+            layer.full(lay)
+        }
+    </script>
 
 {% endblock %}

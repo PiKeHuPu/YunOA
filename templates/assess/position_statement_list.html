@@ -1,0 +1,174 @@
+{% extends "base-left.html" %}
+{% load staticfiles %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugins/datatables/jquery.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+    <!-- iCheck for checkboxes and radio inputs -->
+{% endblock %}
+
+{% block content %}
+
+    <!-- Content Header (Page header) -->
+    <section class="content-header margin-bottom">
+        <ol class="breadcrumb">
+            <li><a href=""><i class="fa fa-dashboard"></i>办公平台</a></li>
+            <li class="active"><a href="#">系统工具</a></li>
+            <li class="active"><a href="#">岗位职责设置</a></li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div id="devlist">
+            <div class="box box-primary" id="liebiao">
+                <div class="box-header">
+                    <div class="btn-group pull-left">
+                        <button type="button" id="btnCreate" class="btn btn-default">
+                            <i class="glyphicon glyphicon-plus"></i>新增
+                        </button>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <table id="dtbList" class="display" cellspacing="0" width="100%">
+                        <thead>
+                        <tr valign="middle">
+                            <th>名称</th>
+                            <th>所属部门</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                    <br> <br>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- /.content -->
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'plugins/datatables/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables/moment.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables/dataTables.const.js' %}"></script>
+    <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+    <!-- iCheck 1.0.1 -->
+    <script type="text/javascript">
+        $(function () {
+            $('#SYSTEM-TOOLS').addClass('active');
+            $('#POSITION-STATEMENT').addClass('active');
+
+        });
+    </script>
+
+    <script type="text/javascript">
+        var oDataTable = null;
+        $(function () {
+            oDataTable = initTable();
+
+            function initTable() {
+                var oTable = $('#dtbList').DataTable($.extend(true, {},
+                    DATATABLES_CONSTANT.DATA_TABLES.DEFAULT_OPTION,
+                    {
+                        ajax: {
+                            "url": "{% url 'position_statement' %}",
+                            "type": "post",
+                            "data": function (d) {
+                            }
+                        },
+                        columns: [
+                            {
+                                data: "name",
+                            },
+                            {
+                                data: "department__title",
+                            },
+                            {
+                                data: "id",
+                                width: "15%",
+                                bSortable: "false",
+                                render: function (data, type, row, meta) {
+                                    var ret = "";
+                                    var ret = "<button title='查看' onclick='doShow("
+                                        + data + ",\"" + row.name + "\",\"" + row.file + "\")'><i class='glyphicon glyphicon glyphicon-eye-open'></i></button>";
+                                    ret = ret + "<button title='删除' onclick='doDelete("
+                                        + data + ")'><i class='fa fa-trash'></i></button>";
+                                    return ret;
+                                }
+                            }],
+                        "order": [
+                            [1, 'id']
+                        ],
+                    }));
+                return oTable;
+            }
+
+            $("#btnCreate").click(function () {
+                layer.open({
+                    type: 2,
+                    title: '新增岗位职责',
+                    shadeClose: false,
+                    maxmin: true,
+                    area: ['800px', '400px'],
+                    content: "{% url 'position_statement_create' %}",
+                    end: function () {
+                        //关闭时做的事情
+                        oDataTable.ajax.reload();
+                    }
+                });
+            });
+
+            $("#btnRefresh").click(function () {
+                oDataTable.ajax.reload();
+            });
+        });
+
+        function doShow(id, title, file_content) {
+
+            var lay = layer.open({
+                type: 2,
+                title: title,
+                shadeClose: false,
+                maxmin: true,
+                area: ['800px', '400px'],
+                content: ["{{ MEDIA_URL }}" + file_content],
+                end: function () {
+                    oDataTable.ajax.reload();
+                }
+            });
+            layer.full(lay)
+        }
+
+        //停用单个数据
+        function doDelete(id) {
+            var tips = '确认删除吗?';
+            layer.alert(tips, {
+                title: '提示'
+                , icon: 3 //0:感叹号 1：对号 2：差号 3：问号 4：小锁 5：哭脸 6：笑脸
+                , time: 0 //不自动关闭
+                , btn: ['YES', 'NO']
+                , yes: function (index) {
+                    layer.close(index);
+                    $.ajax({
+                        type: "POST",
+                        url: "{% url 'position_statement_ajax' %}",
+                        data: {'id': id},
+                        cache: false,
+                        success: function (msg) {
+                            if (msg.status == '1') {
+                                layer.alert('删除成功', {icon: 1});
+                                parent.location.reload();
+                            } else {
+                                layer.alert('删除失败', {icon: 2});
+                            }
+                        }
+                    });
+                }
+            });
+
+        }
+    </script>
+{% endblock %}
