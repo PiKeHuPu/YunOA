@@ -50,7 +50,6 @@
                     <table id="dtbList" class="display" cellspacing="0" width="100%">
                         <thead>
                         <tr valign="middle">
-                            <th><input type="checkbox" id="checkAll"></th>
                             <th>名称</th>
                             <th>类别</th>
                             <th>状态</th>
@@ -101,7 +100,6 @@
                             }
                         },
                         columns: [
-                            DATATABLES_CONSTANT.DATA_TABLES.COLUMN.CHECKBOX,
                             {
                                 data: "title",//parent
                                 width: "30%",
@@ -162,7 +160,7 @@
                                 }
                             }],
                         "order": [
-                            [1, 'id']
+                            [1, 'desc'], [3, 'desc']
                         ],
                     }));
                 return oTable;
