@@ -1,6 +1,5 @@
 import json
 
-
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import Q
 from django.http import HttpResponse, request
@@ -14,8 +13,9 @@ from django.views import View
 from users.models import UserProfile, Structure
 from .models import Worklog, WorklogPart, User, WorkRecordTem, WorkRecord
 
-
 from datetime import datetime
+
+
 class WorkLog_Show(LoginRequiredMixin, View):
     def get(self, request):
         ret = dict()
@@ -23,6 +23,8 @@ class WorkLog_Show(LoginRequiredMixin, View):
         ret['departments'] = department
         users = UserProfile.objects.filter(is_active="1")
         ret['users'] = users
+        user_id = request.session.get("_auth_user_id")
+        ret["user_id"] = user_id
         return render(request, 'work/worklog_show.html', ret)
 
     def post(self, request):
@@ -30,7 +32,7 @@ class WorkLog_Show(LoginRequiredMixin, View):
                   "performance", "id", "remark", "dutyman_id__name",
                   "content_part__content", "department__title"
             , "is_done", "content_part__is_done", "content_part__step",
-                  "department__id", "content_part_id"]
+                  "department__id", "content_part_id", "content_part__cre_man_id"]
         filters = dict()
 
         if request.POST.get('status'):
@@ -71,56 +73,53 @@ class WorkLog_Create(LoginRequiredMixin, View):
 
     def post(self, request):
         res = dict()
-        try:
-            creman = request.session.get("_auth_user_id")
-            list1 = []
-            # adm_work_id = adm_work_list.split(",")
-            # if creman in adm_work_id:
-            adm_work_list = Structure.objects.values("adm_work").filter(~Q(adm_work=None))
-            for i in adm_work_list:
-                if "," in i["adm_work"]:
-                    work_id = i["adm_work"].split(",")
-                    list1 += work_id
-                else:
-                    list1.append(i["adm_work"])
-            # adm_work_id = adm_work_list.split(",")
-
-            if str(creman) in list1:
-                content = request.POST.get("content")
-                stage = request.POST.get("stage")
-                worklog = Worklog()
-                worklog.content = content
-                worklog.step = stage
-                worklog.cre_man_id = creman
-                worklog.save()
-                logid = worklog.id
-                is_done = []
-                for i in range(1, int(stage) + 1):
-                    logpart = WorklogPart()
-                    logpart.plan = request.POST.get('workplan' + str(i))
-                    logpart.stage = i
-                    logpart.is_done = request.POST.get('is_done' + str(i))
-                    logpart.s_time = request.POST.get('start_time' + str(i))
-                    logpart.e_time = request.POST.get('end_time' + str(i))
-                    logpart.performance = request.POST.get('complete' + str(i))
-                    logpart.remark = request.POST.get('remark' + str(i))
-                    logpart.department_id = request.POST.get('department' + str(i))
-                    logpart.content_part_id = logid
-                    logpart.dutyman_id = request.POST.get('dutyman' + str(i))
-                    logpart.save()
-                    if int(request.POST.get('is_done' + str(i))) == 1:
-                        is_done.append(request.POST.get('is_done' + str(i)))
-
-                if len(is_done) == int(stage):
-                    Worklog.objects.filter(id=logid).update(is_done=True)
-                else:
-                    Worklog.objects.filter(id=logid).update(is_done=False)
-                res['result'] = "1"
+        creman = request.session.get("_auth_user_id")
+        list1 = []
+        # adm_work_id = adm_work_list.split(",")
+        # if creman in adm_work_id:
+        adm_work_list = Structure.objects.values("adm_work").filter(~Q(adm_work=None))
+        for i in adm_work_list:
+            if "," in i["adm_work"]:
+                work_id = i["adm_work"].split(",")
+                list1 += work_id
             else:
-                res['result'] = "2"
-        except Exception as e:
-            e = str(e)
-            res['result'] = e
+                list1.append(i["adm_work"])
+        # adm_work_id = adm_work_list.split(",")
+
+        if str(creman) in list1:
+            content = request.POST.get("content")
+            stage = request.POST.get("stage")
+            worklog = Worklog()
+            worklog.content = content
+            worklog.step = stage
+            worklog.cre_man_id = creman
+            worklog.save()
+            logid = worklog.id
+            is_done = []
+            for i in range(1, int(stage) + 1):
+                logpart = WorklogPart()
+                logpart.plan = request.POST.get('workplan' + str(i))
+                logpart.stage = i
+                logpart.is_done = request.POST.get('is_done' + str(i))
+                logpart.s_time = request.POST.get('start_time' + str(i))
+                logpart.e_time = request.POST.get('end_time' + str(i))
+                logpart.performance = request.POST.get('complete' + str(i))
+                logpart.remark = request.POST.get('remark' + str(i))
+                logpart.department_id = request.POST.get('department' + str(i))
+                logpart.content_part_id = logid
+                logpart.dutyman_id = request.POST.get('dutyman' + str(i))
+                logpart.save()
+                if int(request.POST.get('is_done' + str(i))) == 1:
+                    is_done.append(request.POST.get('is_done' + str(i)))
+
+            if len(is_done) == int(stage):
+                Worklog.objects.filter(id=logid).update(is_done=True)
+            else:
+                Worklog.objects.filter(id=logid).update(is_done=False)
+            res['result'] = "1"
+        else:
+            res['result'] = "2"
+
         return HttpResponse(json.dumps(res, cls=DjangoJSONEncoder), content_type='application/json')
 
 
@@ -227,6 +226,22 @@ class WorkLog_Detail(LoginRequiredMixin, View):
             'logpart': logpart
         }
         return render(request, 'work/worklog_detail.html', ret)
+
+    def post(self, request):
+        """
+        看板删除
+        :param request:
+        :return:
+        """
+        ret = dict()
+        part_id = request.POST.get("id")
+        log_part = WorklogPart.objects.filter(id=part_id).first()
+        log = log_part.content_part
+        log_parts = log.worklogpart_set.all()
+        log_parts.delete()
+        log.delete()
+        ret['status'] = "1"
+        return HttpResponse(json.dumps(ret), content_type='application/json')
 
 
 # 设置填写人员
@@ -473,6 +488,7 @@ class WorkRecordHistory(LoginRequiredMixin, View):
     """
     日志记录历史
     """
+
     def get(self, request):
         ret = dict()
         user_id = request.GET.get("id")
@@ -487,5 +503,7 @@ class WorkRecordHistory(LoginRequiredMixin, View):
         filters = dict()
         if request.POST.get("date"):
             filters["date"] = request.POST.get("date")
-        ret = dict(data=list(WorkRecord.objects.values(*fields).filter(is_submit=True, tem__user_id=user_id, **filters).order_by("-date")))
+        ret = dict(data=list(
+            WorkRecord.objects.values(*fields).filter(is_submit=True, tem__user_id=user_id, **filters).order_by(
+                "-date")))
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')

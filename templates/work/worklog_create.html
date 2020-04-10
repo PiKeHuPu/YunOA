@@ -189,6 +189,7 @@
                         return false
                     }
                 }
+                $("#stage").attr("disabled", false);
                 var data = $("#addForm").serialize();
                 $.ajax({
                     type: $("#addForm").attr('method'),
