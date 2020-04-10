@@ -314,6 +314,7 @@ class AssetCreateView(LoginRequiredMixin, View):
             department_id = request.POST.get("department")
             warehouse_id = request.POST.get("warehouse")
             quantity = request.POST.get("quantity")
+            status = request.POST.get("status")
 
             if id0:
                 asset = AssetInfo.objects.get(id=id0)
@@ -353,6 +354,7 @@ class AssetCreateView(LoginRequiredMixin, View):
                 asset.due_time = due_time
             asset.unit = request.POST.get("unit")
             asset.type = request.POST.get("type")
+            asset.status = status
             asset.remark = request.POST.get("remark")
             if request.POST.get("no_approve") == "on":
                 asset.is_no_approve = True
