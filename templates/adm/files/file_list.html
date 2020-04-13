@@ -190,7 +190,7 @@
                 area: ['800px', '550px'],
                 content: ["{% url 'file_rename' %}" + '?id=' + id, 'no'],
                 end: function () {
-                    oDataTable.ajax.reload();
+                    window.location.reload()
                 }
             });
         }
@@ -212,7 +212,7 @@
                         success: function (msg) {
                             if (msg.result) {
                                 layer.alert('删除成功', {icon: 1});
-                                oDataTable.ajax.reload();
+                                window.location.reload()
                             } else {
                                 //alert(msg.message);
                                 layer.alert('删除失败', {icon: 2});
