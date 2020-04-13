@@ -4,6 +4,7 @@
 {% block css %}
     <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/fileinput/fileinput.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
 {% endblock %}
 
 {% block main %}
@@ -23,12 +24,32 @@
                         </div>
                     </div>
                     <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">变更编号</label>
+                        <div class="col-sm-6">
+                            <input class="form-control" name="number" type="text" id="number"
+                                   value="{% if file0.number %}{{ file0.number }}{% endif %}"/>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
                         <label class="col-sm-2 control-label">变更类型</label>
                         <div class="col-sm-6">
-                            <select class="form-control" name="type0" type="text" id="type0" value="{{ file_name }}"/>
-                                <option value="">档案列表</option>
+                            <select class="form-control select2" name="type0" type="text" id="type0" value="{{ file_name }}">
+                            <option value="">档案列表</option>
                             {% for type in types %}
-                                <option value="{{ type.id }}" {% if file0.type_id == type.id %}selected{% endif %}>{{ type.name }}</option>
+                                <option value="{{ type.id }}"
+                                        {% if file0.type_id == type.id %}selected{% endif %}>{{ type.name }}</option>
+                            {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">变更保管人</label>
+                        <div class="col-sm-6">
+                            <select class="form-control select2" name="preserver" type="text" id="preserver"
+                                    value="{{ file_name }}">
+                            {% for user in users %}
+                                <option value="{{ user.id }}"
+                                        {% if file0.preserver_id == user.id %}selected{% endif %}>{{ user.name }}</option>
                             {% endfor %}
                             </select>
                         </div>
@@ -50,6 +71,7 @@
     <script src="{% static 'plugins/combo-select/jquery.combo.select.js' %}"></script>
     <script src="{% static 'plugins/fileinput/fileinput.js' %}"></script>
     <script src="{% static 'plugins/fileinput/zh.js' %}"></script>
+    <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
     <script type="text/javascript">
 
         /*点取消刷新新页面*/
@@ -76,6 +98,12 @@
                 }
             });
         }
+    </script>
+    <script>
+        $(function () {
+            //Initialize Select2 Elements
+            $(".select2").select2();
+        });
     </script>
 
 {% endblock %}

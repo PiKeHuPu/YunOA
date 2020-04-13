@@ -724,8 +724,9 @@ class FileUpload(LoginRequiredMixin, View):
     def get(self, request):
         ret = dict()
         type0 = request.GET.get("type")
-        print(type0)
         ret["type0"] = type0
+        users = User.objects.filter(is_active="1")
+        ret["users"] = users
         return render(request, "adm/files/file_upload.html", ret)
 
     def post(self, request):
@@ -735,6 +736,8 @@ class FileUpload(LoginRequiredMixin, View):
         type1 = FileType.objects.filter(id=type0).first()
         if not file0:
             return HttpResponse("没有上传文件")
+        number = request.POST.get("number", None)
+        preserver = request.POST.get("preserver")
         file_manage = FileManage()
         file_manage.name = file0.name
         file_manage.content = file0
@@ -743,6 +746,9 @@ class FileUpload(LoginRequiredMixin, View):
         else:
             file_manage.type = None
         file_manage.uploader_id = user_id
+        if number:
+            file_manage.number = number
+        file_manage.preserver_id = preserver
         file_manage.save()
         return HttpResponse("上传成功")
 
@@ -764,12 +770,12 @@ class FileList(LoginRequiredMixin, View):
 
     def post(self, request):
         # 获取资产列表
-        fields = ['id', 'name', 'upload_time', 'content']
+        fields = ['id', 'name', 'upload_time', 'content', 'number', 'preserver__name']
         type0 = request.POST.get("type0")
         if type0:
-            ret = dict(data=list(FileManage.objects.values(*fields).filter(is_delete=False, type_id=type0)))
+            ret = dict(data=list(FileManage.objects.values(*fields).filter(is_delete=False, type_id=type0).order_by("-upload_time")))
         else:
-            ret = dict(data=list(FileManage.objects.values(*fields).filter(is_delete=False, type_id=None)))
+            ret = dict(data=list(FileManage.objects.values(*fields).filter(is_delete=False, type_id=None).order_by("-upload_time")))
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
 
 
@@ -784,6 +790,8 @@ class FileRename(LoginRequiredMixin, View):
         ret["file0"] = file
         types = FileType.objects.all()
         ret["types"] = types
+        users = User.objects.filter(is_active="1")
+        ret["users"] = users
         return render(request, "adm/files/file_rename.html", ret)
 
     def post(self, request):
@@ -791,12 +799,17 @@ class FileRename(LoginRequiredMixin, View):
         id0 = request.POST.get("id")
         name = request.POST.get("name0")
         type0 = request.POST.get("type0")
+        number = request.POST.get("number")
+        preserver = request.POST.get("preserver")
         file = FileManage.objects.filter(id=id0).first()
         path = "media/file_manage/" + str(file.name)
         new_path = "media/file_manage/" + name
         os.rename(path, new_path)
         file.name = name
         file.type_id = type0
+        if number:
+            file.number = number
+        file.preserver_id = preserver
         file.save()
         ret["status"] = "success"
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")

@@ -19,7 +19,7 @@ from system.models import SystemSetup
 from .forms import ImageUploadForm, UserUpdateForm
 from users.forms import AdminPasswdChangeForm
 from .models import WorkOrder, BusinessApply, FeeType
-from adm.models import Asset, AssetType, AssetApproveDetail, AssetInfo
+from adm.models import Asset, AssetType, AssetApproveDetail, AssetInfo, FileManage
 from .models import WorkOrder, BusinessApply, Advise
 from adm.models import Asset, AssetType
 from rbac.models import Role, SpecialRole
@@ -760,35 +760,19 @@ class Direction(View):
         return HttpResponse(json.dumps(ret), content_type='application/json')
 
 
-class Check(View):
-
+class Catalog(View):
+    """
+    档案管理目录
+    """
     def get(self, request):
         ret = dict()
-        advise = Advise.objects.all()
-        ret["advice"] = advise
 
-        # creator = []
-        # create_time = []
-        # back = []
-        # is_done = []
-        # if advise:
-        #     for x in advise:
-        #         creator.append(x.creator)
-        #         create_time.append(x.create_time)
-        #         back.append(x.back)
-        #         is_done.append(x.is_done)
-        # else:
-        #     creator = ''
-        #     create_time = ''
-        #     back = ''
-        #     is_done = ''
-        # ret.update({
-        #     'create_time': create_time,
-        #     'creator': creator,
-        #     'back': back,
-        #     'is_done': is_done,
-        # })
-        return render(request, 'checkAdvise.html', ret)
+        return render(request, 'adm/asset/file_list.html', ret)
+
+    def post(self, request):
+        fields = ['id', 'name', 'upload_time', 'content', 'number', 'preserver__name', 'type__name']
+        ret = dict(data=list(FileManage.objects.values(*fields).filter(is_delete=False).order_by("-upload_time")))
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
 
 
 class DueAssetView(LoginRequiredMixin, View):

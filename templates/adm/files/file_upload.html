@@ -4,6 +4,7 @@
 {% block css %}
     <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
     <link rel="stylesheet" href="{% static 'plugins/fileinput/fileinput.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
 {% endblock %}
 
 {% block main %}
@@ -17,22 +18,38 @@
                         <h4>上传档案</h4>
                     </legend>
                 </fieldset>
-            <fieldset>
-            <div class="form-group has-feedback">
-                    <label class="col-sm-2 control-label">上传附件</label>
-                    <div class="col-sm-9">
-                        <div class="file-loading">
-                            <input id="file_content" name="file_content" class="form-control" type="file" multiple="multiple"/>
+                <fieldset>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">档案编号(选填)</label>
+                        <div class="col-sm-4">
+                            <input type="text" id="number" class="form-control">
+                        </div>
+                        <label class="col-sm-2 control-label">保管人</label>
+                        <div class="col-sm-3">
+                            <select name="preserver" id="preserver" class="form-control select2">
+                                <option value=""></option>
+                                {% for user in users %}
+                                    <option value="{{ user.id }}">{{ user.name }}</option>
+                                {% endfor %}
+                            </select>
                         </div>
                     </div>
-                </div>
-                <div class="form-group has-feedback">
-                    <label class="col-sm-2 control-label"></label>
-                    <div class="col-sm-8">
-                        <small class="text-red">支持同时上传多个文件</small>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">上传附件</label>
+                        <div class="col-sm-9">
+                            <div class="file-loading">
+                                <input id="file_content" name="file_content" class="form-control" type="file"
+                                       multiple="multiple"/>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </fieldset>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label"></label>
+                        <div class="col-sm-8">
+                            <small class="text-red">支持同时上传多个文件</small>
+                        </div>
+                    </div>
+                </fieldset>
 
             </div>
             <div class="box-footer ">
@@ -46,36 +63,62 @@
 {% endblock %}
 
 {% block javascripts %}
-<script src="{% static 'plugins/combo-select/jquery.combo.select.js' %}"></script>
-<script src="{% static 'plugins/fileinput/fileinput.js' %}"></script>
-<script src="{% static 'plugins/fileinput/zh.js' %}"></script>
-<script type="text/javascript">
-    $("#file_content").fileinput({
-        language: "zh",
-        showPreview: false,
-        showUpload: false,
-        uploadUrl: "{% url 'file_upload' %}",
-        uploadExtraData: {"type0": {{ type0 }}},
-     });
+    <script src="{% static 'plugins/combo-select/jquery.combo.select.js' %}"></script>
+    <script src="{% static 'plugins/fileinput/fileinput.js' %}"></script>
+    <script src="{% static 'plugins/fileinput/zh.js' %}"></script>
+    <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+    <script type="text/javascript">
+        $("#file_content").fileinput({
+            language: "zh",
+            showPreview: false,
+            showUpload: false,
+            uploadUrl: "{% url 'file_upload' %}",
+            uploadExtraData: function () {
+                var para = {
+                    "type0": {{ type0 }},
+                    "number": $("#number").val(),
+                    "preserver": $("#preserver").val()
+                };
+                return para;
+            }
+        });
 
-    function Create() {
-        $("#btn_save").attr("disabled", "disabled");
-        if ($("#file_content").val()) {
-            $("#file_content").fileinput("upload");
-            $("#file_content").on("fileuploaded", function(event, data, previewId, index) {
-                 parent.layer.closeAll(); //关闭所有弹窗
-            });
-        } else {
-            alert("没有上传文件")
+        /**
+         * @return {boolean}
+         */
+        function Create() {
+            var preserver = $("#preserver").val();
+            if (preserver) {
+
+            } else {
+                alert("请选择保管人");
+                return false;
+            }
+            $("#btn_save").attr("disabled", "disabled");
+            if ($("#file_content").val()) {
+                $("#file_content").fileinput("upload");
+                $("#file_content").on("fileuploaded", function (event, data, previewId, index) {
+                    parent.layer.closeAll(); //关闭所有弹窗
+                });
+            } else {
+                alert("没有上传文件");
+                $("#btn_save").attr("disabled", false);
+            }
         }
-}
 
 
-    /*点取消刷新新页面*/
-    $("#btnCancel").click(function () {
-        window.location.reload();
+        /*点取消刷新新页面*/
+        $("#btnCancel").click(function () {
+            window.location.reload();
 
-    });
-</script>
+        });
+    </script>
+
+    <script>
+        $(function () {
+            //Initialize Select2 Elements
+            $(".select2").select2();
+        });
+    </script>
 
 {% endblock %}
