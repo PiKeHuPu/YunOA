@@ -30,8 +30,11 @@
                         </button>
                     </div>
                     <div class="btn-group pull-right">
-                        <button type="button" class="btn btn-default" onclick="BulletinType()">
-                            <i class="	glyphicon glyphicon-user"></i>类型设置
+                        <button type="button" class="btn btn-default" onclick="FileType()">
+                            <i class="fa fa-plus-square-o"></i>类型设置
+                        </button>
+                        <button type="button" class="btn btn-default" onclick="FileSubType()">
+                            <i class="fa fa-plus-square"></i>子类型设置
                         </button>
                     </div>
                 </div>
@@ -70,6 +73,7 @@
     <script type="text/javascript">
         $(function () {
             $('#FILE-MANAGE').addClass('active');
+            $('#FILE-LIST{{ type.parent_type_id }}').addClass('active');
             $('#FILE-LIST{{ type0 }}').addClass('active');
         });
     </script>
@@ -105,7 +109,7 @@
                                 data: "number",
                             },
                             {
-                                data: "name",
+                                data: "file_name",
                             },
                             {
                                 data: "upload_time",
@@ -166,7 +170,6 @@
         });
 
         function doShow(name, file_content) {
-
             var lay = layer.open({
                 type: 2,
                 title: name,
@@ -225,14 +228,29 @@
         }
 
 
-        function BulletinType() {
-            layer.open({
+        function FileType() {
+            var index = layer.open({
                 type: 2,
                 title: '设置类型',
                 shadeClose: false,
                 maxmin: true,
                 area: ['800px', '600px'],
                 content: ["{% url 'file_type_set' %}"],
+                end: function () {
+                    window.location.reload();
+                }
+            });
+            layer.full(index)
+        }
+
+        function FileSubType() {
+            layer.open({
+                type: 2,
+                title: '设置类型',
+                shadeClose: false,
+                maxmin: true,
+                area: ['800px', '600px'],
+                content: ["{% url 'file_sub_type_set' %}"],
                 end: function () {
                     window.location.reload();
                 }

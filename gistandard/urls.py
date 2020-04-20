@@ -32,7 +32,8 @@ from system.views import SystemView
 from adm.views import AdmView, WarehouseView, \
     WarehouseCreateView, WarehouseDeleteView, AssetView, AssetCreateView, AssetAjaxView, AssetUseFlowView, \
     AssetApplyView, AssetApproveView, AssetApproveresultView, AssetApproveHistoryView, AssetOrderDetailView, \
-    AssetTransferView, FileUpload, FileList, FileRename, FileDelete, SetFileType, FileTypeAjax
+    AssetTransferView, FileUpload, FileList, FileRename, FileDelete, SetFileType, FileTypeAjax, FileSubType, FileShow, \
+    FileTypeEditPart
 from oilWear.views import OilOrderCreateView
 from personal import views as personal_views
 from personal import views_work_order as order
@@ -183,6 +184,9 @@ urlpatterns = [
     url(r'^adm/file_delete/$', FileDelete.as_view(), name="file_delete"),
     url(r'^adm/file_type_set/$', SetFileType.as_view(), name="file_type_set"),
     url(r'^adm/file_type_ajax/$', FileTypeAjax.as_view(), name="file_type_ajax"),
+    url(r'^adm/file_sub_type_set/$', FileSubType.as_view(), name="file_sub_type_set"),
+    url(r'^personal/file_show_list/$', FileShow.as_view(), name="file_show_list"),
+    url(r'^adm/file_type_edit_part/$', FileTypeEditPart.as_view(), name="file_type_edit_part"),
     # 修改个人岗位职责
     url(r'^personal/create_statement', ChangeStatement.as_view(), name='create_statement'),
     url(r'^personal/show_statement', ShowStatement.as_view(), name='show_statement'),

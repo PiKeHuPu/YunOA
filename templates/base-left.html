@@ -8,15 +8,16 @@
         <!-- sidebar: style can be found in sidebar.less -->
         <section class="sidebar">
             <!-- search form (Optional) -->
-              <form action="#" method="get" class="sidebar-form">
+            <form action="#" method="get" class="sidebar-form">
                 <div class="input-group">
-                  <input type="text" name="q" class="form-control" placeholder="Search...">
-                      <span class="input-group-btn">
-                        <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i class="fa fa-search"></i>
+                    <input type="text" name="q" class="form-control" placeholder="Search...">
+                    <span class="input-group-btn">
+                        <button type="submit" name="search" id="search-btn" class="btn btn-flat"><i
+                                class="fa fa-search"></i>
                         </button>
                       </span>
                 </div>
-              </form>
+            </form>
             <!-- /.search form -->
 
             <!-- Sidebar Menu -->
@@ -32,9 +33,46 @@
                             </a>
                             <ul class="treeview-menu">
                                 {% for sub in  menu.sub_menu %}
-                                    <li id="{{ sub.code }}">
-                                        <a href="{{ sub.url }}"><i class="fa fa-circle-thin" style="font-size: 1px"></i>{{ sub.title }}</a>
-                                    </li>
+                                    {% if sub.id != 155 %}
+                                        {% if sub.parent == 154 or sub.parent == 201 %}
+                                            {% if sub.sub_menu|length == 0 %}
+                                                <li id="{{ sub.code }}">
+                                                    <a href="{{ sub.url }}"><i class="fa fa-circle-thin"
+                                                                               style="font-size: 1px"></i>{{ sub.title }}
+                                                    </a>
+                                                </li>
+                                            {% else %}
+                                                <li class="treeview" id="{{ sub.code }}">
+                                                    <a href="{{ sub.url }}"><i class="fa fa-circle-thin"></i>
+                                                        <span>{{ sub.title }}</span>
+                                                        <span class="pull-right-container"><i
+                                                                class="fa fa-angle-left pull-right"></i></span>
+                                                    </a>
+                                                    <ul class="treeview-menu">
+                                                        {% for sub_sub in sub.sub_menu %}
+                                                            <li id="{{ sub_sub.code }}">
+                                                                <a href="{{ sub_sub.url }}"><i class="fa fa-circle"
+                                                                                               style="font-size: 1px"></i>{{ sub_sub.title }}
+                                                                </a>
+                                                            </li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </li>
+
+                                            {% endif %}
+                                        {% else %}
+                                            <li id="{{ sub.code }}">
+                                                <a href="{{ sub.url }}"><i class="fa fa-circle-thin"
+                                                                           style="font-size: 1px"></i>{{ sub.title }}
+                                                </a>
+                                            </li>
+                                        {% endif %}
+                                    {% else %}
+                                        <li id="{{ sub.code }}">
+                                            <a href="{{ sub.url }}"><i class="fa fa-circle-thin"
+                                                                       style="font-size: 1px"></i>{{ sub.title }}</a>
+                                        </li>
+                                    {% endif %}
                                 {% endfor %}
                             </ul>
                         </li>

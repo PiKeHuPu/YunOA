@@ -3,6 +3,7 @@
 
 {% block css %}
     <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
 {% endblock %}
 
 {% block main %}
@@ -16,34 +17,80 @@
                     </legend>
                     <div class="form-group has-feedback">
                         <label class="col-sm-3 control-label">名称</label>
-                        <div class="col-sm-5">
+                        <div class="col-sm-2">
                             <input class="form-control" name="title" type="text" id="title" autocomplete="off"/>
+                        </div>
+                        <label class="col-sm-2 control-label">可见人员</label>
+                        <div class="col-sm-2">
+                            <select name="is_show" id="is_show" class="form-control" onchange="ChangeShow()">
+                                <option value="1">全部可见</option>
+                                <option value="0">不可见</option>
+                                <option value="2">部分可见</option>
+                            </select>
                         </div>
                         <div class="col-sm-3">
                             <button type="button" onclick="CreateType()" class="btn btn-info margin-right ">新增</button>
                         </div>
                     </div>
+                    <div class="form-group has-feedback" id="part_user" hidden>
+                        <div class="col-xs-offset-1 col-xs-4">
+                            <label class="control-label">可选用户:</label>
+                            <select name="from" id="multiselect" class="form-control" size="18" multiple="multiple">
+                                {% for item in un_add_users %}
+                                    <option value="{{ item.id }}">{{ item.name }}({{ item.username }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-xs-2">
+                            <br><br><br><br><br><br>
+                            <button type="button" id="multiselect_rightAll" class="btn btn-block"><i
+                                    class="glyphicon glyphicon-forward"></i></button>
+                            <button type="button" id="multiselect_rightSelected" class="btn btn-block"><i
+                                    class="glyphicon glyphicon-chevron-right"></i></button>
+                            <button type="button" id="multiselect_leftSelected" class="btn btn-block"><i
+                                    class="glyphicon glyphicon-chevron-left"></i></button>
+                            <button type="button" id="multiselect_leftAll" class="btn btn-block"><i
+                                    class="glyphicon glyphicon-backward"></i></button>
+                        </div>
+                        <div class="col-xs-4">
+                            <label class="control-label">已绑定用户:</label>
+                            <select name="to" id="multiselect_to" class="form-control" size="18"
+                                    multiple="multiple">
+                                {% for item in added_users %}
+                                    <option value="{{ item.id }}">{{ item.name }}({{ item.username }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
                 </fieldset>
-
             </div>
             <div class="box-footer ">
                 {% for type in file_types %}
-                    <dic class="col-sm-6">
+                    <div class="col-sm-6">
                         <div class="col-sm-6" style="margin-bottom: 10px;">
                             <input class="form-control" name="title" type="text" value="{{ type.name }}"
                                    id="tl{{ type.id }}"/>
                         </div>
-                        <div class="col-sm-2">
+                        <div class="col-sm-3" style="margin-bottom: 10px;">
+                            <select name="show{{ type.id }}" id="show{{ type.id }}" class="form-control">
+                                <option value="1" {% if type.is_show == True %}selected{% endif %}>全部可见</option>
+                                <option value="0" {% if type.is_show == False %}selected{% endif %}>不可见</option>
+                                <option value="2"
+                                        {% if type.is_show == True and type.is_part == True %}selected{% endif %}>部分可见
+                                </option>
+                            </select>
+                        </div>
+                        <div class="col-sm-1">
                             <button type="button" onclick="TypeTitle({{ type.id }})" class="btn btn-info margin-right ">
                                 更改
                             </button>
                         </div>
-                        <div class="col-sm-2">
+                        <div class="col-sm-1">
                             <button type="button" onclick="TypeStatus({{ type.id }})"
                                     class="btn btn-warning margin-right">删除
                             </button>
                         </div>
-                    </dic>
+                    </div>
                 {% endfor %}
             </div>
         </form>
@@ -53,7 +100,23 @@
 
 {% block javascripts %}
     <script src="{% static 'plugins/combo-select/jquery.combo.select.js' %}"></script>
+    <script src="{% static 'plugins/select/multiselect.min.js' %}"></script>
     <script type="text/javascript">
+
+        $(document).ready(function () {
+            //初始化多选列表
+            $('#multiselect').multiselect({
+                search: {
+                    left: '<input type="text" class="form-control" placeholder="Search..." />',
+                    right: '<input type="text" class="form-control" placeholder="Search..." />',
+                },
+                fireSearch: function (value) {
+                    return value.length > 1;
+                }
+            });
+
+
+        });
 
         /*点取消刷新新页面*/
         $("#btnCancel").click(function () {
@@ -61,15 +124,28 @@
 
         });
 
+        function ChangeShow() {
+            if ($("#is_show").val() == "2") {
+                $("#part_user").attr("hidden", false)
+            } else {
+                $("#part_user").attr("hidden", "hidden")
+            }
+        }
+
         function CreateType() {
             var title = $("#title").val();
             if (title == "") {
                 alert("类型名称不能为空")
             } else {
+                $('#multiselect_to option').prop('selected', true);
                 $.ajax({
                     type: 'post',
                     url: "{% url 'file_type_set' %}",
-                    data: {"title": $("#title").val()},
+                    data: {
+                        "title": $("#title").val(),
+                        "is_show": $("#is_show").val(),
+                        "part": $("#multiselect_to").val()
+                    },
                     cache: false,
                     success: function (msg) {
                         if (msg.status == 'success') {
@@ -83,7 +159,6 @@
                     }
                 });
             }
-
         }
 
         function TypeStatus(id) {
@@ -95,7 +170,7 @@
                 , btn: ['是', '否']
                 , yes: function (index) {
                     layer.close(index);
-                    layer.alert("是否要保留此类型内的档案至档案列表？", {
+                    layer.alert("是否要保留此类型内的档案至档案设置？", {
                         title: "提示",
                         icon: 3,
                         time: 0,
@@ -112,13 +187,13 @@
                                     if (msg.status == 'success') {
                                         layer.alert('删除成功', {icon: 1});
                                         parent.location.reload();
+                                    } else if (msg.status == 'had_sub_type') {
+                                        layer.alert('请先删除该类型的所有子类型', {icon: 2});
                                     } else {
-                                        //alert(msg.message);
                                         layer.alert('删除失败', {icon: 2});
                                     }
                                 }
                             });
-
                         },
                         cancel: function () {
                             $.ajax({
@@ -130,8 +205,9 @@
                                     if (msg.status == 'success') {
                                         layer.alert('删除成功', {icon: 1});
                                         parent.location.reload();
+                                    } else if (msg.status == 'had_sub_type') {
+                                        layer.alert('请先删除该类型的所有子类型', {icon: 2});
                                     } else {
-                                        //alert(msg.message);
                                         layer.alert('删除失败', {icon: 2});
                                     }
                                 }
@@ -145,21 +221,38 @@
         function TypeTitle(id) {
             var tlid = 'tl' + id;
             var title = $("#" + tlid).val();
-            $.ajax({
-                type: 'get',
-                url: "{% url 'file_type_ajax' %}",
-                data: {"id": id, "title": title},
-                cache: false,
-                success: function (msg) {
-                    if (msg.status == 'success') {
-                        layer.alert('数据保存成功！', {icon: 1}, function (index) {
-                            parent.location.reload();
-                        });
-                    } else {
-                        layer.alert('数据保存失败', {icon: 5});
+            var show_id = 'show' + id;
+            var is_show = $("#" + show_id).val();
+            if (is_show == "2") {
+                layer.open({
+                    type: 2,
+                    title: '编辑' + title + '可见人员',
+                    shadeClose: false,
+                    maxmin: true,
+                    area: ['800px', '600px'],
+                    content: "{% url 'file_type_edit_part' %}?id=" + id + "&title=" + title,
+                    end: function () {
+                        //关闭时做的事情
+                        window.location.reload();
                     }
-                }
-            });
+                });
+            } else {
+                $.ajax({
+                    type: 'get',
+                    url: "{% url 'file_type_ajax' %}",
+                    data: {"id": id, "title": title, "is_show": is_show},
+                    cache: false,
+                    success: function (msg) {
+                        if (msg.status == 'success') {
+                            layer.alert('数据保存成功！', {icon: 1}, function (index) {
+                                parent.location.reload();
+                            });
+                        } else {
+                            layer.alert('数据保存失败', {icon: 5});
+                        }
+                    }
+                });
+            }
         }
 
     </script>

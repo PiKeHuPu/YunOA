@@ -20,7 +20,7 @@
                     <div class="form-group has-feedback">
                         <label class="col-sm-2 control-label">变更名称</label>
                         <div class="col-sm-6">
-                            <input class="form-control" name="name0" type="text" id="name0" value="{{ file0.name }}"/>
+                            <input class="form-control" name="name0" type="text" id="name0" value="{{ file_name }}"/>
                         </div>
                     </div>
                     <div class="form-group has-feedback">
@@ -33,12 +33,19 @@
                     <div class="form-group has-feedback">
                         <label class="col-sm-2 control-label">变更类型</label>
                         <div class="col-sm-6">
-                            <select class="form-control select2" name="type0" type="text" id="type0" value="{{ file_name }}">
-                            <option value="">档案列表</option>
-                            {% for type in types %}
-                                <option value="{{ type.id }}"
-                                        {% if file0.type_id == type.id %}selected{% endif %}>{{ type.name }}</option>
-                            {% endfor %}
+                            <select class="form-control select2" name="type0" type="text" id="type0"
+                                    value="{{ file_name }}">
+                                <option value="">档案设置</option>
+                                {% for type in types %}
+                                    <option value="{{ type.id }}"
+                                            {% if file0.type_id == type.id %}selected{% endif %}>
+                                        {% if type.parent_type %}
+                                            {{ type.parent_type.name }}--{{ type.name }}
+                                        {% else %}
+                                            {{ type.name }}
+                                        {% endif %}
+                                    </option>
+                                {% endfor %}
                             </select>
                         </div>
                     </div>
@@ -47,10 +54,10 @@
                         <div class="col-sm-6">
                             <select class="form-control select2" name="preserver" type="text" id="preserver"
                                     value="{{ file_name }}">
-                            {% for user in users %}
-                                <option value="{{ user.id }}"
-                                        {% if file0.preserver_id == user.id %}selected{% endif %}>{{ user.name }}</option>
-                            {% endfor %}
+                                {% for user in users %}
+                                    <option value="{{ user.id }}"
+                                            {% if file0.preserver_id == user.id %}selected{% endif %}>{{ user.name }}</option>
+                                {% endfor %}
                             </select>
                         </div>
                     </div>

@@ -16,7 +16,8 @@ from django.views.generic.base import View
 
 from adm import migrate_asset
 from adm.migrate_asset import migrate_asset_flow, create_no_back
-from adm.models import AssetWarehouse, AssetInfo, AssetEditFlow, AssetApprove, AssetApproveDetail, FileManage, FileType
+from adm.models import AssetWarehouse, AssetInfo, AssetEditFlow, AssetApprove, AssetApproveDetail, FileManage, FileType, \
+    FileTypeUser
 from users.models import Structure
 from rbac.models import Menu, Role
 from system.models import SystemSetup
@@ -449,6 +450,9 @@ class AssetUseFlowView(LoginRequiredMixin, View):
             asset_order = AssetApprove.objects.filter(id=id)[0]
             if asset_order.asset.is_no_return:
                 asset_order.use_status = "3"
+            elif asset_order.return_date == None:
+                asset_order.use_status = "2"
+                asset_order.return_quantity = asset_order.quantity
             else:
                 if asset_order.type == "1":
                     asset_order.use_status = "4"
@@ -721,6 +725,7 @@ class FileUpload(LoginRequiredMixin, View):
     """
     档案上传
     """
+
     def get(self, request):
         ret = dict()
         type0 = request.GET.get("type")
@@ -757,6 +762,7 @@ class FileList(LoginRequiredMixin, View):
     """
     文件列表
     """
+
     def get(self, request):
         ret = dict()
         type0 = request.GET.get("type")
@@ -766,16 +772,24 @@ class FileList(LoginRequiredMixin, View):
         else:
             ret["type0"] = ""
             ret["type1"] = "-1"
+        type = FileType.objects.filter(id=type0).first()
+        ret["type"] = type
         return render(request, "adm/files/file_list.html", ret)
 
     def post(self, request):
-        # 获取资产列表
         fields = ['id', 'name', 'upload_time', 'content', 'number', 'preserver__name']
         type0 = request.POST.get("type0")
         if type0:
-            ret = dict(data=list(FileManage.objects.values(*fields).filter(is_delete=False, type_id=type0).order_by("-upload_time")))
+            ret = dict(data=list(
+                FileManage.objects.values(*fields).filter(is_delete=False, type_id=type0).order_by("-upload_time")))
         else:
-            ret = dict(data=list(FileManage.objects.values(*fields).filter(is_delete=False, type_id=None).order_by("-upload_time")))
+            ret = dict(data=list(
+                FileManage.objects.values(*fields).filter(is_delete=False, type_id=None).order_by("-upload_time")))
+
+        for i in ret["data"]:
+            file_name = os.path.basename(i["content"])
+            i["file_name"] = file_name
+
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
 
 
@@ -783,12 +797,22 @@ class FileRename(LoginRequiredMixin, View):
     """
     文件重命名与修改类型
     """
+
     def get(self, request):
         ret = dict()
         id0 = request.GET.get("id")
         file = FileManage.objects.filter(id=id0).first()
         ret["file0"] = file
+        ret["file_name"] = os.path.basename(str(file.content))
         types = FileType.objects.all()
+        type_list = []
+        for i in types:
+            type_list.append(i.id)
+        for i in types:
+            if i.is_sub == True:
+                type_list.remove(i.parent_type_id)
+        print(type_list)
+        types = FileType.objects.filter(id__in=type_list)
         ret["types"] = types
         users = User.objects.filter(is_active="1")
         ret["users"] = users
@@ -802,13 +826,15 @@ class FileRename(LoginRequiredMixin, View):
         number = request.POST.get("number")
         preserver = request.POST.get("preserver")
         file = FileManage.objects.filter(id=id0).first()
-        path = "media/file_manage/" + str(file.name)
+        path = "media/" + str(file.content)
         new_path = "media/file_manage/" + name
+        content_path = "file_manage/" + name
         os.rename(path, new_path)
         file.name = name
         file.type_id = type0
         if number:
             file.number = number
+        file.content = content_path
         file.preserver_id = preserver
         file.save()
         ret["status"] = "success"
@@ -819,6 +845,7 @@ class FileDelete(LoginRequiredMixin, View):
     """
     文件删除
     """
+
     def post(self, request):
         ret = dict()
         user_id = request.session.get("_auth_user_id")
@@ -841,26 +868,66 @@ class SetFileType(LoginRequiredMixin, View):
     """
     设置文件类型
     """
+
     def get(self, request):
         ret = dict()
-        file_types = FileType.objects.all()
+        file_types = FileType.objects.filter(is_sub=False)
         ret["file_types"] = file_types
+        users = User.objects.filter(is_active="1")
+        ret["un_add_users"] = users
         return render(request, "adm/files/file_type.html", ret)
 
     def post(self, request):
         ret = dict()
         title = request.POST.get("title")
+        is_show = request.POST.get("is_show")
+        is_sub = request.POST.get("is_sub", None)
         file_type = FileType()
         file_type.name = title
+        id_list = []
+        if is_show == "1":
+            file_type.is_show = True
+            file_type.is_part = False
+        if is_show == "2":
+            file_type.is_show = True
+            file_type.is_part = True
+            if 'part[]' in request.POST and request.POST['part[]']:
+                id_list = request.POST.getlist('part[]', [])
+        if is_sub == "1":
+            file_type.is_sub = True
+            file_type.parent_type_id = request.POST.get("parent")
         file_type.save()
+        if len(id_list) != 0:
+            for i in id_list:
+                type_user = FileTypeUser()
+                type_user.file_type_id = file_type.id
+                type_user.user_id = i
+                type_user.save()
         file_manage_menu = Menu.objects.filter(title="档案管理").first()
         menu = Menu()
         menu.title = title
-        menu.parent = file_manage_menu
+        if is_sub == "1":
+            menu.parent = Menu.objects.filter(title=file_type.parent_type.name).first()
+        else:
+            menu.parent = file_manage_menu
         menu.code = "FILE-LIST" + str(file_type.id)
         menu.url = "/adm/file_list/?type=" + str(file_type.id)
         menu.save()
         role = Role.objects.filter(title="能力：档案管理").first()
+        role.permissions.add(menu.id)
+
+        menu = Menu()
+        file_menu = Menu.objects.filter(title="档案").first()
+        menu.title = title + "-"
+        if is_sub == "1":
+            file_type_parent_name = file_type.parent_type.name + "-"
+            menu.parent = Menu.objects.filter(title=file_type_parent_name).first()
+        else:
+            menu.parent = file_menu
+        menu.code = "FILE-LIST" + str(file_type.id) + "-"
+        menu.url = "/personal/file_show_list/?type=" + str(file_type.id)
+        menu.save()
+        role = Role.objects.filter(title="员工：基础功能").first()
         role.permissions.add(menu.id)
         ret["status"] = "success"
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
@@ -870,17 +937,24 @@ class FileTypeAjax(LoginRequiredMixin, View):
     """
     文件类型ajax
     """
+
     def get(self, request):
         """
-        文件类型重命名
+        文件类型修改
         :param request:
         :return:
         """
         ret = dict()
         id0 = request.GET.get("id")
         name = request.GET.get("title")
+        is_show = request.GET.get("is_show")
         file_type = FileType.objects.filter(id=id0).first()
         file_type.name = name
+        if is_show == "1":
+            file_type.is_show = True
+            file_type.is_part = False
+        elif is_show == "0":
+            file_type.is_show = False
         file_type.save()
         menu_code = "FILE-LIST" + str(id0)
         menu = Menu.objects.filter(code=menu_code).first()
@@ -900,6 +974,10 @@ class FileTypeAjax(LoginRequiredMixin, View):
         status = request.POST.get("status")
         user_id = request.session.get("_auth_user_id")
         file_list = FileManage.objects.filter(type_id=id0)
+        sub_type = FileType.objects.filter(parent_type_id=id0)
+        if sub_type:
+            ret["status"] = "had_sub_type"
+            return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
         if status == "0":
             for file in file_list:
                 path = "media/file_manage/" + str(file.name)
@@ -913,9 +991,121 @@ class FileTypeAjax(LoginRequiredMixin, View):
                 file.type_id = None
                 file.save()
         menu_code = "FILE-LIST" + str(id0)
+        menu_code_ = "FILE-LIST" + str(id0) + "-"
         menu = Menu.objects.filter(code=menu_code).first()
+        menu_ = Menu.objects.filter(code=menu_code_).first()
         menu.delete()
+        if menu_:
+            menu_.delete()
         file_type = FileType.objects.filter(id=id0).first()
         file_type.delete()
         ret["status"] = "success"
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
+
+
+class FileSubType(LoginRequiredMixin, View):
+    """
+    子类型设置
+    """
+
+    def get(self, request):
+        ret = dict()
+        types = FileType.objects.filter(is_sub=False)
+        ret["types"] = types
+        sub_types = FileType.objects.filter(is_sub=True)
+        ret["sub_types"] = sub_types
+        return render(request, "adm/files/file_sub_type.html", ret)
+
+
+class FileShow(LoginRequiredMixin, View):
+    """
+    所有人可见档案
+    """
+
+    def get(self, request):
+        ret = dict()
+        type0 = request.GET.get("type")
+        if type0:
+            ret["type0"] = type0
+            ret["type1"] = type0
+        else:
+            ret["type0"] = ""
+            ret["type1"] = "-1"
+        type = FileType.objects.filter(id=type0).first()
+        # 判断是否可查看
+        ret["type"] = type
+        if type.is_sub == True:
+            type = type.parent_type
+        if type.is_show == True and type.is_part == False:
+            ret["show"] = "1"
+        elif type.is_show == True and type.is_part == True:
+            user_id = request.session.get("_auth_user_id")
+            show_users = FileTypeUser.objects.filter(file_type_id=type.id)
+            for i in show_users:
+                if str(user_id) == str(i.user_id):
+                    ret["show"] = "1"
+                    break
+            else:
+                ret["show"] = "0"
+        else:
+            ret["show"] = "0"
+        return render(request, "adm/files/file_show_list.html", ret)
+
+    def post(self, request):
+        # 获取资产列表
+        fields = ['id', 'name', 'upload_time', 'content', 'number', 'preserver__name']
+        type0 = request.POST.get("type0")
+        if type0:
+            ret = dict(data=list(
+                FileManage.objects.values(*fields).filter(is_delete=False, type_id=type0).order_by("-upload_time")))
+        else:
+            ret = dict(data=list(
+                FileManage.objects.values(*fields).filter(is_delete=False, type_id=None).order_by("-upload_time")))
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
+
+
+class FileTypeEditPart(LoginRequiredMixin, View):
+    """
+    修改文件类型时设置可见人员弹窗
+    """
+
+    def get(self, request):
+        ret = dict()
+        id0 = request.GET.get("id")
+        ret["id0"] = id0
+        title = request.GET.get("title")
+        ret["title"] = title
+        file_type_users = FileTypeUser.objects.filter(file_type_id=id0)
+        ret["added_users"] = file_type_users
+        id_list = []
+        for f in file_type_users:
+            id_list.append(f.user_id)
+        un_add_users = User.objects.filter(is_active=1)
+        ret["un_add_users"] = un_add_users
+        return render(request, "adm/files/file_type_part_user_edit.html", ret)
+
+    def post(self, request):
+        ret = dict()
+        id0 = request.POST.get("id0")
+        title = request.POST.get("title")
+        id_list = request.POST.getlist("to")
+        file_type = FileType.objects.filter(id=id0).first()
+        file_type.name = title
+        file_type.is_show = True
+        file_type.is_part = True
+        file_type_part = FileTypeUser.objects.filter(file_type_id=id0)
+        for i in file_type_part:
+            if i.user_id in id_list:
+                id_list.remove(i.user_id)
+            else:
+                i.delete()
+        else:
+            if len(id_list) != 0:
+                for j in id_list:
+                    file_type_users = FileTypeUser()
+                    file_type_users.file_type_id = id0
+                    file_type_users.user_id = j
+                    file_type_users.save()
+        file_type.save()
+        ret["result"] = "1"
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")

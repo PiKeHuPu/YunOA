@@ -10,12 +10,12 @@ class Menu(models.Model):
     """
     菜单
     """
-    title = models.CharField(max_length=32, unique=True, verbose_name="菜单名")
+    title = models.CharField(max_length=32, verbose_name="菜单名")
     parent = models.ForeignKey("self", null=True, blank=True, verbose_name="父菜单")
     is_top = models.BooleanField(default=False, verbose_name="首页显示")
     icon = models.CharField(max_length=50, null=True, blank=True, verbose_name="图标")
     code = models.CharField(max_length=50, null=True, blank=True, verbose_name="编码")
-    url = models.CharField(max_length=128, unique=True, null=True, blank=True)
+    url = models.CharField(max_length=128, null=True, blank=True)
 
     def __str__(self):
         title_list = [self.title]

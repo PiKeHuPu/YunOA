@@ -313,6 +313,10 @@ class FileType(models.Model):
     文件类型
     """
     name = models.CharField(max_length=30, verbose_name="文件类型名称")
+    is_show = models.BooleanField(default=False, verbose_name="是否所有人可见")
+    is_sub = models.BooleanField(default=False, verbose_name="是否为子类型")
+    parent_type = models.ForeignKey('self', blank=True, null=True, verbose_name="父类型")
+    is_part = models.BooleanField(default=False, verbose_name="部分人可见")
 
 
 class FileManage(models.Model):
@@ -329,3 +333,11 @@ class FileManage(models.Model):
     delete_time = models.DateTimeField(blank=True, null=True, verbose_name="删除时间")
     deleter = models.ForeignKey(User, blank=True, null=True, related_name="deleter", verbose_name="删除人")
     type = models.ForeignKey(FileType, blank=True, null=True, verbose_name="文件类型")
+
+
+class FileTypeUser(models.Model):
+    """
+    部分可见档案关联
+    """
+    file_type = models.ForeignKey(FileType, verbose_name="档案类型")
+    user = models.ForeignKey(User, verbose_name="可见用户")

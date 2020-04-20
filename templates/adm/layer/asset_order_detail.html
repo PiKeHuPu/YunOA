@@ -38,19 +38,24 @@
                 <div class="table-responsive mailbox-messages">
                     <table class="table" id="tbWorkList" style="table-layout: fixed;">
                         <tbody>
-                        <tr class="info">
+                        <tr>
                             <td><strong> ID: </strong></td>
                             <td>{{ asset_order.id }}</td>
                         </tr>
 
-                        <tr>
+                        <tr class="info">
                             <td><strong> 所在仓库: </strong></td>
                             <td>{{ asset_order.asset.warehouse.name }}</td>
                         </tr>
 
-                        <tr class="info">
+                        <tr>
                             <td><strong> 资产名称: </strong></td>
                             <td>{{ asset_order.asset.name }}</td>
+                        </tr>
+
+                        <tr class="info">
+                            <td><strong> 是否外带: </strong></td>
+                            <td>{% if asset_order.return_date %}是{% else %}否{% endif %} </td>
                         </tr>
 
                         <tr>

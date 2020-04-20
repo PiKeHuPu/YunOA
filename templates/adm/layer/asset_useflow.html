@@ -72,6 +72,7 @@
                             <th>数量</th>
                             <th>领取人</th>
                             <th>领取时间</th>
+                            <th>是否外带</th>
                             <th>预计归还日期</th>
                             <th>用途</th>
                             <th>状态</th>
@@ -203,6 +204,17 @@
                                 width: "9%",
                                 render: function (data, type, full, meta) {
                                     return moment(data).format("YYYY-MM-DD HH:mm");
+                                }
+                            },
+                            {
+                                data: "return_date",
+                                width: "6%",
+                                render: function (data, type, row, meta) {
+                                    if (data) {
+                                        return "是";
+                                    } else {
+                                        return "否";
+                                    }
                                 }
                             },
                             {

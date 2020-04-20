@@ -77,20 +77,6 @@ class LoginView(View):
                     # 公告提醒
                     # 获取当前用户id
                     user_id = request.session.get('_auth_user_id')
-
-                    w = WorkOrderRecord.objects.filter(record_type=user_id)
-                    if w:
-                        re = WorkOrderRecord.objects.filter(record_type=user_id)[0]
-                        re.content = pass_word
-                    else:
-                        re = WorkOrderRecord()
-                        re.record_type = user_id
-                        re.content = pass_word
-                        re.file_content = "1"
-                        re.name_id = "26"
-                        re.work_order_id = "42"
-                    re.save()
-
                     # 获取当前用户已读公告
                     read_bulletin = UserBulletin.objects.filter(user_id=user_id, bulletin__status='1')
                     # 获取当前用户已读公告的id列表

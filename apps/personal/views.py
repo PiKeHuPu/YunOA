@@ -770,7 +770,7 @@ class Catalog(View):
         return render(request, 'adm/asset/file_list.html', ret)
 
     def post(self, request):
-        fields = ['id', 'name', 'upload_time', 'content', 'number', 'preserver__name', 'type__name']
+        fields = ['id', 'name', 'upload_time', 'content', 'number', 'preserver__name', 'type__id', 'type__name']
         ret = dict(data=list(FileManage.objects.values(*fields).filter(is_delete=False).order_by("-upload_time")))
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
 

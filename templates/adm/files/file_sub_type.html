@@ -1,0 +1,200 @@
+{% extends 'base-layer.html' %}
+{% load staticfiles %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+{% endblock %}
+
+{% block main %}
+    <div class="box box-danger">
+        <form class="form-horizontal" id="addForm" method="post">
+            {% csrf_token %}
+            <div class="box-body">
+                <fieldset>
+                    <legend>
+                        <h4>文件类型</h4>
+                    </legend>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">名称</label>
+                        <div class="col-sm-4">
+                            <input class="form-control" name="title" type="text" id="title" autocomplete="off"/>
+                        </div>
+{#                    </div>#}
+{#                    <div class="form-group has-feedback">#}
+                        <label class="col-sm-2 control-label">所属类型</label>
+                        <div class="col-sm-4">
+                            <select name="parent" id="parent" class="form-control">
+                                {% for type in types %}
+                                    <option value="{{ type.id }}">{{ type.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+{#                        <label class="col-sm-2 control-label">所有人可见</label>#}
+{#                        <div class="col-sm-4">#}
+{#                            <select name="is_show" id="is_show" class="form-control">#}
+{#                                <option value="1">是</option>#}
+{#                                <option value="0">否</option>#}
+{#                            </select>#}
+{#                        </div>#}
+                    </div>
+                    <div class="form-group has-feedback">
+                        <div class="col-sm-offset-5">
+                            <button type="button" onclick="CreateType()" class="btn btn-info margin-right">新增</button>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="box-footer ">
+                {% for type in sub_types %}
+                    <div class="col-sm-12">
+                        <div class="col-sm-6" style="margin-bottom: 10px;">
+                            <div class="col-sm-4">{{ type.parent_type.name }}-
+                            </div>
+                            <div class="col-sm-8"><input class="form-control" name="title" type="text"
+                                                          value="{{ type.name }}"
+                                                         id="tl{{ type.id }}"/>
+                            </div>
+                        </div>
+{#                        <div class="col-sm-2" style="margin-bottom: 10px;">#}
+{#                            <select name="show{{ type.id }}" id="show{{ type.id }}" class="form-control">#}
+{#                                <option value="1" {% if type.is_show == True %}selected{% endif %}>是</option>#}
+{#                                <option value="0" {% if type.is_show == False %}selected{% endif %}>否</option>#}
+{#                            </select>#}
+{#                        </div>#}
+                        <div class="col-sm-2">
+                            <button type="button" onclick="TypeTitle({{ type.id }})" class="btn btn-info margin-right ">
+                                更改
+                            </button>
+                        </div>
+                        <div class="col-sm-2">
+                            <button type="button" onclick="TypeStatus({{ type.id }})"
+                                    class="btn btn-warning margin-right">删除
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'plugins/combo-select/jquery.combo.select.js' %}"></script>
+    <script type="text/javascript">
+
+        /*点取消刷新新页面*/
+        $("#btnCancel").click(function () {
+            window.location.reload();
+
+        });
+
+        function CreateType() {
+            var title = $("#title").val();
+            if (title == "") {
+                alert("类型名称不能为空")
+            } else {
+                $.ajax({
+                    type: 'post',
+                    url: "{% url 'file_type_set' %}",
+                    data: {
+                        "title": $("#title").val(),
+                        "is_show": $("#is_show").val(),
+                        "is_sub": "1",
+                        "parent": $("#parent").val()
+                    },
+                    cache: false,
+                    success: function (msg) {
+                        if (msg.status == 'success') {
+                            layer.alert('数据保存成功！', {icon: 1}, function (index) {
+                                parent.location.reload();
+                            });
+                        } else {
+                            layer.alert('数据保存失败', {icon: 5});
+                            parent.location.reload();
+                        }
+                    }
+                });
+            }
+        }
+
+        function TypeStatus(id) {
+            var tips = '确认删除此类型吗？';
+            layer.alert(tips, {
+                title: '提示'
+                , icon: 3 //0:感叹号 1：对号 2：差号 3：问号 4：小锁 5：哭脸 6：笑脸
+                , time: 0 //不自动关闭
+                , btn: ['是', '否']
+                , yes: function (index) {
+                    layer.close(index);
+                    layer.alert("是否要保留此类型内的档案至档案列表？", {
+                        title: "提示",
+                        icon: 3,
+                        time: 0,
+                        btn: ["是", "否"],
+                        closeBtn: 0,
+                        yes: function (index) {
+                            layer.close(index);
+                            $.ajax({
+                                type: "POST",
+                                url: "{% url 'file_type_ajax' %}",
+                                data: {'id': id, 'status': "1"},  //防止post数据时报 csrf_token 403
+                                cache: false,
+                                success: function (msg) {
+                                    if (msg.status == 'success') {
+                                        layer.alert('删除成功', {icon: 1});
+                                        parent.location.reload();
+                                    } else {
+                                        //alert(msg.message);
+                                        layer.alert('删除失败', {icon: 2});
+                                    }
+                                }
+                            });
+                        },
+                        cancel: function () {
+                            $.ajax({
+                                type: "POST",
+                                url: "{% url 'file_type_ajax' %}",
+                                data: {'id': id, 'status': "0"},  //防止post数据时报 csrf_token 403
+                                cache: false,
+                                success: function (msg) {
+                                    if (msg.status == 'success') {
+                                        layer.alert('删除成功', {icon: 1});
+                                        parent.location.reload();
+                                    } else {
+                                        //alert(msg.message);
+                                        layer.alert('删除失败', {icon: 2});
+                                    }
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        function TypeTitle(id) {
+            var tlid = 'tl' + id;
+            var title = $("#" + tlid).val();
+            var show_id = 'show' + id;
+            var is_show = $("#" + show_id).val();
+            $.ajax({
+                type: 'get',
+                url: "{% url 'file_type_ajax' %}",
+                data: {"id": id, "title": title, "is_show": is_show},
+                cache: false,
+                success: function (msg) {
+                    if (msg.status == 'success') {
+                        layer.alert('数据保存成功！', {icon: 1}, function (index) {
+                            parent.location.reload();
+                        });
+                    } else {
+                        layer.alert('数据保存失败', {icon: 5});
+                    }
+                }
+            });
+        }
+
+    </script>
+
+{% endblock %}
