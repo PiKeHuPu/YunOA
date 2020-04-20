@@ -27,7 +27,7 @@ from gistandard.settings import MEDIA_ROOT
 import xadmin
 
 from apps.users.views_user import LoginView, IndexView, LogoutView
-from personal.views import Direction, ChangeStatement, ShowStatement, Catalog
+from personal.views import Direction, ChangeStatement, ShowStatement, Catalog, ShowCatalog
 from system.views import SystemView
 from adm.views import AdmView, WarehouseView, \
     WarehouseCreateView, WarehouseDeleteView, AssetView, AssetCreateView, AssetAjaxView, AssetUseFlowView, \
@@ -55,6 +55,7 @@ urlpatterns = [
     url(r'^direction/$', Direction.as_view(), name='direction'),
     # 档案管理目录
     url(r'^adm/catalog/$', Catalog.as_view(), name='catalog'),
+    url(r'^personal/catalog/', ShowCatalog.as_view(), name="show-catalog"),
     # 系统模块
     url(r'^system/$', SystemView.as_view(), name="system"),
     url(r'^system/basic/', include('users.urls', namespace='system-basic')),

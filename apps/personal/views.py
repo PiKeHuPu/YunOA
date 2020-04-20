@@ -766,7 +766,6 @@ class Catalog(View):
     """
     def get(self, request):
         ret = dict()
-
         return render(request, 'adm/asset/file_list.html', ret)
 
     def post(self, request):
@@ -928,3 +927,17 @@ class FeedbackRemark(LoginRequiredMixin, View):
         advise.save()
         ret["success"] = True
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')
+
+
+class ShowCatalog(View):
+    """
+    首页档案管理目录
+    """
+    def get(self, request):
+        ret = dict()
+        return render(request, 'adm/asset/file_show_list.html', ret)
+
+    def post(self, request):
+        fields = ['id', 'name', 'upload_time', 'content', 'number', 'preserver__name', 'type__id', 'type__name']
+        ret = dict(data=list(FileManage.objects.values(*fields).filter(Q(is_delete=False), ~Q(type_id=None)).order_by("-upload_time")))
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
