@@ -86,7 +86,7 @@
                         <div class="col-sm-3">
                             <input type="text" class="form-control pull-right form_datetime" name="due_time"
                                    id="due_time"
-                                   value="{% if asset.due_time %}{{ asset.due_time }}{% else %}{% endif %}"
+                                   value="{% if asset.due_time|date:"Y-m-d" %}{{ asset.due_time|date:"Y-m-d" }}{% else %}{% endif %}"
                                    autocomplete="off"/>
                         </div>
                     </div>
