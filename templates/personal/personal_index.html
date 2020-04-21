@@ -5,13 +5,13 @@
 
 {% block css %}
     <style>
-    .small-box{
-        box-shadow: 0 0 10px gray;
-    }
+        .small-box {
+            box-shadow: 0 0 10px gray;
+        }
 
-    .small-box:hover{
-        box-shadow: 0 0 25px #00a65a;
-    }
+        .small-box:hover {
+            box-shadow: 0 0 25px #00a65a;
+        }
     </style>
 {% endblock %}
 
@@ -138,8 +138,8 @@
                                                    onmouseout="this.style.color='white'">部门列表</p>
                     </a>
                     <a href="/personal/assess_dep/">
-                    <p style="font-size:28px; color: rgba(217, 107, 116, 0.0); font-family: 楷体">
-                        部门列表</p></a>
+                        <p style="font-size:28px; color: rgba(217, 107, 116, 0.0); font-family: 楷体">
+                            部门列表</p></a>
                 </div>
                 <div class="icon" style="margin-top: 40px">
                     <i class="fa fa-line-chart"></i>
@@ -207,7 +207,8 @@
                                                    onmouseover="this.style.color='#5D1C8E'"
                                                    onmouseout="this.style.color='white'">档案目录</p></a>
                     <a href=""
-                       class="small-box-footer"><p style="font-size:28px; color: rgba(217, 107, 116, 0.0); font-family: 楷体">
+                       class="small-box-footer"><p
+                            style="font-size:28px; color: rgba(217, 107, 116, 0.0); font-family: 楷体">
                         档案目录</p></a>
                 </div>
                 <div class="icon" style="margin-top: 40px">
@@ -288,11 +289,14 @@
         <div class="col-lg-3 col-xs-6">
             <!-- small box -->
             <div class="small-box" style="background-image: linear-gradient(to bottom right, #b5dee6, #6699a1)">
-                <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">意见或建议</p>
+                <p class="small-box-footer" style="font-weight: bolder; height: 35px; font-size: 20px; color: white">
+                    意见或建议</p>
                 <div class="inner">
                     <a href="{% url 'feedback_view' %}" class="small-box-footer">
-                        <p style="font-size:28px; color: white; font-family: 楷体" onmouseover="this.style.color='#5d1c8e'" onmouseout="this.style.color='white'">意见反馈</p></a>
-                    <a href="{% url 'feedback_view' %}" class="small-box-footer"><p style="font-size:28px; color: rgba(217, 107, 116, 0.0); font-family: 楷体">意见反馈</p></a>
+                        <p style="font-size:28px; color: white; font-family: 楷体"
+                           onmouseover="this.style.color='#5d1c8e'" onmouseout="this.style.color='white'">意见反馈</p></a>
+                    <a href="{% url 'feedback_view' %}" class="small-box-footer"><p
+                            style="font-size:28px; color: rgba(217, 107, 116, 0.0); font-family: 楷体">意见反馈</p></a>
                 </div>
                 <div class="icon" style="margin-top: 40px">
                     <i class="fa fa-comments"></i>
@@ -300,122 +304,124 @@
             </div>
         </div>
     </section>
-{#    <div style="padding-left: 30px;" class="col-lg-12">#}
-{#        <div id="per" style="display: none;">#}
-{#            <h1 style="font-family: 楷体; font-size: 30px; margin-left: 0">个人报表</h1>#}
-{#            <div id="content">#}
-{#                <form class="form-inline" id="queryForm">#}
-{#                    <div class="form-group searchArea margin-r-5 margin-top-5">#}
-{#                        <label>开始日期：</label>#}
-{#                        <input class="form-control timepick" name="start_time" id="start_time" type="text"#}
-{#                               autocomplete="off"/>#}
-{#                    </div>#}
-{#                    <div class="form-group searchArea margin-r-5 margin-top-5">#}
-{#                        <label>结束日期：</label>#}
-{#                        <input class="form-control timepick" name="end_time" id="end_time" type="text"#}
-{#                               autocomplete="off"/>#}
-{#                    </div>#}
-{#                    <button type="button" id="btnWorkorderSearch" class="btn btn-default">#}
-{#                        <i class="glyphicon glyphicon-search"></i>查询#}
-{#                    </button>#}
-{#                </form>#}
-{##}
-{#                <div style="margin-top: 15px"> </div>#}
-{#                <div id="main1" class="chart"></div>#}
-{#            </div>#}
-{#        </div>#}
-{#        <div id="partform" style="display: none">#}
-{#            <h1 style="font-family: 楷体; font-size: 30px; margin-left: 0">部门报表</h1>#}
-{#            <div id="content">#}
-{#                <form class="form-inline" id="queryForm">#}
-{#                    <div class="form-group searchArea margin-r-5 margin-top-5">#}
-{#                        <label>开始日期：</label>#}
-{#                        <input class="form-control timepick" name="start_time" id="start_time1" type="text"#}
-{#                               autocomplete="off"/>#}
-{#                    </div>#}
-{#                    <div class="form-group searchArea margin-r-5 margin-top-5">#}
-{#                        <label>结束日期：</label>#}
-{#                        <input class="form-control timepick" name="end_time" id="end_time1" type="text"#}
-{#                               autocomplete="off"/>#}
-{#                    </div>#}
-{#                    <button type="button" id="btnorderSearch1" class="btn btn-default">#}
-{#                        <i class="glyphicon glyphicon-search"></i>查询#}
-{#                    </button>#}
-{#                </form>#}
-{#                <div id="departmentform" class="chart" style="display:inline-block;">#}
-{#                </div>#}
-{#                <div style="display:inline-block;padding-right: 200px;float: right;">#}
-{#                    <select name="depeople" id="depeople">#}
-{#                        <option value="1"></option>#}
-{#                        {% for foo in depeople %}#}
-{#                            <option value="{{ foo }}">{{ foo }}</option>#}
-{#                        {% endfor %}#}
-{#                    </select>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div>#}
-{#        <div id="allf" style="display: none">#}
-{#            <h1 style="font-family: 楷体; font-size: 30px; margin-left: 0">全公司报表</h1>#}
-{#            <div style="margin-top: 15px">#}
-{#                <button type="button" id="production" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">#}
-{#                    生产中心#}
-{#                </button>#}
-{#                <button type="button" id="BigData" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">#}
-{#                    大数据事业部#}
-{#                </button>#}
-{#                <button type="button" id="personal" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">#}
-{#                    人事行政中心#}
-{#                </button>#}
-{#                <button type="button" id="saleCenter" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">#}
-{#                    营销中心#}
-{#                </button>#}
-{#                <button type="button" id="ops" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">#}
-{#                    运维服务中心#}
-{#                </button>#}
-{#                <button type="button" id="SAC" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">#}
-{#                    证券事务中心#}
-{#                </button>#}
-{#                <br>#}
-{#                <button type="button" id="finance" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">#}
-{#                    财务部#}
-{#                </button>#}
-{#                <button type="button" id="afterSale" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">#}
-{#                    售后服务中心#}
-{#                </button>#}
-{#                <button type="button" id="materials" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">#}
-{#                    物资管理中心#}
-{#                </button>#}
-{#                <button type="button" id="communication" class="btn btn-primary"#}
-{#                        style="margin-left: 10px;margin-top: 10px">#}
-{#                    通信工程项目部#}
-{#                </button>#}
-{#                <button type="button" id="electric" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">#}
-{#                    电力工程项目部#}
-{#                </button>#}
-{#            </div>#}
-{#            <form class="form-inline" id="queryForm">#}
-{#                <div class="form-group searchArea margin-r-5 margin-top-5">#}
-{#                    <label>开始日期：</label>#}
-{#                    <input class="form-control timepick" name="dep_start_time" id="dep_start_time" type="text"#}
-{#                           autocomplete="off"/>#}
-{#                </div>#}
-{#                <div class="form-group searchArea margin-r-5 margin-top-5">#}
-{#                    <label>结束日期：</label>#}
-{#                    <input class="form-control timepick" name="dep_end_time" id="dep_end_time" type="text"#}
-{#                           autocomplete="off"/>#}
-{#                </div>#}
-{#                <button type="button" id="depButton" class="btn btn-default">#}
-{#                    <i class="glyphicon glyphicon-search"></i>查询#}
-{#                </button>#}
-{#            </form>#}
-{##}
-{#            <div id="allform" class="chart" style="display:inline-block;"></div>#}
-{#            <div style="display:inline-block;padding-right: 50px;float: right;">#}
-{#                <p><span id="text"></span></p>#}
-{#            </div>#}
-{#        </div>#}
-{##}
-{#    </div>#}
+    <div style="padding-left: 30px;" class="visible-lg-12">
+        <div id="per" style="display: none;">
+            <h1 style="font-family: 楷体; font-size: 30px; margin-left: 0">个人报表</h1>
+            <div id="content">
+                <form class="form-inline" id="queryForm">
+                    <div class="form-group searchArea margin-r-5 margin-top-5">
+                        <label>开始日期：</label>
+                        <input class="form-control timepick" name="start_time" id="start_time" type="text"
+                               autocomplete="off"/>
+                    </div>
+                    <div class="form-group searchArea margin-r-5 margin-top-5">
+                        <label>结束日期：</label>
+                        <input class="form-control timepick" name="end_time" id="end_time" type="text"
+                               autocomplete="off"/>
+                    </div>
+                    <button type="button" id="btnWorkorderSearch" class="btn btn-default">
+                        <i class="glyphicon glyphicon-search"></i>查询
+                    </button>
+                </form>
+
+                <div style="margin-top: 15px"></div>
+                <div id="main1" class="chart"></div>
+            </div>
+        </div>
+        <div id="partform" style="display: none">
+            <h1 style="font-family: 楷体; font-size: 30px; margin-left: 0">部门报表</h1>
+            <div id="content">
+                <form class="form-inline" id="queryForm">
+                    <div class="form-group searchArea margin-r-5 margin-top-5">
+                        <label>开始日期：</label>
+                        <input class="form-control timepick" name="start_time" id="start_time1" type="text"
+                               autocomplete="off"/>
+                    </div>
+                    <div class="form-group searchArea margin-r-5 margin-top-5">
+                        <label>结束日期：</label>
+                        <input class="form-control timepick" name="end_time" id="end_time1" type="text"
+                               autocomplete="off"/>
+                    </div>
+                    <button type="button" id="btnorderSearch1" class="btn btn-default">
+                        <i class="glyphicon glyphicon-search"></i>查询
+                    </button>
+                </form>
+                <div id="departmentform" class="chart" style="display:inline-block;">
+                </div>
+                <div style="display:inline-block;padding-right: 200px;float: right;">
+                    <select name="depeople" id="depeople">
+                        <option value="1"></option>
+                        {% for foo in depeople %}
+                            <option value="{{ foo }}">{{ foo }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div id="allf" style="display: none">
+            <h1 style="font-family: 楷体; font-size: 30px; margin-left: 0">全公司报表</h1>
+            <div style="margin-top: 15px">
+                <button type="button" id="production" class="btn btn-primary"
+                        style="margin-left: 10px;margin-top: 10px">
+                    生产中心
+                </button>
+                <button type="button" id="BigData" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">
+                    大数据事业部
+                </button>
+                <button type="button" id="personal" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">
+                    人事行政中心
+                </button>
+                <button type="button" id="saleCenter" class="btn btn-primary"
+                        style="margin-left: 10px;margin-top: 10px">
+                    营销中心
+                </button>
+                <button type="button" id="ops" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">
+                    运维服务中心
+                </button>
+                <button type="button" id="SAC" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">
+                    证券事务中心
+                </button>
+                <br>
+                <button type="button" id="finance" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">
+                    财务部
+                </button>
+                <button type="button" id="afterSale" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">
+                    售后服务中心
+                </button>
+                <button type="button" id="materials" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">
+                    物资管理中心
+                </button>
+                <button type="button" id="communication" class="btn btn-primary"
+                        style="margin-left: 10px;margin-top: 10px">
+                    通信工程项目部
+                </button>
+                <button type="button" id="electric" class="btn btn-primary" style="margin-left: 10px;margin-top: 10px">
+                    电力工程项目部
+                </button>
+            </div>
+            <form class="form-inline" id="queryForm">
+                <div class="form-group searchArea margin-r-5 margin-top-5">
+                    <label>开始日期：</label>
+                    <input class="form-control timepick" name="dep_start_time" id="dep_start_time" type="text"
+                           autocomplete="off"/>
+                </div>
+                <div class="form-group searchArea margin-r-5 margin-top-5">
+                    <label>结束日期：</label>
+                    <input class="form-control timepick" name="dep_end_time" id="dep_end_time" type="text"
+                           autocomplete="off"/>
+                </div>
+                <button type="button" id="depButton" class="btn btn-default">
+                    <i class="glyphicon glyphicon-search"></i>查询
+                </button>
+            </form>
+
+            <div id="allform" class="chart" style="display:inline-block;"></div>
+            <div style="display:inline-block;padding-right: 50px;float: right;">
+                <p><span id="text"></span></p>
+            </div>
+        </div>
+
+    </div>
 
 
 {% endblock %}
@@ -424,10 +430,11 @@
     <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
     <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
     <script type="text/javascript" src="{% static 'plugins/echarts/echarts.min.js' %}"></script>
+    <script src="{% static 'js/masonry.pkgd.min.js' %}"></script>
     <script>
         {# 个人报表#}
-        (function () {
-            x = {{ status|safe }}
+        $(function () {
+            x ={{ status|safe }};
             if (x == 2) {
                 document.getElementById("per").style.display = "";
                 var myChart1 = echarts.init(document.getElementById('main1'));
@@ -464,7 +471,7 @@
                     ]
                 };
                 myChart1.setOption(option1);
-                window.onresize = function(){
+                window.onresize = function () {
                     myChart1.resize();
                 }
             }
@@ -474,7 +481,8 @@
     {#  部门负责人可以看的报表  #}
     <script>
         (function () {
-            x = {{ m }}
+            x =
+            {{ m }}
             if (x == 1) {
                 document.getElementById("partform").style.display = "";
                 var myChart1 = echarts.init(document.getElementById('departmentform'));
@@ -511,8 +519,9 @@
                     ]
                 };
                 myChart1.setOption(option1);
-                window.onresize = function(){
-                        myChart1.resize();}
+                window.onresize = function () {
+                    myChart1.resize();
+                }
 
             }
         })()
@@ -556,8 +565,9 @@
                     ]
                 };
                 myChart1.setOption(option1);
-                window.onresize = function(){
-                        myChart1.resize();}
+                window.onresize = function () {
+                    myChart1.resize();
+                }
 
             } else {
                 retdata = {
@@ -608,8 +618,9 @@
                                 ]
                             };
                             myChart3.setOption(option3, true);
-                            window.onresize = function(){
-                            myChart3.resize();}
+                            window.onresize = function () {
+                                myChart3.resize();
+                            }
 
                         }
                     }
@@ -679,8 +690,9 @@
                                 ]
                             };
                             myChart3.setOption(option3, true);
-                            window.onresize = function(){
-                            myChart3.resize();}
+                            window.onresize = function () {
+                                myChart3.resize();
+                            }
                         }
                     }
                 })
@@ -733,8 +745,9 @@
                     }]
                 };
                 myChart1.setOption(option1);
-                window.onresize = function(){
-                        myChart1.resize();}
+                window.onresize = function () {
+                    myChart1.resize();
+                }
             }
         })()
 
@@ -809,8 +822,9 @@
                                 ]
                             };
                             myChart3.setOption(option3, true);
-                            window.onresize = function(){
-                            myChart3.resize();}
+                            window.onresize = function () {
+                                myChart3.resize();
+                            }
                         }
                     }
                 })
@@ -819,7 +833,7 @@
     </script>
 
     <script>
-    {#  董事长，总经理报表选择时间段  #}
+        {#  董事长，总经理报表选择时间段  #}
         $("#depButton").click(function () {
             if ($("#dep_start_time").val() == '' && $("#dep_end_time").val() == '') {
                 alert('起始时间或结束时间不能为空')
@@ -879,8 +893,9 @@
                                 ]
                             };
                             myChart3.setOption(option3, true);
-                            window.onresize = function(){
-                            myChart3.resize();}
+                            window.onresize = function () {
+                                myChart3.resize();
+                            }
                         }
                     }
                 })
@@ -945,8 +960,9 @@
                             ]
                         };
                         myChart3.setOption(option3, true);
-                        window.onresize = function(){
-                        myChart3.resize();}
+                        window.onresize = function () {
+                            myChart3.resize();
+                        }
                     }
                 }
             })
@@ -1006,8 +1022,9 @@
                             ]
                         };
                         myChart3.setOption(option3, true);
-                        window.onresize = function(){
-                        myChart3.resize();}
+                        window.onresize = function () {
+                            myChart3.resize();
+                        }
                     }
                 }
             })
@@ -1067,8 +1084,9 @@
                             ]
                         };
                         myChart3.setOption(option3, true);
-                        window.onresize = function(){
-                        myChart3.resize();}
+                        window.onresize = function () {
+                            myChart3.resize();
+                        }
                     }
                 }
             })
@@ -1128,8 +1146,9 @@
                             ]
                         };
                         myChart3.setOption(option3, true);
-                        window.onresize = function(){
-                        myChart3.resize();}
+                        window.onresize = function () {
+                            myChart3.resize();
+                        }
                     }
                 }
             })
@@ -1189,8 +1208,9 @@
                             ]
                         };
                         myChart3.setOption(option3, true);
-                        window.onresize = function(){
-                        myChart3.resize();}
+                        window.onresize = function () {
+                            myChart3.resize();
+                        }
                     }
                 }
             })
@@ -1250,8 +1270,9 @@
                             ]
                         };
                         myChart3.setOption(option3, true);
-                        window.onresize = function(){
-                        myChart3.resize();}
+                        window.onresize = function () {
+                            myChart3.resize();
+                        }
                     }
                 }
             })
@@ -1311,8 +1332,9 @@
                             ]
                         };
                         myChart3.setOption(option3, true);
-                        window.onresize = function(){
-                        myChart3.resize();}
+                        window.onresize = function () {
+                            myChart3.resize();
+                        }
                     }
                 }
             })
@@ -1372,8 +1394,9 @@
                             ]
                         };
                         myChart3.setOption(option3, true);
-                        window.onresize = function(){
-                        myChart3.resize();}
+                        window.onresize = function () {
+                            myChart3.resize();
+                        }
                     }
                 }
             })
@@ -1433,8 +1456,9 @@
                             ]
                         };
                         myChart3.setOption(option3, true);
-                        window.onresize = function(){
-                        myChart3.resize();}
+                        window.onresize = function () {
+                            myChart3.resize();
+                        }
                     }
                 }
             })
@@ -1494,8 +1518,9 @@
                             ]
                         };
                         myChart3.setOption(option3, true);
-                        window.onresize = function(){
-                        myChart3.resize();}
+                        window.onresize = function () {
+                            myChart3.resize();
+                        }
                     }
                 }
             })
@@ -1555,17 +1580,19 @@
                             ]
                         };
                         myChart3.setOption(option3, true);
-                        window.onresize = function(){
-                        myChart3.resize();}
+                        window.onresize = function () {
+                            myChart3.resize();
+                        }
                     }
                 }
             })
         })
-    //图表窗体自适应
+        //图表窗体自适应
         {#$(window).resize(function () {#}
         {#    myChart3.resize();#}
         {##}
-        {#})#}
+        {#})
+        #}
 
     </script>
 
