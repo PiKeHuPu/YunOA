@@ -30,7 +30,7 @@
         </ol>
     </section>
 
-    <section class="content">
+    <section class="content col-lg-12">
 
         {#        新我的工作台页面#}
         <div class="col-lg-3 col-xs-6">
@@ -305,7 +305,7 @@
         </div>
     </section>
     <div style="padding-left: 30px;" class="visible-lg-12">
-        <div id="per" style="display: none;">
+        <div id="per" style="display: none;" class="visible-lg-12">
             <h1 style="font-family: 楷体; font-size: 30px; margin-left: 0">个人报表</h1>
             <div id="content">
                 <form class="form-inline" id="queryForm">
@@ -328,7 +328,7 @@
                 <div id="main1" class="chart"></div>
             </div>
         </div>
-        <div id="partform" style="display: none">
+        <div id="partform" style="display: none" class="visible-lg-12">
             <h1 style="font-family: 楷体; font-size: 30px; margin-left: 0">部门报表</h1>
             <div id="content">
                 <form class="form-inline" id="queryForm">
@@ -342,20 +342,21 @@
                         <input class="form-control timepick" name="end_time" id="end_time1" type="text"
                                autocomplete="off"/>
                     </div>
+                    <div style="display:inline-block;padding-right: 20px;">
+                        <label for="depeople">部门成员：</label>
+                        <select name="depeople" id="depeople" class="form-control">
+                            <option value="1"></option>
+                            {% for foo in depeople %}
+                                <option value="{{ foo }}">{{ foo }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                     <button type="button" id="btnorderSearch1" class="btn btn-default">
                         <i class="glyphicon glyphicon-search"></i>查询
                     </button>
+                    <div id="departmentform" class="chart" style="display:inline-block;">
+                    </div>
                 </form>
-                <div id="departmentform" class="chart" style="display:inline-block;">
-                </div>
-                <div style="display:inline-block;padding-right: 200px;float: right;">
-                    <select name="depeople" id="depeople">
-                        <option value="1"></option>
-                        {% for foo in depeople %}
-                            <option value="{{ foo }}">{{ foo }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
             </div>
         </div>
         <div id="allf" style="display: none">
