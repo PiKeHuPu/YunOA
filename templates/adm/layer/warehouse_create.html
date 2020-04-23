@@ -22,7 +22,6 @@
                             <input class="form-control" name="warehouse" id="warehouse" type="text"
                                    value="{{ warehouse.name }}" maxlength="20"/>
                         </div>
-                        <br><br>
                         <label class="col-sm-2 control-label">所属部门</label>
                         <div class="col-sm-3">
                             <select class="form-control select2" name="department_id" id="department_id">
@@ -32,9 +31,21 @@
                                 {% endfor %}
                             </select>
                         </div>
-                        <input type="checkbox" name="is_all_view" id="is_all_view" style="zoom: 150%"
-                               {% if warehouse.is_all_view %}checked{% endif %}/>
-                        <span style="font-size: 120%; font-weight: bolder">所有部门可见</span>
+                        <br><br>
+                        <label class="col-sm-2 control-label">所有部门可见</label>
+                        <div class="col-sm-3">
+                            <select name="is_all_view" id="is_all_view" class="form-control select2">
+                                <option value="0">否</option>
+                                <option value="1" {% if warehouse.is_all_view == True %}selected{% endif %}>是</option>
+                            </select>
+                        </div>
+                        <label class="col-sm-2 control-label">该仓库物资无需归还</label>
+                        <div class="col-sm-3">
+                            <select name="is_no_return" id="is_no_return" class="form-control select2">
+                                <option value="0">否</option>
+                                <option value="1" {% if warehouse.is_no_return == True %}selected{% endif %}>是</option>
+                            </select>
+                        </div>
                         <br><br>
                         <label class="col-sm-2 control-label">备注</label>
                         <div class="col-sm-3">

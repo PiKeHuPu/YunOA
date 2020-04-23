@@ -408,6 +408,8 @@ class AssetUseInfoView(LoginRequiredMixin, View):
         id = request.GET.get("id")
         asset = AssetInfo.objects.get(id=id)
         ret['asset'] = asset
+        if asset.warehouse.is_no_return:
+            ret["no_return"] = "1"
         return render(request, 'adm/asset/asset_detail_use.html', ret)
 
     def post(self, request):
@@ -421,7 +423,7 @@ class AssetUseInfoView(LoginRequiredMixin, View):
             if is_out == "1":
                 asset.quantity = int(asset.quantity) - int(use_quantity)
                 asset.save()
-                if asset.is_no_return:
+                if asset.warehouse.is_no_return:
                     pass
                 else:
                     use_asset = asset
@@ -432,7 +434,10 @@ class AssetUseInfoView(LoginRequiredMixin, View):
                     use_asset.status = '1'
                     use_asset.user_id = request.session.get('_auth_user_id')
                     use_asset.save()
-
+            else:
+                if asset.warehouse.is_no_return:
+                    asset.quantity = int(asset.quantity) - int(use_quantity)
+                    asset.save()
             user_id = request.session.get('_auth_user_id')
             asset_order = AssetApprove()
             asset_order.proposer_id = user_id

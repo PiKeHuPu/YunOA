@@ -232,6 +232,7 @@ class AssetWarehouse(models.Model):
     remark = models.TextField(blank=True, null=True, verbose_name="备注")
     is_delete = models.BooleanField(default=False, verbose_name="是否删除")
     is_all_view = models.BooleanField(default=False, verbose_name="是否所有人可见")
+    is_no_return = models.BooleanField(default=False, verbose_name="仓库内物品是否无需归还")
     verifier = models.ManyToManyField(User, blank=True, null=True, verbose_name="物资审批人")
 
 
@@ -260,7 +261,6 @@ class AssetInfo(models.Model):
     unit = models.CharField(max_length=20, verbose_name="单位")
     type = models.CharField(max_length=20, verbose_name="型号")
     remark = models.TextField(max_length=500, verbose_name="备注信息")
-    is_no_return = models.BooleanField(default=False, verbose_name="无需归还")
     is_no_approve = models.BooleanField(default=False, verbose_name="无需审批")
     is_vice_approve = models.BooleanField(default=False, verbose_name="分管副总审批")
 

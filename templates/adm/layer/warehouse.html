@@ -41,6 +41,7 @@
                                 <th>仓库名称</th>
                                 <th>所属部门</th>
                                 <th>所有部门可见</th>
+                                <th>无需归还</th>
                                 <th>物资审批人</th>
                                 <th>备注</th>
                                 <th>操作</th>
@@ -83,6 +84,7 @@
                             "name": "{{ warehouse.name }}",
                             "department": "{{ warehouse.department.title }}",
                             "is_all_view": "{{ warehouse.is_all_view }}",
+                            "is_no_return": "{{ warehouse.is_no_return }}",
                             "remark": "{{ warehouse.remark }}",
                             "verifier": "{% for user in warehouse.verifier.all %}{{ user.name }} {% endfor %}"
                         },
@@ -118,6 +120,18 @@
                                 }
                             },
                             {
+                                data: "is_no_return",
+                                render: function (data) {
+                                    var ret = "";
+                                    if (data == "True") {
+                                        ret = "是";
+                                    } else {
+                                        ret = "否";
+                                    }
+                                    return ret;
+                                }
+                            },
+                            {
                                 data: "verifier",
                             },
                             {
@@ -142,7 +156,7 @@
                     title: '新增',
                     shadeClose: false,
                     maxmin: true,
-                    area: ['1000px', '800px'],
+                    area: ['1000px', '700px'],
                     content: "{% url 'adm-warehouse-create' %}",
                     end: function () {
                         //关闭时做的事情
@@ -158,17 +172,18 @@
         });
 
         function doUpdate(id) {
-            layer.open({
+            var index = layer.open({
                 type: 2,
                 title: '编辑-详情',
                 shadeClose: false,
                 maxmin: true,
-                area: ['1000px', '800px'],
+                area: ['1000px', '600px'],
                 content: ["{% url 'adm-warehouse-create' %}" + '?id=' + id, 'no'],
                 end: function () {
                     window.location.reload()
                 }
             });
+            layer.full(index)
         }
 
         function doDelete(id) {

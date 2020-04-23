@@ -199,6 +199,7 @@ class WarehouseCreateView(LoginRequiredMixin, View):
         department_id = request.POST.get("department_id")
         remark = request.POST.get("remark")
         is_all_view = request.POST.get("is_all_view")
+        is_no_return = request.POST.get("is_no_return")
         if name and department_id:
             if id:
                 warehouse = AssetWarehouse.objects.get(id=id)
@@ -206,10 +207,14 @@ class WarehouseCreateView(LoginRequiredMixin, View):
                 warehouse = AssetWarehouse()
             warehouse.name = name
             warehouse.department_id = department_id
-            if is_all_view == "on":
+            if is_all_view == "1":
                 warehouse.is_all_view = True
             else:
                 warehouse.is_all_view = False
+            if is_no_return == "1":
+                warehouse.is_no_return = True
+            else:
+                warehouse.is_no_return = False
             warehouse.remark = remark
             warehouse.save()
 
@@ -361,10 +366,6 @@ class AssetCreateView(LoginRequiredMixin, View):
                 asset.is_no_approve = True
             else:
                 asset.is_no_approve = False
-            if request.POST.get("no_return") == "on":
-                asset.is_no_return = True
-            else:
-                asset.is_no_return = False
             if request.POST.get("vice_approve") == "on":
                 asset.is_vice_approve = True
             else:
@@ -448,7 +449,7 @@ class AssetUseFlowView(LoginRequiredMixin, View):
         try:
             id = request.POST.get("id")
             asset_order = AssetApprove.objects.filter(id=id)[0]
-            if asset_order.asset.is_no_return:
+            if asset_order.asset.warehouse.is_no_return:
                 asset_order.use_status = "3"
             elif asset_order.return_date == None:
                 asset_order.use_status = "2"
@@ -508,6 +509,11 @@ class AssetApplyView(LoginRequiredMixin, View):
         asset_log.return_operator_id = user_id
         asset_log.t_return_date = datetime.today()
         asset_log.save()
+        if asset_log.asset.warehouse.is_no_return:
+            asset = asset_log.asset
+            asset.quantity += asset_log.quantity
+            asset.save()
+
         if asset_log.return_date != None:
             asset = asset_log.asset
             asset.quantity += asset_log.quantity

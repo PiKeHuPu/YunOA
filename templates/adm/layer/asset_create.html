@@ -26,8 +26,6 @@
                         <label class="col-sm-2 control-label">资产名称</label>
                         <div class="col-sm-3">
                             <input class="form-control" name="name" id="name" type="text" value="{{ asset.name }}"/>
-                            <input type="checkbox" name="no_return" id="no_return"
-                                   {% if asset.is_no_return %}checked{% endif %}>无需归还
                             <input type="checkbox" name="no_approve" id="no_approve"
                                    {% if asset.is_no_approve %}checked{% endif %}>无需审批
                             <input type="checkbox" name="vice_approve" id="vice_approve"
@@ -41,14 +39,14 @@
                                     onchange="a_ajax()">
                                 <option></option>
                                 {% for department in department_list %}
-                                    <option value="{{ department.id }}">{{ department.title }}</option>
+                                    <option value="{{ department.id }}" {% if asset.department_id == department.id %}selected{% endif %} >{{ department.title }}</option>
                                 {% endfor %}
                             </select>
                         </div>
                         <label class="col-sm-2 control-label">所属仓库</label>
                         <div class="col-sm-3">
-                            <select class="form-control select2" style="width:100%;" name="warehouse" id="warehouse"
-                                    disabled>
+                            <select class="form-control select2" style="width:100%;" name="warehouse" id="warehouse" disabled>
+                                <option value="{{ asset.warehouse_id }}">{{ asset.warehouse.name }}</option>
                             </select>
                         </div>
                     </div>
@@ -132,6 +130,7 @@
             } else if ($("#no_approve").is(":checked") && $("#vice_approve").is(":checked")) {
                 alert("无需审批与分管副总审批冲突")
             } else {
+                $("#warehouse").removeAttr("disabled");
                 var data = $("#addForm").serialize();
                 $.ajax({
                     type: $("#addForm").attr('method'),
