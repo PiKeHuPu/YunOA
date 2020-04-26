@@ -503,6 +503,8 @@ class WorkRecordHistory(LoginRequiredMixin, View):
         filters = dict()
         if request.POST.get("date"):
             filters["date"] = request.POST.get("date")
+        if request.POST.get("is_done"):
+            filters["is_done"] = request.POST.get("is_done")
         ret = dict(data=list(
             WorkRecord.objects.values(*fields).filter(is_submit=True, tem__user_id=user_id, **filters).order_by(
                 "-date")))
