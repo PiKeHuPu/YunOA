@@ -173,6 +173,7 @@ urlpatterns = [
     url(r'^personal/edit_schedule/$', EditSchedule.as_view(), name="edit_schedule"),
     url(r'^personal/assess_score/$', AssessScore0.as_view(), name="assess_score"),
     url(r'^personal/year_month/$', YearMonth.as_view(), name="year_month"),
+    url(r'^personal/position_statement_show_list/$', PositionStatementList.as_view(), name="position_statement_show_list"),
     url(r'^personal/assess_gather/$', AssessGather.as_view(), name="assess_gather"),
     url(r'^personal/assess_gather_list/$', AssessGatherList.as_view(), name="assess_gather_list"),
     url(r'system/position_statement$', PositionStatementList.as_view(), name="position_statement"),

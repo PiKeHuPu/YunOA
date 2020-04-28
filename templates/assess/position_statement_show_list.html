@@ -1,0 +1,36 @@
+{% extends "base-left.html" %}
+{% load staticfiles %}
+
+{% block content %}
+    <h1 style="text-align: center">{{ position_statement.0.department.title }}岗位职责</h1>
+    {% for ps in position_statement %}
+        <button style="margin-left: 10px" type="button" class="btn btn-lg btn-info"><a style="font-size: 22px; color: white" onclick="doShow({{ ps.id }}, '{{ ps.name }}', '{{ ps.file }}')">{{ ps.name }}</a></button>
+    {% endfor %}
+    <div class="col-lg-12" style="text-align: center; margin-top: 20px">
+        <input class="btn btn-danger" type=button value="返回" onClick="javascript:history.go(-1);">
+        {% if is_adm == '1' %}<input class="btn btn-info" type=button value="新建" onClick="create_goal({{ department.id }})">{% endif %}
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'plugins/combo-select/jquery.combo.select.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
+    <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+    <script src="{% static 'plugins/ajaxfileupload/ajaxfile-upload.js' %}"></script>
+    <script src="{% static 'plugins/fileinput/fileinput.js' %}"></script>
+    <script src="{% static 'plugins/fileinput/zh.js' %}"></script>
+
+    <script type="text/javascript">
+        function doShow(id, title, file_content) {
+            var lay = layer.open({
+                type: 2,
+                title: title,
+                shadeClose: false,
+                maxmin: true,
+                area: ['800px', '400px'],
+                content: ["{{ MEDIA_URL }}" + file_content]
+            });
+            layer.full(lay)
+        }
+    </script>
+{% endblock %}

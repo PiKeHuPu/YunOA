@@ -59,19 +59,19 @@
                         <!-- small box -->
                         <div class="small-box" style="background-color: #5ce268;">
                             <p class="small-box-footer"
-                               style="font-weight: bolder; height: 35px; font-size: 20px; color: white">
-                                <a href="/personal/year_month?id={{ dep.id }}" class="dep_style">{{ dep.title }}</a></p>
+                               style="font-weight: bolder; height: 35px; font-size: 20px; color: white">{{ dep.title }}</p>
                             <div class="inner">
-                                {% if dep.id in ps_list %}
-                                    {% for ps in position_statement %}
-                                        {% if ps.department_id == dep.id %}
-                                            <a href="#"
-                                               onclick="doShow({{ ps.id }}, '{{ ps.name }}', '{{ ps.file }}')"
-                                               class="ps_style">{{ ps.name }}</a>
-                                            &nbsp;&nbsp;&nbsp;
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endif %}
+                                <a href="/personal/year_month?id={{ dep.id }}"
+                                   class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体"
+                                                               onmouseover="this.style.color='#5D1C8E'"
+                                                               onmouseout="this.style.color='white'">绩效考核</p></a>
+                                <a href="{% url 'position_statement_show_list' %}?id={{ dep.id }}"
+                                   class="small-box-footer"><p style="font-size:28px; color: white; font-family: 楷体"
+                                                               onmouseover="this.style.color='#5D1C8E'"
+                                                               onmouseout="this.style.color='white'">岗位职责</p></a>
+                            </div>
+                            <div class="icon" style="margin-top: 40px">
+                                <i class="fa fa-users"></i>
                             </div>
                         </div>
                     </div>
@@ -89,10 +89,8 @@
                 <div class="col-lg-12 col-xs-12 pin">
                     <!-- small box -->
                     <div class="small-box"
-                         style="background-image: linear-gradient(to bottom right, #71e277, #b58bed)">
-                        <p class="small-box-footer"
-                           style="font-weight: bolder; height: 35px; font-size: 20px; color: white">
-                            汇总</p>
+                         style="background-color: #5ce268; font-weight: bolder; font-size: 22px; color: white; text-align: center">
+                        <a href="{% url 'assess_gather' %}" class="dep_style">汇总</a>
                         <div class="inner">
                         </div>
                     </div>
@@ -161,7 +159,8 @@
         {##}
         {#        small_box[i].style.backgroundImage = blender();#}
         {#    }#}
-        {#}#}
+        {
+        #}#}
     </script>
 
 {% endblock %}

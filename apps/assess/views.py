@@ -32,6 +32,18 @@ class AssessDep(LoginRequiredMixin, View):
         return render(request, "assess/assess-dep.html", ret)
 
 
+class PositionStatementList(LoginRequiredMixin, View):
+    """
+    选择岗位职责列表
+    """
+    def get(self, request):
+        ret = dict()
+        dep_id = request.GET.get("id")
+        ps = PositionStatement.objects.filter(department_id=dep_id)
+        ret["position_statement"] = ps
+        return render(request, "assess/position_statement_show_list.html", ret)
+
+
 class AssessDetail(LoginRequiredMixin, View):
     """
     考核内容表格
@@ -294,7 +306,7 @@ class YearMonth(LoginRequiredMixin, View):
         return render(request, "assess/year_month.html", ret)
 
 
-class PositionStatementList(LoginRequiredMixin, View):
+class PositionStatementShowList(LoginRequiredMixin, View):
     """
     部门岗位职责列表
     """
