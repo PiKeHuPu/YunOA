@@ -153,8 +153,8 @@
                                     </tbody>
                                 </table>
                             </div>
-{#                            <div class="box-footer ">#}
-{#                            </div>#}
+                            {#                            <div class="box-footer ">#}
+                            {#                            </div>#}
                         </div>
                         <!-- /.box-body -->
                     </div>
@@ -175,19 +175,33 @@
                                       style="margin: 0px 3px 0px 0px; height: 210px;resize: vertical">{% if cashier == '1' %}预付款成功{% endif %}</textarea>
                             <br>
 
-{#                            无需报销提示#}
+                            {#                            无需报销提示#}
                             {% if is_apply_only %}
                                 <div>
                                     <span style="color: red">当前申请预付款完成后结束，无报销流程</span><br>
                                 </div>
+                                <br>
                             {% endif %}
-
+                            {% if copy_to == "1" %}
+                                <div>
+                                    <label for="copy_to" style="font-size: 18px">抄送至:</label>
+                                    <select name="copy_to" id="copy_to" class="form-control">
+                                        <option value="">无</option>
+                                        {% for department in departments %}
+                                            <option value="{{ department.id }}">{{ department.title }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                            <br>
                             <div class="text-center">
                                 {% if cashier == '0' %}
-                                    <button type="button" class="btn btn-primary" data-toggle="modal" onclick="updateOpin('disagree')">不同意
+                                    <button type="button" class="btn btn-primary" data-toggle="modal"
+                                            onclick="updateOpin('disagree')">不同意
                                     </button>
                                 {% else %}
-                                    <button type="button" class="btn btn-primary" data-toggle="modal" onclick="updateOpin('disagree_c')">取消预付款
+                                    <button type="button" class="btn btn-primary" data-toggle="modal"
+                                            onclick="updateOpin('disagree_c')">取消预付款
                                     </button>
                                 {% endif %}
                                 <button type="button" class="btn btn-danger" onclick="updateOpin('agree')">
@@ -258,23 +272,25 @@
                     <div>
                         <table>
                             <thead>
-                                <tr>
-                                    <th colspan="4" style="width:500px; font-size: 18px">申请人最近10条其他申请记录</th>
-                                </tr>
+                            <tr>
+                                <th colspan="4" style="width:500px; font-size: 18px">申请人最近10条其他申请记录</th>
+                            </tr>
                             </thead>
                             <tbody>
+                            <tr>
+                                <td style="text-align: center; font-weight: bolder">费用类型</td>
+                                <td style="text-align: center; font-weight: bolder">金额</td>
+                                <td style="text-align: center; font-weight: bolder">申请时间</td>
+                            </tr>
+                            {% for user_order in user_orders %}
                                 <tr>
-                                    <td style="text-align: center; font-weight: bolder">费用类型</td>
-                                    <td style="text-align: center; font-weight: bolder">金额</td>
-                                    <td style="text-align: center; font-weight: bolder">申请时间</td>
+                                    <td><a onclick="showDetail({{ user_order.id }})">
+                                        {% if user_order.feeid.fee_type %}{{ user_order.feeid.fee_type }}{% else %}
+                                            {{ user_order.title }}{% endif %}</a></td>
+                                    <td>{{ user_order.cost }}</td>
+                                    <td style="text-align: center">{{ user_order.create_time }}</td>
                                 </tr>
-                                {% for user_order in user_orders %}
-                                    <tr>
-                                        <td><a onclick="showDetail({{ user_order.id }})">{% if user_order.feeid.fee_type %}{{ user_order.feeid.fee_type }}{% else %}{{ user_order.title }}{% endif %}</a></td>
-                                        <td>{{ user_order.cost }}</td>
-                                        <td style="text-align: center">{{ user_order.create_time }}</td>
-                                    </tr>
-                                {% endfor %}
+                            {% endfor %}
 
                             </tbody>
                         </table>
@@ -287,7 +303,7 @@
             <!-- /.col -->
 
 
-        <!-- /.row -->
+            <!-- /.row -->
         </section>
 
         <!-- /.content -->
@@ -307,7 +323,8 @@
                 'id': '{{ work_order.id }}',
                 'desc0': desc0,
                 'type': '{{ work_order.type }}',
-                'structure': '{{ work_order.structure.id }}'
+                'structure': '{{ work_order.structure.id }}',
+                'copy_to': $('#copy_to').val()
             };
             if (opinion == 'disagree' && desc0 == '') {
                 layer.alert('不同意，请写下审批意见', {icon: 5});
@@ -333,7 +350,6 @@
                     } else {
                         layer.alert(msg.error, {icon: 5});
                     }
-                    return;
                 }
             });
         }
@@ -373,7 +389,7 @@
                 shadeClose: true,
                 maxmin: true,
                 area: ['640px', '580px'],
-                fixed:false,
+                fixed: false,
                 content: ["{% url 'personal-workorder-app-other-detail' %}" + '?id=' + id],
 
             })

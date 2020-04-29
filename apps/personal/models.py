@@ -44,7 +44,6 @@ User = get_user_model()
 class FeeType(models.Model):
     fee_id = models.IntegerField(blank=True)
     fee_type = models.CharField(max_length=10, blank=True)
-    copy_to = models.ForeignKey(Structure, blank=True, null=True, on_delete=models.SET_NULL, verbose_name="审批完成后所抄送部门")
 
 
 class WorkOrder(models.Model):
@@ -90,6 +89,7 @@ class WorkOrder(models.Model):
                                   verbose_name='申请时所在部门')
     create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     file_content = models.FileField(upload_to='file/%Y/%m', blank=True, null=True, verbose_name='附件')
+    copy_to = models.ForeignKey(Structure, related_name="copy_to_dep", blank=True, null=True, verbose_name="抄送部门")
 
     class Meta:
         verbose_name = '申报信息'
@@ -229,7 +229,6 @@ class BusinessApply(models.Model):
                                   verbose_name='申请时所在部门')
     create_time = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     file_content = models.FileField(upload_to='file/%Y/%m', blank=True, null=True, verbose_name='附件')
-
 
 
 class Advise(models.Model):

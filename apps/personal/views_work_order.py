@@ -421,15 +421,9 @@ class WorkOrderDetailView(LoginRequiredMixin, View):
             except:
                 adm_list = []
 
-            fee_id = work_order.feeid_id
-            fee_type = FeeType.objects.filter(fee_id=fee_id)
-            if fee_type:
-                fee_type = FeeType.objects.filter(fee_id=fee_id)[0]
-                copy_dep = fee_type.copy_to_id
-            else:
-                copy_dep = "-1"
+            user = User.objects.filter(id=user_id).first()
 
-            if (request.user.id in user_list) or (str(request.user.id) in adm_list) or (request.user.department_id == copy_dep):
+            if (request.user.id in user_list) or (str(request.user.id) in adm_list) or (work_order.copy_to_id == user.department_id):
                 ret['work_order'] = work_order
                 # ret['work_order_record'] = work_order_record
                 ret['work_order_log'] = work_order_log
@@ -511,6 +505,15 @@ class WorkOrderAppUpdateView(LoginRequiredMixin, View):
                 #     i.t_title = i.t_title[:10] + "..."
             ret['user_orders'] = user_orders
 
+            # 判断当前审批人部门是否为财务部
+            sp_user_id = request.session.get("_auth_user_id")
+            sp_user = User.objects.filter(id=sp_user_id).first()
+            sp_dep = sp_user.department
+            if sp_dep.title == "财务部":
+                ret["copy_to"] = "1"
+                departments = Structure.objects.filter(~Q(title="财务部"), ~Q(title="测试"))
+                ret["departments"] = departments
+
             ret['is_apply_only'] = work_order.is_apply_only
 
         return render(request, 'personal/workorder/workorder_app_update.html', ret)
@@ -519,6 +522,10 @@ class WorkOrderAppUpdateView(LoginRequiredMixin, View):
         res = dict()
         ret_data = json.loads(request.body.decode())
         work_order = get_object_or_404(WorkOrder, pk=str(ret_data.get('id')))
+        copy_to = ret_data.get('copy_to')
+        if copy_to:
+            work_order.copy_to_id = copy_to
+            work_order.save()
         advance = work_order.advance
         current_user_id = request.user.id
         if current_user_id == work_order.next_user_id:  #TODO
@@ -1199,15 +1206,10 @@ class ApDetailView(LoginRequiredMixin, View):
             except:
                 adm_list = []
 
-            fee_id = work_order.feeid_id
-            fee_type = FeeType.objects.filter(fee_id=fee_id)
-            if fee_type:
-                fee_type = FeeType.objects.filter(fee_id=fee_id)[0]
-                copy_dep = fee_type.copy_to_id
-            else:
-                copy_dep = "-1"
+            user_id = request.session.get("_auth_user_id")
+            user = User.objects.filter(id=user_id).first()
 
-            if (request.user.id in user_list) or (str(request.user.id) in adm_list) or (request.user.department_id == copy_dep):
+            if (request.user.id in user_list) or (str(request.user.id) in adm_list) or (ap.workorder.copy_to_id == user.department_id):
                 ret['work_order'] = work_order
                 ret['work_order_log'] = work_order_log
             else:
@@ -1657,11 +1659,6 @@ class CopyTo(LoginRequiredMixin, View):
     def post(self, request):
         user_id = request.session.get("_auth_user_id")
         user = User.objects.get(id=user_id)
-        copy = FeeType.objects.filter(copy_to_id=user.department_id)
-        copy_list = []
-        if copy:
-            for c in copy:
-                copy_list.append(c.fee_id)
 
         fields = ['id', 'number', 'feeid_id__fee_type', 'status', 'end_time', 'cretor_id__name', 'cost', 'feeid_id', 'structure_id__title']
         filters = dict()
@@ -1670,6 +1667,6 @@ class CopyTo(LoginRequiredMixin, View):
             end_time = request.GET.get("end_time")
             filters['end_time__range'] = (start_time, end_time)
         filters['status'] = "6"
-        filters['feeid_id__in'] = copy_list
+        filters['copy_to_id'] = user.department_id
         ret = dict(data=list(WorkOrder.objects.filter(**filters).values(*fields).order_by('-end_time')))
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type='application/json')

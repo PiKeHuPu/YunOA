@@ -212,11 +212,9 @@
 {#                    <!-- /.box-body -->#}
 {#                </div>#}
                 {% if ap.type == '1' %}
-
                     <div class="box box-primary">
                         <div class="box-header with-border">
                             <h3 class="box-title">完成情况</h3>
-
                             <div class="box-tools">
                                 <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
                                         class="fa fa-minus"></i>
@@ -224,7 +222,6 @@
                             </div>
                         </div>
                         <div class="box-body no-padding">
-
                             <textarea class="form-control" name="cost" id="desc" type="textarea" readonly="readonly"
                                       style="margin: 0px 3px 0px 0px; height: 250px; resize:vertical"> {{ ap.completion_info }}</textarea>
                             <br>
@@ -268,7 +265,6 @@
                                     {# <img src="/media/{{ wlog.creator.image }}" alt="Product Image">#}
                                     {# </div>#}
                                     <div>
-
                                         <small>{{ wlog.create_time }}</small>
                                         <span class="text-green">{{ wlog.structure.title }}</span>
                                         <a href="javascript:void(0)" class="product-title">
@@ -280,8 +276,6 @@
                                         <span class="text-muted margin-top-5">
                                             详情：{{ wlog.desc }}
                                         </span>
-
-
                                     </div>
                                 </li>
                             {% endfor %}
