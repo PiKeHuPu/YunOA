@@ -93,6 +93,7 @@
             alert("请输入金额")
         } else{
            var data = $("#addForm").serialize();
+           $("#btnSave").attr("disabled", "disabled");
            $.ajax({
                type: $("#addForm").attr('method'),
                url : "{% url 'oil_order_create' %}",

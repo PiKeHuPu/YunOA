@@ -41,10 +41,11 @@
                     <form class="form-inline" id="queryForm">
                         <div class="form-group searchArea margin-r-5 margin-top-5">
                             <label style="font-weight: bolder; margin-left: 15px">车牌号：</label>
-                            <select class="form-control select2" name="license_plate" id="license_plate" style="width: 200px">
+                            <select class="form-control select2" name="license_plate" id="license_plate"
+                                    style="width: 200px">
                                 <option value=""></option>
                                 {% for vehicle in vehicle_list %}
-                                <option value={{ vehicle.id }} > {{ vehicle.license_plate }}&nbsp;&nbsp;{{ vehicle.department }}</option>
+                                    <option value={{ vehicle.id }}> {{ vehicle.license_plate }}&nbsp;&nbsp;{{ vehicle.department }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -102,62 +103,66 @@
         var oDataTable = null;
         $(function () {
             oDataTable = initTable();
+
             function initTable() {
                 var oTable = $('#dtbList').DataTable(
-                    $.extend(true, {"scrollX": true},
-                    DATATABLES_CONSTANT.DATA_TABLES.DEFAULT_OPTION,
-                    {
-                        ajax: {
-                            type: "post",
-                            url: "{% url "personal-oilWear:oil_order" %}",
-                            data: function (d) {
-                                d.license_plate = $("#license_plate").val();
-                            }
-                        },
-                        columns: [
-                            {
-                                data: "vehicle_id__license_plate",
+                    $.extend(true,
+                        DATATABLES_CONSTANT.DATA_TABLES.DEFAULT_OPTION,
+                        {
+                            ajax: {
+                                type: "post",
+                                url: "{% url "personal-oilWear:oil_order" %}",
+                                data: function (d) {
+                                    d.license_plate = $("#license_plate").val();
+                                }
                             },
-                            {
-                                data: "vehicle_id__type",
-                            },
-                            {
-                                data: "vehicle_id__department",
-                            },
-                            {
-                                data: "operator__name",
-                            },
-                            {
-                                data: "refuel_time",
-                            },
-                            {
-                                data: "mileage",
-                            },
-                            {
-                                data: "weight",
-                            },
-                            {
-                                data: "price",
-                            },
-                            {
-                                data: "amount",
-                            },
-                            {
-                                data: "remark",
-                                width: "25%"
-                            },
-                            {
-                                data: "operator_id",
-                                render: function (data, type, row, meta) {
-                                    var ret = "";
-                                    if (data=={{ user_id }}) {
-                                        ret = ret + "<button title='修改' onclick='change_log("
-                                        + row.id + ")'><i class='glyphicon glyphicon-wrench'></i></button>"
-                                    }
-                                    return ret;
+                            columns: [
+                                {
+                                    data: "vehicle_id__license_plate",
                                 },
-                            }],
-                    }));
+                                {
+                                    data: "vehicle_id__type",
+                                },
+                                {
+                                    data: "vehicle_id__department",
+                                },
+                                {
+                                    data: "operator__name",
+                                },
+                                {
+                                    data: "refuel_time",
+                                },
+                                {
+                                    data: "mileage",
+                                },
+                                {
+                                    data: "weight",
+                                },
+                                {
+                                    data: "price",
+                                },
+                                {
+                                    data: "amount",
+                                },
+                                {
+                                    data: "remark",
+                                    width: "25%"
+                                },
+                                {
+                                    data: "operator_id",
+                                    width: "8%",
+                                    render: function (data, type, row, meta) {
+                                        var ret = "";
+                                        if (data =={{ user_id }}) {
+                                            ret = ret + "<button title='修改' onclick='change_log("
+                                                + row.id + ")'><i class='glyphicon glyphicon-wrench'></i></button>";
+                                            ret = ret + "<button title='删除' onclick='delete_log("
+                                                + row.id + ")'><i class='glyphicon glyphicon-trash'></i></button>"
+                                        }
+                                        return ret;
+                                    },
+                                }],
+                        }));
                 return oTable;
             }
 
@@ -175,7 +180,7 @@
                     end: function () {
                         window.location.reload()
                     }
-                    });
+                });
             });
 
             $("#btnRefresh").click(function () {
@@ -193,7 +198,26 @@
                 end: function () {
                     window.location.reload()
                 }
+            });
+        }
+
+        function delete_log(id) {
+            con = confirm("确定删除吗？");
+            if (con) {
+                $.ajax({
+                    url: "{% url 'oil_order_create' %}",
+                    type: "POST",
+                    data: {"id": id, "is_del": "1"},
+                    success: function (ret) {
+                        if (ret.result == "1") {
+                            alert("删除成功");
+                            window.location.reload()
+                        } else (
+                            alert("删除失败")
+                        )
+                    }
                 });
+            }
         }
 
         $(function () {

@@ -241,33 +241,43 @@ class OilOrderCreateView(LoginRequiredMixin, View):
 
     def post(self, request):
         res = dict()
-        try:
-            operator_id = request.session.get("_auth_user_id")
-            refuel_time = request.POST.get("refuel_time")
-            mileage = request.POST.get("mileage")
-            weight = request.POST.get("weight")
-            price = request.POST.get("price")
-            amount = request.POST.get("amount")
-            remark = request.POST.get("remark")
-            vehicle_id = request.POST.get("license_plate")
-
-            id0 = request.POST.get("id0")
-            if id0:
+        is_del = request.POST.get("is_del", None)
+        if is_del:
+            try:
+                id0 = request.POST.get("id")
                 oil_order = OilWear.objects.get(id=id0)
-            else:
-                oil_order = OilWear()
-            oil_order.operator_id = operator_id
-            oil_order.refuel_time = refuel_time
-            oil_order.mileage = mileage
-            oil_order.weight = weight
-            oil_order.price = price
-            oil_order.amount = amount
-            oil_order.remark = remark
-            oil_order.vehicle_id = vehicle_id
-            oil_order.save()
-            res["result"] = True
-        except:
-            pass
+                oil_order.delete()
+                res["result"] = "1"
+            except:
+                pass
+        else:
+            try:
+                operator_id = request.session.get("_auth_user_id")
+                refuel_time = request.POST.get("refuel_time")
+                mileage = request.POST.get("mileage")
+                weight = request.POST.get("weight")
+                price = request.POST.get("price")
+                amount = request.POST.get("amount")
+                remark = request.POST.get("remark")
+                vehicle_id = request.POST.get("license_plate")
+
+                id0 = request.POST.get("id0")
+                if id0:
+                    oil_order = OilWear.objects.get(id=id0)
+                else:
+                    oil_order = OilWear()
+                oil_order.operator_id = operator_id
+                oil_order.refuel_time = refuel_time
+                oil_order.mileage = mileage
+                oil_order.weight = weight
+                oil_order.price = price
+                oil_order.amount = amount
+                oil_order.remark = remark
+                oil_order.vehicle_id = vehicle_id
+                oil_order.save()
+                res["result"] = True
+            except:
+                pass
         return HttpResponse(json.dumps(res), content_type='application/json')
 
 
@@ -307,8 +317,9 @@ class OilStatisticView(LoginRequiredMixin, View):
             # 统计数据
             if ret['data']:
                 num = len(ret['data'])
+                mileage_list = [int(i['mileage']) for i in ret['data']]
 
-                mileage = ret['data'][0]['mileage'] - ret['data'][-1]['mileage']
+                mileage = max(mileage_list) - min(mileage_list)
                 if mileage % 1 == 0:
                     mileage = int(mileage)
 
