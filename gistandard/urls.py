@@ -21,7 +21,8 @@ from django.conf.urls import url, include
 from django.views.static import serve
 
 from assess.views import AssessDep, AssessDetail, CreateGoal, CreatePerGoal, EditSchedule, AssessScore0, YearMonth, \
-    PositionStatementList, PositionStatementCreate, PositionStatementAjax, AssessGather, AssessGatherList
+    PositionStatementList, PositionStatementCreate, PositionStatementAjax, AssessGather, AssessGatherList, \
+    PositionStatementShowList
 from gistandard.settings import MEDIA_ROOT
 
 import xadmin
@@ -176,7 +177,7 @@ urlpatterns = [
     url(r'^personal/position_statement_show_list/$', PositionStatementList.as_view(), name="position_statement_show_list"),
     url(r'^personal/assess_gather/$', AssessGather.as_view(), name="assess_gather"),
     url(r'^personal/assess_gather_list/$', AssessGatherList.as_view(), name="assess_gather_list"),
-    url(r'system/position_statement$', PositionStatementList.as_view(), name="position_statement"),
+    url(r'system/position_statement$', PositionStatementShowList.as_view(), name="position_statement"),
     url(r'system/position_statement_create$', PositionStatementCreate.as_view(), name="position_statement_create"),
     url(r'system/position_statement_ajax$', PositionStatementAjax.as_view(), name="position_statement_ajax"),
     # 档案管理
