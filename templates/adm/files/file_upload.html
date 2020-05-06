@@ -24,12 +24,12 @@
                         <div class="col-sm-4">
                             <input type="text" id="number" class="form-control">
                         </div>
-                        <label class="col-sm-2 control-label">保管人</label>
+                        <label class="col-sm-2 control-label">保管部门</label>
                         <div class="col-sm-3">
-                            <select name="preserver" id="preserver" class="form-control select2">
+                            <select name="preserve_dep" id="preserve_dep" class="form-control select2">
                                 <option value=""></option>
-                                {% for user in users %}
-                                    <option value="{{ user.id }}">{{ user.name }}</option>
+                                {% for dep in departments %}
+                                    <option value="{{ dep.id }}">{{ dep.title }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -78,7 +78,7 @@
                 var para = {
                     "type0": {{ type0 }},
                     "number": $("#number").val(),
-                    "preserver": $("#preserver").val()
+                    "preserve_dep": $("#preserve_dep").val()
                 };
                 return para;
             }
@@ -88,11 +88,11 @@
          * @return {boolean}
          */
         function Create() {
-            var preserver = $("#preserver").val();
-            if (preserver) {
+            var preserve_dep = $("#preserve_dep").val();
+            if (preserve_dep) {
 
             } else {
-                alert("请选择保管人");
+                alert("请选择保管部门");
                 return false;
             }
             $("#btn_save").attr("disabled", "disabled");

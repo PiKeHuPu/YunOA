@@ -736,8 +736,8 @@ class FileUpload(LoginRequiredMixin, View):
         ret = dict()
         type0 = request.GET.get("type")
         ret["type0"] = type0
-        users = User.objects.filter(is_active="1")
-        ret["users"] = users
+        departments = Structure.objects.all()
+        ret["departments"] = departments
         return render(request, "adm/files/file_upload.html", ret)
 
     def post(self, request):
@@ -748,7 +748,7 @@ class FileUpload(LoginRequiredMixin, View):
         if not file0:
             return HttpResponse("没有上传文件")
         number = request.POST.get("number", None)
-        preserver = request.POST.get("preserver")
+        preserve_dep = request.POST.get("preserve_dep")
         file_manage = FileManage()
         file_manage.name = file0.name
         file_manage.content = file0
@@ -759,7 +759,7 @@ class FileUpload(LoginRequiredMixin, View):
         file_manage.uploader_id = user_id
         if number:
             file_manage.number = number
-        file_manage.preserver_id = preserver
+        file_manage.preserve_dep_id = preserve_dep
         file_manage.save()
         return HttpResponse("上传成功")
 
@@ -783,7 +783,7 @@ class FileList(LoginRequiredMixin, View):
         return render(request, "adm/files/file_list.html", ret)
 
     def post(self, request):
-        fields = ['id', 'name', 'upload_time', 'content', 'number', 'preserver__name']
+        fields = ['id', 'name', 'upload_time', 'content', 'number', 'preserve_dep__title']
         type0 = request.POST.get("type0")
         if type0:
             ret = dict(data=list(
@@ -819,8 +819,8 @@ class FileRename(LoginRequiredMixin, View):
                 type_list.remove(i.parent_type_id)
         types = FileType.objects.filter(id__in=type_list)
         ret["types"] = types
-        users = User.objects.filter(is_active="1")
-        ret["users"] = users
+        departments = Structure.objects.all()
+        ret["departments"] = departments
         return render(request, "adm/files/file_rename.html", ret)
 
     def post(self, request):
@@ -829,7 +829,7 @@ class FileRename(LoginRequiredMixin, View):
         name = request.POST.get("name0")
         type0 = request.POST.get("type0")
         number = request.POST.get("number")
-        preserver = request.POST.get("preserver")
+        preserve_dep = request.POST.get("preserve_dep")
         file = FileManage.objects.filter(id=id0).first()
         path = "media/" + str(file.content)
         new_path = "media/file_manage/" + name
@@ -840,7 +840,7 @@ class FileRename(LoginRequiredMixin, View):
         if number:
             file.number = number
         file.content = content_path
-        file.preserver_id = preserver
+        file.preserve_dep_id = preserve_dep
         file.save()
         ret["status"] = "success"
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
@@ -1059,7 +1059,7 @@ class FileShow(LoginRequiredMixin, View):
 
     def post(self, request):
         # 获取资产列表
-        fields = ['id', 'name', 'upload_time', 'content', 'number', 'preserver__name']
+        fields = ['id', 'name', 'upload_time', 'content', 'number', 'preserve_dep__title']
         type0 = request.POST.get("type0")
         if type0:
             ret = dict(data=list(

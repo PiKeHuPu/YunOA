@@ -327,7 +327,7 @@ class FileManage(models.Model):
     number = models.CharField(max_length=50, blank=True, null=True, verbose_name="档案编号")
     content = models.FileField(upload_to="file_manage/", verbose_name="档案内容")
     uploader = models.ForeignKey(User, related_name="uploader", verbose_name="上传人")
-    preserver = models.ForeignKey(User, related_name="preserver", blank=True, null=True, verbose_name="保管人")
+    preserve_dep = models.ForeignKey(Structure, related_name="preserve_dep", default=19, verbose_name="保管部门")
     upload_time = models.DateTimeField(auto_now_add=True, verbose_name="上传时间")
     is_delete = models.BooleanField(default=False, verbose_name="是否删除")
     delete_time = models.DateTimeField(blank=True, null=True, verbose_name="删除时间")
