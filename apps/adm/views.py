@@ -856,8 +856,9 @@ class FileDelete(LoginRequiredMixin, View):
         user_id = request.session.get("_auth_user_id")
         id0 = request.POST.get("id")
         file = FileManage.objects.filter(id=id0).first()
+        file_name = os.path.basename(str(file.content))
         if file:
-            path = "media/file_manage/" + str(file.name)
+            path = "media/file_manage/" + file_name
             os.remove(path)
             file.deleter_id = user_id
             file.is_delete = True
