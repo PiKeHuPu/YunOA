@@ -815,9 +815,8 @@ class FileRename(LoginRequiredMixin, View):
         for i in types:
             type_list.append(i.id)
         for i in types:
-            if i.is_sub == True:
+            if i.is_sub == True and i.parent_type_id in type_list:
                 type_list.remove(i.parent_type_id)
-        print(type_list)
         types = FileType.objects.filter(id__in=type_list)
         ret["types"] = types
         users = User.objects.filter(is_active="1")
