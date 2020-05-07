@@ -787,10 +787,10 @@ class FileList(LoginRequiredMixin, View):
         type0 = request.POST.get("type0")
         if type0:
             ret = dict(data=list(
-                FileManage.objects.values(*fields).filter(is_delete=False, type_id=type0).order_by("-upload_time")))
+                FileManage.objects.values(*fields).filter(is_delete=False, type_id=type0)))
         else:
             ret = dict(data=list(
-                FileManage.objects.values(*fields).filter(is_delete=False, type_id=None).order_by("-upload_time")))
+                FileManage.objects.values(*fields).filter(is_delete=False, type_id=None)))
 
         for i in ret["data"]:
             file_name = os.path.basename(i["content"])
@@ -1018,9 +1018,23 @@ class FileSubType(LoginRequiredMixin, View):
         ret = dict()
         types = FileType.objects.filter(is_sub=False)
         ret["types"] = types
-        sub_types = FileType.objects.filter(is_sub=True)
+        sub_types = FileType.objects.filter(is_sub=True, parent_type=types[0])
         ret["sub_types"] = sub_types
         return render(request, "adm/files/file_sub_type.html", ret)
+
+    def post(self, request):
+        ret = dict()
+        type_id = request.POST.get("type_id")
+        sub_types = FileType.objects.filter(is_sub=True, parent_type_id=type_id)
+        sub_type_str = ""
+        for sub in sub_types:
+            sub_type_str += '<div class="col-sm-12"><div class="col-sm-6" style="margin-bottom: 10px;"><div ' \
+                            'class="col-sm-4">' + sub.parent_type.name + '-</div><div class="col-sm-8"><input ' \
+                            'class="form-control" name="title" type="text"value="' + sub.name + '"id="tl' + str(sub.id) + '"/></div></div><div class="col-sm-2"><button type="button" onclick="TypeTitle(' + str(sub.id) + ')" class="btn btn-info margin-right ">更改</button></div><div ' \
+                            'class="col-sm-2"><button type="button" onclick="TypeStatus(' + str(sub.id) + ')"class="btn ' \
+                            'btn-warning margin-right">删除</button></div></div> '
+        ret["sub_str"] = sub_type_str
+        return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
 
 
 class FileShow(LoginRequiredMixin, View):
