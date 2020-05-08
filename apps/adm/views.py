@@ -1130,5 +1130,13 @@ class FileTypeEditPart(LoginRequiredMixin, View):
                     file_type_users.user_id = j
                     file_type_users.save()
         file_type.save()
+        menu_code = "FILE-LIST" + str(id0)
+        menu = Menu.objects.filter(code=menu_code).first()
+        menu.title = title
+        menu.save()
+        menu_code_ = "FILE-LIST" + str(id0) + "-"
+        menu_ = Menu.objects.filter(code=menu_code_).first()
+        menu_.title = title + "-"
+        menu_.save()
         ret["result"] = "1"
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
