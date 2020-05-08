@@ -196,15 +196,15 @@
                             <br>
                             <div class="text-center">
                                 {% if cashier == '0' %}
-                                    <button type="button" class="btn btn-primary" data-toggle="modal"
+                                    <button type="button" class="btn btn-primary ban_btn" data-toggle="modal"
                                             onclick="updateOpin('disagree')">不同意
                                     </button>
                                 {% else %}
-                                    <button type="button" class="btn btn-primary" data-toggle="modal"
+                                    <button type="button" class="btn btn-primary ban_btn" data-toggle="modal"
                                             onclick="updateOpin('disagree_c')">取消预付款
                                     </button>
                                 {% endif %}
-                                <button type="button" class="btn btn-danger" onclick="updateOpin('agree')">
+                                <button type="button" class="btn btn-danger ban_btn" onclick="updateOpin('agree')">
                                     {% if cashier == '1' %}完成预付款{% else %}同意{% endif %}
                                 </button>
                             </div>
@@ -317,6 +317,7 @@
     <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
     <script type="text/javascript">
         function updateOpin(opinion) {
+            $(".ban_btn").attr("disabled", true);
             var desc0 = $('#desc0').val();
             var data = {
                 'opinion': opinion,
@@ -328,6 +329,7 @@
             };
             if (opinion == 'disagree' && desc0 == '') {
                 layer.alert('不同意，请写下审批意见', {icon: 5});
+                $(".ban_btn").attr("disabled", false);
                 return
             }
             $.ajax({
