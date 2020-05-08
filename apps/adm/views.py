@@ -837,8 +837,7 @@ class FileRename(LoginRequiredMixin, View):
         os.rename(path, new_path)
         file.name = name
         file.type_id = type0
-        if number:
-            file.number = number
+        file.number = number
         file.content = content_path
         file.preserve_dep_id = preserve_dep
         file.save()
