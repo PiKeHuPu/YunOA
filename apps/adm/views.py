@@ -965,6 +965,10 @@ class FileTypeAjax(LoginRequiredMixin, View):
         menu = Menu.objects.filter(code=menu_code).first()
         menu.title = name
         menu.save()
+        menu_code_ = "FILE-LIST" + str(id0) + "-"
+        menu_ = Menu.objects.filter(code=menu_code_).first()
+        menu_.title = name + "-"
+        menu_.save()
         ret["status"] = "success"
         return HttpResponse(json.dumps(ret, cls=DjangoJSONEncoder), content_type="application/json")
 
