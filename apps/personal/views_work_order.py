@@ -897,7 +897,7 @@ class WorkOrderFlowDetailView(LoginRequiredMixin, View):
         ret = dict()
         flow_id = request.GET.get('id')
         structures = Structure.objects.all()
-        users = User.objects.all().values('id', 'name')
+        users = User.objects.filter(is_active="1").values('id', 'name')
         ret['flow_type'] = WorkOrderFlow.type_choices
         ret['pro_type'] = WorkOrderFlow.pro_type_choices
         ret['factor_choices'] = WorkOrderFlow.factor_choices
