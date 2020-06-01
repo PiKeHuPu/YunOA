@@ -279,9 +279,10 @@ class AssessScore0(LoginRequiredMixin, View):
             if targetArr[i] and abilityArr[i] and attitudeArr[i]:
                 per_goal.total_score = float(targetArr[i]) + float(abilityArr[i]) + float(attitudeArr[i])
             per_goal.remark = remarkArr[i]
-            if per_goal.total_score < 90 and (remarkArr[i] == "" or remarkArr[i] == None or len(remarkArr[i].strip(" ")) == 0):
-                ret["status"] = "szygsql"
-                break
+            if per_goal.total_score:
+                if per_goal.total_score < 90 and (remarkArr[i] == "" or remarkArr[i] == None or len(remarkArr[i].strip(" ")) == 0):
+                    ret["status"] = "szygsql"
+                    break
             per_goal.save()
         if ret["status"] != "szygsql":
             ret["status"] = "1"
