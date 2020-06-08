@@ -89,7 +89,7 @@ class PersonalView(LoginRequiredMixin, View):
 
         # 物资相关
         user_id = request.session.get("_auth_user_id")
-        asset_approve_num = len(AssetApproveDetail.objects.filter(approver_id=user_id, is_pass=None))
+        asset_approve_num = len(AssetApproveDetail.objects.filter(approver_id=user_id, is_pass=None, status='1'))
         ret['asset_approve_num'] = asset_approve_num
 
         # 报表的时间
