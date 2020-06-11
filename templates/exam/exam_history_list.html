@@ -1,0 +1,116 @@
+{% extends "base-left.html" %}
+{% load staticfiles %}
+
+{% block content %}
+    <section class="content-header margin-bottom">
+        <ol class="breadcrumb">
+            <li><a href=""><i class="fa fa-dashboard"></i>办公平台</a></li>
+            <li class="active"><a href="{% url 'personal' %}">我的工作台</a></li>
+            <li class="active"><a href="">考试列表</a></li>
+        </ol>
+    </section>
+    <!-- Main content -->
+    <section class="content">
+        <div class="row">
+            <div class="col-lg-12">
+                <a href="/personal/exam/list/"><button class="col-lg-2 btn btn-primary" style="margin-bottom: 20px">当前考试</button></a>
+            </div>
+            {% if exam_list %}
+                {% for e in exam_list %}
+                    <div class="col-md-4" style="margin-top: 20px">
+                        <div class="box-body" style="border: 1px grey solid">
+                            <h4 style="font-weight: bolder">{{ e.exam.name }}</h4>
+                            <ul class="list-group list-group-unbordered">
+                                <li class="list-group-item">
+                                    <b>考试时间：</b> <a>{{ e.exam.start_time }}至{{ e.exam.end_time }}</a>
+                                </li>
+                                <li class="list-group-item">
+                                    <b>考试时长：</b> <a>{{ e.exam.duration }}分钟</a>
+                                </li>
+                                <li class="list-group-item">
+                                    <b>考试状态：</b> <a>
+                                    {% if e.status == '1' %}
+                                        已完成
+                                    {% else %}
+                                        已结束
+                                    {% endif %}
+                                </a>
+                                </li>
+                                <li>
+                                    {% if e.status == '1' %}
+                                        <span style="float: left; margin-top: 10px; margin-left: 5px; font-size: 20px; font-weight: bolder">{{ e.total_score }}分
+                                            {% if e.pass0 == 0 %}
+                                                <span style="color: red">不及格</span>
+                                            {% elif e.pass0 == 1 %}
+                                                <span style="color: green">及格</span>
+                                            {% endif %}
+                                    </span>
+                                        <a href="{% url 'score_detail' %}?id0={{ e.exam.id }}">
+                                            <button style="float: right; margin-top: 10px"
+                                                    class="btn btn-primary exam_btn">
+                                                查看
+                                            </button>
+                                        </a>
+                                    {% else %}
+                                    {% endif %}
+                                </li>
+                            </ul>
+                        </div>
+                        <!-- /.box-body -->
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h2 style="padding-left: 20px">暂无考试记录</h2>
+            {% endif %}
+        </div>
+
+        <!-- Modal -->
+    </section>
+
+{% endblock %}
+{% block javascripts %}
+    <script src="{% static 'plugins/combo-select/jquery.combo.select.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap-datetimepicker.js' %}"></script>
+    <script src="{% static 'js/plugins/layer/layer.js' %}"></script>
+    <script src="{% static 'plugins/ajaxfileupload/ajaxfile-upload.js' %}"></script>
+    <script src="{% static 'plugins/fileinput/fileinput.js' %}"></script>
+    <script src="{% static 'plugins/fileinput/zh.js' %}"></script>
+
+    <script type="text/javascript">
+        $(function () {
+            $('#EXAM').addClass('active');
+            $('#EXAM-SHOW-LIST').addClass('active');
+
+        });
+
+        function exam_start(id) {
+            con = confirm("考试开始后不可中断，请确保有充足的时间，并在网络较好的环境下答题");
+            if (con) {
+                $(".exam_btn").attr('disabled', 'disabled');
+                $.ajax({
+                    url: '{% url "exam_show_list" %}',
+                    type: 'post',
+                    data: {'id0': id},
+                    success: function (ret) {
+                        if (ret.code == '0') {
+                            window.location.href = "{% url 'exam_start' %}?id0=" + ret.exam_id
+                        } else {
+                            alert(ret.error)
+                        }
+                    }
+                })
+            }
+        }
+
+        function time_out_exam(exam_id) {
+            $.ajax({
+                url: '{% url "exam_ajax" %}?id0=' + exam_id,
+                type: 'get',
+                success: function () {
+                    window.location.href = '/personal/exam/score_detail/?id0=' + exam_id
+                }
+            });
+        }
+    </script>
+
+{% endblock %}

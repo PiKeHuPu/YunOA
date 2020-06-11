@@ -1,0 +1,243 @@
+{% extends 'base-layer.html' %}
+{% load staticfiles %}
+
+{% block css %}
+    <link rel="stylesheet" href="{% static 'js/plugins/layer/skin/layer.css' %}">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap-datetimepicker.min.css' %}">
+{% endblock %}
+
+{% block main %}
+    <div class="box box-danger">
+        <form class="form-horizontal" id="addForm" method="post">
+            {% csrf_token %}
+            <div class="box-body">
+                <fieldset>
+                    <legend>
+                        <h4>创建考试</h4>
+                    </legend>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">考试名称</label>
+                        <div class="col-sm-4">
+                            <input class="form-control" name="title" type="text" id="title" autocomplete="off"/>
+                        </div>
+                        <label class="col-sm-2 control-label">考试时长</label>
+                        <div class="col-sm-2">
+                            <input class="form-control" name="duration" type="number" id="duration" autocomplete="off"/>
+                        </div>
+                        <div class="col-sm-2">
+                            <span>分钟</span>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">考试类型</label>
+                        <div class="col-sm-10">
+                            {% for type in types %}
+                                <label class="control-label">
+                                    <input type="checkbox" class="types" name="types" value="{{ type.id }}">
+                                    {{ type.name }}
+                                </label>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <div class="col-sm-2 control-label">
+                            <span>考试部门</span>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="control-label">可选部门:</label>
+                            <select name="from" id="multiselect" class="form-control" size="18" multiple="multiple">
+                                {% for dep in departments %}
+                                    <option value="{{ dep.id }}">{{ dep.title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-sm-2">
+                            <br><br><br><br><br><br>
+                            <button type="button" id="multiselect_rightAll" class="btn btn-block"><i
+                                    class="glyphicon glyphicon-forward"></i></button>
+                            <button type="button" id="multiselect_rightSelected" class="btn btn-block"><i
+                                    class="glyphicon glyphicon-chevron-right"></i></button>
+                            <button type="button" id="multiselect_leftSelected" class="btn btn-block"><i
+                                    class="glyphicon glyphicon-chevron-left"></i></button>
+                            <button type="button" id="multiselect_leftAll" class="btn btn-block"><i
+                                    class="glyphicon glyphicon-backward"></i></button>
+                        </div>
+                        <div class="col-sm-4">
+                            <label class="control-label">已选择部门:</label>
+                            <select name="to" id="multiselect_to" class="form-control" size="18" multiple="multiple">
+                                {% for item in added_users %}
+                                    <option value="{{ item.id }}">{{ item.name }}({{ item.username }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">开始日期</label>
+                        <div class="col-sm-4">
+                            <input class="form-control timepick" name="start_time" type="text" id="start_time"
+                                   autocomplete="off"/>
+                        </div>
+                        <label class="col-sm-2 control-label">截止日期</label>
+                        <div class="col-sm-4">
+                            <input class="form-control timepick" name="end_time" type="text" id="end_time"
+                                   autocomplete="off"/>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">单选题数量</label>
+                        <div class="col-sm-4">
+                            <input class="form-control" name="one_num" type="number" id="one_num" autocomplete="off" oninput="cal_score()"/>
+                        </div>
+                        <label class="col-sm-2 control-label">单选题分数</label>
+                        <div class="col-sm-4">
+                            <input class="form-control" name="one_score" type="number" id="one_score"
+                                   autocomplete="off" oninput="cal_score()"/>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">多选题数量</label>
+                        <div class="col-sm-4">
+                            <input class="form-control" name="muti_num" type="number" id="muti_num" autocomplete="off" oninput="cal_score()"/>
+                        </div>
+                        <label class="col-sm-2 control-label">多选题分数</label>
+                        <div class="col-sm-4">
+                            <input class="form-control" name="muti_score" type="number" id="muti_score"
+                                   autocomplete="off" oninput="cal_score()"/>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">判断题数量</label>
+                        <div class="col-sm-4">
+                            <input class="form-control" name="TorF_num" type="number" id="TorF_num" autocomplete="off" oninput="cal_score()"/>
+                        </div>
+                        <label class="col-sm-2 control-label">判断题分数</label>
+                        <div class="col-sm-4">
+                            <input class="form-control" name="TorF_score" type="number" id="TorF_score"
+                                   autocomplete="off" oninput="cal_score()"/>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">总分</label>
+                        <div class="col-sm-4">
+                            <input class="form-control" name="total_score" type="number" id="total_score"
+                                   autocomplete="off" readonly value="0"/>
+                        </div>
+                        <label class="col-sm-2 control-label">及格分数</label>
+                        <div class="col-sm-4">
+                            <input class="form-control" name="pass_score" type="number" id="pass_score"
+                                   autocomplete="off"/>
+                        </div>
+                    </div>
+                    <div class="form-group has-feedback">
+                        <div class="col-sm-offset-5">
+                            <button type="button" onclick="CreateType()" class="btn btn-info margin-right">新增</button>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'plugins/combo-select/jquery.combo.select.js' %}"></script>
+    <script src="{% static 'plugins/select/multiselect.min.js' %}"></script>
+    <script src="/static/bootstrap/js/bootstrap-datetimepicker.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            //初始化多选列表
+            $('#multiselect').multiselect({
+                search: {
+                    left: '<input type="text" class="form-control" placeholder="Search..." />',
+                    right: '<input type="text" class="form-control" placeholder="Search..." />',
+                },
+                fireSearch: function (value) {
+                    return value.length > 1;
+                }
+            });
+
+            $(".timepick").datetimepicker({
+                format: 'yyyy-mm-dd',
+                language: 'zh',
+                autoclose: 1,
+                forceParse: 0,
+                minView: 2,
+            });
+        });
+
+        /*点取消刷新新页面*/
+        $("#btnCancel").click(function () {
+            window.location.reload();
+
+        });
+
+        function CreateType() {
+            $('#multiselect_to option').prop('selected', true);
+            var data = $("#addForm").serialize();
+            if ($('#title').val() == "") {
+                alert("考试名称不能为空")
+            } else if ($('#duration').val() == "") {
+                alert("考试时长不能为空")
+            } else if ($('#start_time').val() == "") {
+                alert("开始日期不能为空")
+            } else if ($('#end_time').val() == "") {
+                alert("截止日期不能为空")
+            }else if($("#start_time").val()>$("#end_time").val()){
+                alert('开始日期不能晚于截止日期')
+            }else if ($('#pass_score').val() == "") {
+                alert("及格分数不能为空")
+            }else {
+                $.ajax({
+                    type: 'post',
+                    url: "{% url 'exam_create' %}",
+                    data: data,
+                    cache: false,
+                    success: function (msg) {
+                        if (msg.code == '0') {
+                            layer.alert('考试创建成功！', {icon: 1}, function (index) {
+                                parent.location.reload();
+                            });
+                        } else {
+                            layer.alert(msg.error, {icon: 5});
+                        }
+                    }
+                });
+            }
+        }
+
+        function TypeTitle(id) {
+            var tlid = 'tl' + id;
+            var title = $("#" + tlid).val();
+            $.ajax({
+                type: 'post',
+                url: "{% url 'exam_type' %}",
+                data: {"id": id, "title": title},
+                cache: false,
+                success: function (msg) {
+                    if (msg.code == '0') {
+                        layer.alert('数据保存成功！', {icon: 1}, function (index) {
+                            parent.location.reload();
+                        });
+                    } else {
+                        layer.alert(msg.error, {icon: 5});
+                    }
+                }
+            });
+        }
+
+
+        function cal_score() {
+            var one_num = $('#one_num').val();
+            var one_score = $('#one_score').val();
+            var muti_num = $('#muti_num').val();
+            var muti_score = $('#muti_score').val();
+            var TorF_num = $('#TorF_num').val();
+            var TorF_score = $('#TorF_score').val();
+            var total_score = one_num * one_score + muti_num * muti_score + TorF_num * TorF_score;
+            $('#total_score').val(total_score);
+        }
+
+    </script>
+
+{% endblock %}

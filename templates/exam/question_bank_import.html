@@ -1,0 +1,95 @@
+{% extends 'base-layer.html' %}
+{% load staticfiles %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugins/fileinput/fileinput.css' %}">
+{% endblock %}
+
+{% block main %}
+    <div class="box box-danger">
+        <form id="addForm" method="post">
+            {% csrf_token %}
+            <div class="box-body">
+                <legend>
+                    <h4>题库导入</h4>
+                </legend>
+                <label class="col-sm-2" for="que_type">题型：</label>
+                <div class="col-sm-4">
+                    <select name="que_type" id="que_type" class="form-control col-sm-4">
+                        <option value="0">单选题</option>
+                        <option value="1">多选题</option>
+                        <option value="2">判断题</option>
+                    </select>
+                </div>
+                <label class="col-sm-2" for="que_class">类型：</label>
+                <div class="col-sm-4">
+                    <select name="que_class" id="que_class" class="form-control col-sm-4">
+                        {% for type in types %}
+                            <option value="{{ type.id }}">{{ type.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <br><br>
+                <label class="col-sm-2" for="que_class">导入: </label>
+                <div class="col-sm-4">
+                    <div class="file-loading">
+                        <input type="file" name="que_import" id="que_import">
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <small class="text-red">只支持上传Excel文件，文件大小不超过20M</small>
+                </div>
+            </div>
+            <div class="box-footer">
+                <div class="row span7 text-center ">
+                    <button type="button" id="btnSave" class="btn btn-info margin-right ">保存</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'plugins/fileinput/fileinput.js' %}"></script>
+    <script src="{% static 'plugins/fileinput/zh.js' %}"></script>
+    <script type="text/javascript">
+        $("#que_import").fileinput({
+            language: "zh",
+            showUpload: false,
+            allowedFileExtensions: ["xls", "xlsx"],
+            uploadUrl: "{% url 'question_bank_import' %}",
+            uploadExtraData: function () {
+                var para = {
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'que_type': $("#que_type").val(),
+                    'que_class': $("#que_class").val(),
+                };
+                return para;
+            },
+            dropZoneEnabled: false,
+            showPreview: false,
+            maxFileSize: 20480,
+        });
+
+        $("#btnSave").click(function () {
+            $("#btnSave").attr("disabled", "disabled");
+            if ($("#que_import").val()) {
+                $("#que_import").fileinput("upload");
+                $("#que_import").on("fileuploaded", function (event, data, previewId, index) {
+                    console.log(data);
+                    parent.layer.closeAll(); //关闭所有弹窗
+                });
+            } else {
+                alert("没有上传文件");
+                $("#btnSave").attr("disabled", false);
+            }
+        });
+
+
+        /*点取消刷新新页面*/
+        $("#btnCancel").click(function () {
+            window.location.reload();
+        });
+    </script>
+
+{% endblock %}

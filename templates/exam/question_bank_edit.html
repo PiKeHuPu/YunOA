@@ -1,0 +1,172 @@
+{% extends 'base-layer.html' %}
+{% load staticfiles %}
+{% block css %}
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+    <!-- iCheck for checkboxes and radio inputs -->
+{% endblock %}
+{% block main %}
+    <div class="box box-danger">
+        <form class="form-horizontal" id="addForm" method="post">
+            {% csrf_token %}
+            <input type="hidden" name='type0' id="type0" value="{{ type }}"/>
+            <input type="hidden" name='id0' id="id0" value="{{ data.id }}"/>
+            <div class="box-body">
+                <fieldset>
+                    <legend>
+                        <h4>题目编辑</h4>
+                    </legend>
+                    <div class="form-group has-feedback">
+                        <label class="col-sm-2 control-label">题干</label>
+                        <div class="col-sm-9">
+                            <textarea name="question" id="question" rows="5"
+                                      style="width: 100%">{{ data.question }}</textarea>
+                        </div>
+                    </div>
+                    {% if type == 'o' or type == 'm' %}
+                        <div class="form-group has-feedback">
+                            <label class="col-sm-2 control-label">选项A</label>
+                            <div class="col-sm-9">
+                            <textarea name="A" id="A" rows="3"
+                                      style="width: 100%">{{ data.A }}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <label class="col-sm-2 control-label">选项B</label>
+                            <div class="col-sm-9">
+                            <textarea name="B" id="B" rows="3"
+                                      style="width: 100%">{{ data.B }}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <label class="col-sm-2 control-label">选项C</label>
+                            <div class="col-sm-9">
+                            <textarea name="C" id="C" rows="3"
+                                      style="width: 100%">{{ data.C }}</textarea>
+                            </div>
+                        </div>
+                        <div class="form-group has-feedback">
+                            <label class="col-sm-2 control-label">选项D</label>
+                            <div class="col-sm-9">
+                            <textarea name="D" id="D" rows="3"
+                                      style="width: 100%">{{ data.D }}</textarea>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div class="form-group has-feedback">
+                        {% if type == 'o' or type == 't' %}
+                            <label class="col-sm-2 control-label">
+                                {% if type == 'o' %}
+                                    答案
+                                {% elif type == 't' %}
+                                    答案(1为对，0为错)
+                                {% endif %}
+                            </label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control" value="{{ data.answer }}" id="answer"
+                                       name="answer">
+                            </div>
+                        {% else %}
+                            <label class="col-sm-2 control-label">答案</label>
+                            <div class="col-sm-2">
+                                <input type="text" class="form-control" value="{{ answer }}" id="answer"
+                                       name="answer">
+                            </div>
+                        {% endif %}
+                        <label class="col-sm-2 control-label">类型</label>
+                        <div class="col-sm-4">
+                            <select name="question_class" id="question_class" class="form-control">
+                                {% for t in type_list %}
+                                    <option value="{{ t.id }}">{{ t.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="box-footer ">
+                <div class="row span7 text-center ">
+                    <button type="button" id="btnCancel" class="btn btn-default margin-right ">重置</button>
+                    <button type="button" id="btnSave" class="btn btn-info margin-right ">保存</button>
+                </div>
+            </div>
+
+        </form>
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="{% static 'plugins/select2/select2.full.min.js' %}"></script>
+    <script type="text/javascript">
+
+        $("#btnSave").click(function () {
+            var k = '0';
+            var type0 = $('#type0').val();
+            var question = $("#question").val();
+            var answer = $("#answer").val();
+            if (!question) {
+                alert('题干内容不能为空');
+                k = '1'
+            }
+            if (type0 == 'o' || type0 == 'm') {
+                var A = $("#A").val();
+                if (!A) {
+                    alert('选项A内容不能为空');
+                    k = '1'
+                }
+                var B = $("#B").val();
+                if (!B) {
+                    alert('选项B内容不能为空');
+                    k = '1'
+                }
+                var C = $("#C").val();
+                if (!C) {
+                    alert('选项C内容不能为空');
+                    k = '1'
+                }
+                var D = $("#D").val();
+                if (!D) {
+                    alert('选项D内容不能为空');
+                    k = '1'
+                }
+            }
+            if (!answer) {
+                alert('答案内容不能为空');
+                k = '1'
+            }
+            if (k == '0') {
+                var data = $("#addForm").serialize();
+                $.ajax({
+                    type: $("#addForm").attr('method'),
+                    url: "{% url 'question_bank_edit' %}",
+                    data: data,
+                    cache: false,
+                    success: function (msg) {
+                        if (msg.code == '0') {
+                            layer.alert('数据保存成功！', {icon: 1}, function (index) {
+                                parent.layer.closeAll(); //关闭所有弹窗
+                            });
+                        } else {
+                            layer.alert(msg.error, {icon: 5});
+                            //$('errorMessage').html(msg.message)
+                        }
+                    }
+                });
+            }
+        });
+
+
+        /*点取消刷新新页面*/
+        $("#btnCancel").click(function () {
+            window.location.reload();
+
+        });
+
+        $(function () {
+            //Initialize Select2 Elements
+            $(".select2").select2();
+        });
+
+    </script>
+
+{% endblock %}

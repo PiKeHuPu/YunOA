@@ -23,6 +23,8 @@ from django.views.static import serve
 from assess.views import AssessDep, AssessDetail, CreateGoal, CreatePerGoal, EditSchedule, AssessScore0, YearMonth, \
     PositionStatementList, PositionStatementCreate, PositionStatementAjax, AssessGather, AssessGatherList, \
     PositionStatementShowList
+from exam.views import ExamQuestionBank, ExamQuestionBankImport, ExamList, ExamTypeManage, ExamCreate, ExamQuestionEdit, \
+    ExamQuestionDelete, ExamDetail, ExamShowList, ExamStart, ExamAjax, ExamScoreDetail, ExamScoreReport, ExamHistory
 from gistandard.settings import MEDIA_ROOT
 
 import xadmin
@@ -205,4 +207,19 @@ urlpatterns = [
     url(r'^personal/work/work_record_tem_create/', WorkRecordCreate.as_view(), name="work_record_tem_create"),
     url(r'^personal/work/work_record_ajax/', WorkRecordAjax.as_view(), name="work_record_ajax"),
     url(r'^personal/work/work_record_history/', WorkRecordHistory.as_view(), name="work_record_history"),
+    # 考试系统
+    url(r'^system/exam/question_bank/', ExamQuestionBank.as_view(), name="question_bank"),
+    url(r'^system/exam/question_bank_import/', ExamQuestionBankImport.as_view(), name="question_bank_import"),
+    url(r'^system/exam/question_bank_edit/', ExamQuestionEdit.as_view(), name="question_bank_edit"),
+    url(r'^system/exam/question_delete/', ExamQuestionDelete.as_view(), name="question_delete"),
+    url(r'^system/exam/type_manage/', ExamTypeManage.as_view(), name="exam_type"),
+    url(r'^system/exam/list/', ExamList.as_view(), name="exam_list"),
+    url(r'^system/exam/create/', ExamCreate.as_view(), name="exam_create"),
+    url(r'^system/exam/detail/', ExamDetail.as_view(), name="exam_detail"),
+    url(r'^system/exam/score_report/', ExamScoreReport.as_view(), name="score_report"),
+    url(r'^personal/exam/list/', ExamShowList.as_view(), name="exam_show_list"),
+    url(r'^personal/exam/history/list/', ExamHistory.as_view(), name="exam_history_list"),
+    url(r'^personal/exam/start/', ExamStart.as_view(), name="exam_start"),
+    url(r'^personal/exam/ajax/', ExamAjax.as_view(), name="exam_ajax"),
+    url(r'^personal/exam/score_detail/', ExamScoreDetail.as_view(), name="score_detail"),
 ]

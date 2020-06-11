@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'apps.oilWear.apps.OilwearConfig',
     'apps.assess.apps.AssessConfig',
     'apps.worklog.apps.WorklogConfig',
+    'apps.exam.apps.ExamConfig',
     'xadmin',
     'crispy_forms',
 

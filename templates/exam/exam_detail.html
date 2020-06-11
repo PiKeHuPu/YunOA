@@ -1,0 +1,133 @@
+{% load staticfiles %}
+
+<!doctype html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/plugins/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/static/dist/css/AdminLTE.min.css">
+    <link rel="stylesheet" href="/static/dist/css/myself.css">
+    <link rel="stylesheet" href="/static/dist/css/skins/skin-green-light.min.css">
+    <link rel="stylesheet" href="/static/js/plugins/layer/skin/layer.css">
+    <link rel="stylesheet" href="/static/plugins/bootstrap-treeview/bootstrap-treeview.css">
+    <style>
+        #sco::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<section class="content">
+    <div class="col-md-offset-1 col-md-10">
+        <div class="box box-primary">
+            <div class="box-header with-border">
+                <h3 class="box-title">考试详情</h3>
+                <div class="box-tools">
+                    <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                            class="fa fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="box-body no-padding">
+                <div class="table-responsive mailbox-messages">
+                    <table class="table" id="tbWorkList" style="table-layout: fixed;">
+                        <tbody>
+                        <tr>
+                            <td><strong> ID: </strong></td>
+                            <td>{{ exam.id }}</td>
+                        </tr>
+
+                        <tr class="info">
+                            <td><strong> 考试名称: </strong></td>
+                            <td>{{ exam.name }}</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong> 考试时长: </strong></td>
+                            <td>{{ exam.duration }}分钟</td>
+                        </tr>
+
+                        <tr class="info">
+                            <td><strong> 考试类型: </strong></td>
+                            <td>{{ exam_type }}</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong> 考试部门: </strong></td>
+                            <td>{{ exam_dep }}</td>
+                        </tr>
+
+                        <tr class="info">
+                            <td><strong> 开始日期: </strong></td>
+                            <td>{{ exam.start_time }}</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong> 截止日期: </strong></td>
+                            <td>{{ exam.end_time }}</td>
+                        </tr>
+
+                        <tr class="info">
+                            <td><strong> 单选题数量(分数): </strong></td>
+                            <td>{{ exam.one_num }}({{ exam.one_score }})</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong> 多选题数量(分数): </strong></td>
+                            <td>{{ exam.muti_num }}({{ exam.muti_score }})</td>
+                        </tr>
+
+                        <tr class="info">
+                            <td><strong> 判断题数量(分数): </strong></td>
+                            <td>{{ exam.TorF_num }}({{ exam.TorF_score }})</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong> 总分: </strong></td>
+                            <td>{{ exam.total_score }}</td>
+                        </tr>
+
+                        <tr class="info">
+                            <td><strong> 及格分数: </strong></td>
+                            <td>{{ exam.pass_score }}</td>
+                        </tr>
+
+                        <tr>
+                            <td><strong> 创建人: </strong></td>
+                            <td>{{ exam.create_user }}</td>
+                        </tr>
+
+                        <tr class="info">
+                            <td><strong> 创建时间: </strong></td>
+                            <td>{{ exam.create_time }}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="box-footer ">
+
+                </div>
+
+            </div>
+            <!-- /.box-body -->
+        </div>
+    </div>
+    <div class="col-md-12" style="text-align: center">
+        <button type="button" class="btn btn-info" onclick="close_layer()">关闭</button>
+    </div>
+    <!-- /.row -->
+</section>
+</body>
+<script>
+    function close_layer() {
+        var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+        parent.layer.close(index); //再执行关闭
+    }
+</script>
+</html>

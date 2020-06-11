@@ -1,0 +1,471 @@
+﻿{% load static %}
+
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <title>{{ exam.name }}</title>
+    <link href="{% static 'exam/main.css' %}" rel="stylesheet" type="text/css"/>
+    <link href="{% static 'exam/iconfont.css' %}" rel="stylesheet" type="text/css"/>
+    <link href="{% static 'exam/test.css' %}" rel="stylesheet" type="text/css"/>
+
+    <style>
+        .hasBeenAnswer {
+            background: #5d9cec;
+            color: #fff;
+        }
+
+    </style>
+</head>
+
+<body>
+<div class="main">
+    <!--nr start-->
+    <div class="test_main">
+        <div class="nr_left">
+            <div class="test">
+                <form action="" method="post">
+                    <div class="test_title">
+                        <p class="test_time">
+                            <i class="icon iconfont">&#xe6fb;</i><b class="alt-1">{{ duration }}</b>
+                        </p>
+                        <font><input type="button" name="test_jiaojuan" id="test_jiaojuan" value="交卷"
+                                     onclick="exam_submit({{ exam.id }})"></font>
+                    </div>
+                    {% if one_choose_list %}
+                        <div class="test_content">
+                            <div class="test_content_title">
+                                <h2>单选题</h2>
+                                <p>
+                                    <span>共</span><i
+                                        class="content_lit">{{ exam.one_num }}</i><span>题，</span><span>合计</span><i
+                                        class="content_fs">{{ one_choose_total_score }}</i><span>分</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="test_content_nr">
+                            <ul>
+                                {% for one_choose in one_choose_list %}
+                                    <li id="qu_0_{{ one_choose.num }}">
+                                        <div class="test_content_nr_tt">
+                                            <i>{{ one_choose.num }}</i><span>({{ exam.one_score }}分)</span><font>{{ one_choose.one_choose.question }}</font><b
+                                                class="icon iconfont">&#xe881;</b>
+                                        </div>
+
+                                        <div class="test_content_nr_main">
+                                            <ul>
+
+                                                <li class="option">
+
+                                                    <input type="radio" class="radioOrCheck"
+                                                           name="answer{{ one_choose.num }}_0"
+                                                           id="0_answer_{{ one_choose.num }}_option_1"
+                                                           onchange="answer_change('0', {{ one_choose.num }}, '1')"
+                                                            {% if one_choose.user_answer == 'A' %}
+                                                           checked
+                                                            {% endif %}/>
+
+
+                                                    <label for="0_answer_{{ one_choose.num }}_option_1">
+                                                        A.
+                                                        <p class="ue"
+                                                           style="display: inline;">{{ one_choose.one_choose.A }}</p>
+                                                    </label>
+                                                </li>
+
+                                                <li class="option">
+
+                                                    <input type="radio" class="radioOrCheck"
+                                                           name="answer{{ one_choose.num }}_0"
+                                                           id="0_answer_{{ one_choose.num }}_option_2"
+                                                           onchange="answer_change('0', {{ one_choose.num }}, '2')"
+                                                            {% if one_choose.user_answer == 'B' %}
+                                                           checked
+                                                            {% endif %} />
+
+
+                                                    <label for="0_answer_{{ one_choose.num }}_option_2">
+                                                        B.
+                                                        <p class="ue"
+                                                           style="display: inline;">{{ one_choose.one_choose.B }}</p>
+                                                    </label>
+                                                </li>
+
+                                                <li class="option">
+
+                                                    <input type="radio" class="radioOrCheck"
+                                                           name="answer{{ one_choose.num }}_0"
+                                                           id="0_answer_{{ one_choose.num }}_option_3"
+                                                           onchange="answer_change('0', {{ one_choose.num }}, '3')"
+                                                            {% if one_choose.user_answer == 'C' %}
+                                                           checked
+                                                            {% endif %}/>
+
+
+                                                    <label for="0_answer_{{ one_choose.num }}_option_3">
+                                                        C.
+                                                        <p class="ue"
+                                                           style="display: inline;">{{ one_choose.one_choose.C }}</p>
+                                                    </label>
+                                                </li>
+
+                                                <li class="option">
+
+                                                    <input type="radio" class="radioOrCheck"
+                                                           name="answer{{ one_choose.num }}_0"
+                                                           id="0_answer_{{ one_choose.num }}_option_4"
+                                                           onchange="answer_change('0', {{ one_choose.num }}, '4')"
+                                                            {% if one_choose.user_answer == 'D' %}
+                                                           checked
+                                                            {% endif %}/>
+
+
+                                                    <label for="0_answer_{{ one_choose.num }}_option_4">
+                                                        D.
+                                                        <p class="ue"
+                                                           style="display: inline;">{{ one_choose.one_choose.D }}</p>
+                                                    </label>
+                                                </li>
+
+                                            </ul>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    {% if muti_choose_list %}
+                        <div class="test_content">
+                            <div class="test_content_title">
+                                <h2>多选题</h2>
+                                <p>
+                                    <span>共</span><i
+                                        class="content_lit">{{ exam.muti_num }}</i><span>题，</span><span>合计</span><i
+                                        class="content_fs">{{ muti_choose_total_score }}</i><span>分</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="test_content_nr">
+                            <ul>
+                                {% for muti_choose in muti_choose_list %}
+                                    <li id="qu_1_{{ muti_choose.num }}">
+                                        <div class="test_content_nr_tt">
+                                            <i>{{ muti_choose.num }}</i><span>({{ exam.muti_score }}分)</span><font>{{ muti_choose.muti_choose.question }}</font><b
+                                                class="icon iconfont">&#xe881;</b>
+                                        </div>
+
+                                        <div class="test_content_nr_main">
+                                            <ul>
+
+                                                <li class="option">
+
+
+                                                    <input type="checkbox" class="radioOrCheck"
+                                                           name="answer{{ muti_choose.num }}"
+                                                           id="1_answer_{{ muti_choose.num }}_option_1"
+                                                           onchange="answer_change('1', {{ muti_choose.num }}, '1')"
+                                                            {% if 'A' in muti_choose.user_answer %}
+                                                           checked
+                                                            {% endif %}
+                                                    />
+
+                                                    <label for="1_answer_{{ muti_choose.num }}_option_1">
+                                                        A.
+                                                        <p class="ue"
+                                                           style="display: inline;">{{ muti_choose.muti_choose.A }}</p>
+                                                    </label>
+                                                </li>
+
+                                                <li class="option">
+
+
+                                                    <input type="checkbox" class="radioOrCheck"
+                                                           name="answer{{ muti_choose.num }}"
+                                                           id="1_answer_{{ muti_choose.num }}_option_2"
+                                                           onchange="answer_change('1', {{ muti_choose.num }}, '2')"
+                                                            {% if 'B' in muti_choose.user_answer %}
+                                                           checked
+                                                            {% endif %}
+                                                    />
+
+                                                    <label for="1_answer_{{ muti_choose.num }}_option_2">
+                                                        B.
+                                                        <p class="ue"
+                                                           style="display: inline;">{{ muti_choose.muti_choose.B }}</p>
+                                                    </label>
+                                                </li>
+
+                                                <li class="option">
+
+
+                                                    <input type="checkbox" class="radioOrCheck"
+                                                           name="answer{{ muti_choose.num }}"
+                                                           id="1_answer_{{ muti_choose.num }}_option_3"
+                                                            {% if 'C' in muti_choose.user_answer %}
+                                                           checked
+                                                            {% endif %}
+                                                           onchange="answer_change('1', {{ muti_choose.num }}, '3')"
+                                                    />
+
+                                                    <label for="1_answer_{{ muti_choose.num }}_option_3">
+                                                        C.
+                                                        <p class="ue"
+                                                           style="display: inline;">{{ muti_choose.muti_choose.C }}</p>
+                                                    </label>
+                                                </li>
+
+                                                <li class="option">
+
+
+                                                    <input type="checkbox" class="radioOrCheck"
+                                                           name="answer{{ muti_choose.num }}"
+                                                           id="1_answer_{{ muti_choose.num }}_option_4"
+                                                           onchange="answer_change('1', {{ muti_choose.num }}, '4')"
+                                                            {% if 'D' in muti_choose.user_answer %}
+                                                           checked
+                                                            {% endif %}
+                                                    />
+
+                                                    <label for="1_answer_{{ muti_choose.num }}_option_4">
+                                                        D.
+                                                        <p class="ue"
+                                                           style="display: inline;">{{ muti_choose.muti_choose.D }}</p>
+                                                    </label>
+                                                </li>
+
+                                            </ul>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    {% if TorF_choose_list %}
+                        <div class="test_content">
+                            <div class="test_content_title">
+                                <h2>判断题</h2>
+                                <p>
+                                    <span>共</span><i
+                                        class="content_lit">{{ exam.TorF_num }}</i><span>题，</span><span>合计</span><i
+                                        class="content_fs">{{ TorF_choose_total_score }}</i><span>分</span>
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="test_content_nr">
+                            <ul>
+                                {% for TorF_choose in TorF_choose_list %}
+                                    <li id="qu_2_{{ TorF_choose.num }}">
+                                        <div class="test_content_nr_tt">
+                                            <i>{{ TorF_choose.num }}</i><span>({{ exam.TorF_score }}分)</span><font>{{ TorF_choose.TorF_choose.question }}</font><b
+                                                class="icon iconfont">&#xe881;</b>
+                                        </div>
+
+                                        <div class="test_content_nr_main">
+                                            <ul>
+
+                                                <li class="option">
+
+                                                    <input type="radio" class="radioOrCheck"
+                                                           name="answer{{ TorF_choose.num }}"
+                                                           id="2_answer_{{ TorF_choose.num }}_option_1"
+                                                           onchange="answer_change('2', {{ TorF_choose.num }}, '1')"
+                                                            {% if TorF_choose.user_answer == '1' %}
+                                                           checked
+                                                            {% endif %}
+                                                    />
+
+                                                    <label for="2_answer_{{ TorF_choose.num }}_option_1">
+                                                        <p class="ue"
+                                                           style="display: inline;">对</p>
+                                                    </label>
+                                                </li>
+
+                                                <li class="option">
+
+                                                    <input type="radio" class="radioOrCheck"
+                                                           name="answer{{ TorF_choose.num }}"
+                                                           id="2_answer_{{ TorF_choose.num }}_option_2"
+                                                           onchange="answer_change('2', {{ TorF_choose.num }}, '0')"
+                                                            {% if TorF_choose.user_answer == '0' %}
+                                                           checked
+                                                            {% endif %}
+                                                    />
+
+
+                                                    <label for="2_answer_{{ TorF_choose.num }}_option_2">
+                                                        <p class="ue"
+                                                           style="display: inline;">错</p>
+                                                    </label>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </form>
+            </div>
+
+        </div>
+        <div class="nr_right">
+            <div class="nr_rt_main">
+                <div class="rt_nr1">
+                    <div class="rt_nr1_title">
+                        <h1>
+                            <i class="icon iconfont">&#xe692;</i>答题卡
+                        </h1>
+                        <p class="test_time">
+                            <i class="icon iconfont">&#xe6fb;</i><b class="alt-10" id="alt-10">{{ duration }}</b>
+                        </p>
+                    </div>
+
+                    {% if one_choose_list %}
+                        <div class="rt_content">
+                            <div class="rt_content_tt">
+                                <h2>单选题</h2>
+                                <p>
+                                    <span>共</span><i class="content_lit">{{ exam.one_num }}</i><span>题</span>
+                                </p>
+                            </div>
+                            <div class="rt_content_nr answerSheet">
+                                <ul>
+                                    {% for one_choose in one_choose_list %}
+                                        <li><a href="#qu_0_{{ one_choose.num }}"
+                                                {% if one_choose.user_answer and one_choose.user_answer != '' %}
+                                               class="hasBeenAnswer"
+                                                {% endif %}
+                                        >{{ one_choose.num }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if muti_choose_list %}
+                        <div class="rt_content">
+                            <div class="rt_content_tt">
+                                <h2>多选题</h2>
+                                <p>
+                                    <span>共</span><i class="content_lit">{{ exam.muti_num }}</i><span>题</span>
+                                </p>
+                            </div>
+                            <div class="rt_content_nr answerSheet">
+                                <ul>
+                                    {% for muti_choose in muti_choose_list %}
+                                        <li><a href="#qu_1_{{ muti_choose.num }}"
+                                                {% if muti_choose.user_answer and one_choose.user_answer != '' %}
+                                               class="hasBeenAnswer"
+                                                {% endif %}>{{ muti_choose.num }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    {% if TorF_choose_list %}
+                        <div class="rt_content">
+                            <div class="rt_content_tt">
+                                <h2>判断题</h2>
+                                <p>
+                                    <span>共</span><i class="content_lit">{{ exam.TorF_num }}</i><span>题</span>
+                                </p>
+                            </div>
+                            <div class="rt_content_nr answerSheet">
+                                <ul>
+                                    {% for TorF_choose in TorF_choose_list %}
+                                        <li><a href="#qu_2_{{ TorF_choose.num }}"
+                                                {% if TorF_choose.user_answer and TorF_choose.user_answer != '' %}
+                                               class="hasBeenAnswer"
+                                                {% endif %}>{{ TorF_choose.num }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <!--nr end-->
+    <div class="foot"></div>
+</div>
+
+<script src="{% static 'exam/jquery-1.11.3.min.js' %}"></script>
+<script src="{% static 'exam/jquery.easy-pie-chart.js' %}"></script>
+<!--时间js-->
+<script src="{% static 'exam/time/jquery.countdown.js' %}"></script>
+<script>
+    window.jQuery(function ($) {
+        "use strict";
+        $('.alt-10').countDown();
+
+        $('.alt-1').countDown().on('time.elapsed', function () {
+            $('#test_jiaojuan').val('提交中..');
+            $('#test_jiaojuan').attr('disabled', 'disabled');
+            $.ajax({
+                url: '{% url "exam_ajax" %}?id0={{ exam.id }}',
+                type: 'get',
+                success: function () {
+                    alert("时间到，已自动交卷");
+                    window.location.href = '/personal/exam/list/'
+                }
+            });
+        });
+    });
+
+
+    $(function () {
+        $('li.option').click(function () {
+            debugger;
+            var examId = $(this).closest('.test_content_nr_main').closest('li').attr('id'); // 得到题目ID
+            var cardLi = $('a[href=#' + examId + ']'); // 根据题目ID找到对应答题卡
+            // 设置已答题
+            if (!cardLi.hasClass('hasBeenAnswer')) {
+                cardLi.addClass('hasBeenAnswer');
+            }
+
+        });
+
+        window.setInterval(function () {
+            $.ajax({
+                url: '{% url "exam_start" %}',
+                type: 'post',
+                data: {'status': '1'}
+            })
+        }, 300000)
+    });
+
+    function answer_change(type, num, option) {
+        $.ajax({
+            url: '{% url "exam_start" %}',
+            type: 'post',
+            data: {'exam_id': {{ exam.id }}, 'type': type, 'num': num, 'option': option}
+        })
+    }
+
+    function exam_submit() {
+        con = confirm('确定交卷吗？');
+        if (con) {
+            $('#test_jiaojuan').val('提交中..');
+            $('#test_jiaojuan').attr('disabled', 'disabled');
+            $.ajax({
+                url: '{% url "exam_ajax" %}?id0={{ exam.id }}',
+                type: 'get',
+                success: function () {
+                    window.location.href = '/personal/exam/list/'
+                }
+            });
+        }
+    }
+
+</script>
+</body>
+
+</html>
