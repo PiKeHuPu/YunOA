@@ -2,7 +2,7 @@
 
 import os
 import sys
-
+#git 测试
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'apps.exam.apps.ExamConfig',
     'xadmin',
     'crispy_forms',
+    'django.contrib',
 
 ]
 
@@ -98,25 +99,44 @@ WSGI_APPLICATION = 'gistandard.wsgi.application'
 #     }
 # }
 # 本地模仿阿里云数据库
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'yun_oa',
-        'HOST': 'localhost',
-        'USER': 'root',
-        'PASSWORD': '123456',
-    }
-}
-
-
-# 正式服
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
 #         'NAME': 'yun_oa',
 #         'HOST': 'localhost',
 #         'USER': 'root',
-#         'PASSWORD': 'ygdl12345!@#$%',
+#         'PASSWORD': '123456',
+#     }
+# }
+
+
+# 正式服
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'yun_oa',
+        'HOST': 'localhost',
+        'USER': 'root',
+        'PASSWORD': 'ygdl12345!@#$%',
+    }
+}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'yun_oa',
+#         'HOST': '192.168.1.104',
+#         'USER': 'root',
+#         'PASSWORD': 'Ygkj123456.',
+#     }
+# }
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'yun_oa',
+#         'HOST': 'localhost',
+#         'USER': 'root',
+#         'PASSWORD': '123',
 #     }
 # }
 
